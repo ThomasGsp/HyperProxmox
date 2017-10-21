@@ -1,0 +1,17 @@
+{
+    "name": "panique/huge",
+    "type": "project",
+    "description": "A full-feature user authentication / login system embedded into a simple but powerful MVC framework structure",
+    "keywords": ["login", "auth", "user", "authentication", "mvc", "membership"],
+    "homepage": "https://github.com/panique/huge",
+    "license": "MIT",
+    "require-dev": {
+        "php": ">=5.5.0",
+        "phpmailer/phpmailer": "~5.2",
+        "gregwar/captcha": "~1.0.12",
+        "phpunit/phpunit": "~4.5"
+    },
+    "autoload": {
+        "psr-4": { "": ["application/core/", "application/model/"] }
+    }
+}

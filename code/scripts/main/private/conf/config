@@ -1,0 +1,36 @@
+[system]
+; System configurations
+user: hosting
+
+; If not exist on start, the key is auto-generate.
+key_pvt: private/keys/Ragnarok.pvt.key
+key_pub: private/keys/Ragnarok.pub.key
+
+[web]
+user: www-data
+
+[api]:
+user: hosting_api
+
+[databases]
+; Databases configurations
+; NOSQL databases, should use a password
+mongodb_user:
+mongodb_password:
+mongodb_ip: 192.168.66.1
+mongodb_port: 27017
+
+redis_user:
+redis_password:
+redis_ip: 192.168.66.1
+redis_port: 6379
+
+[options]
+; Maximum deploy instance in same time
+; A hight value my do overcharge on your physicals servers
+concurrencydeploy: 2
+
+; Delay between two deploy round
+; If your infrastructure isn't very large, you should'nt reduce this delay.
+; A low delay my do overcharge on your physicals servers
+delayrounddeploy: 15

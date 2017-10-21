@@ -1,0 +1,23 @@
+{
+  "name": "Cluster_1",
+  "url":"myproxmox1.cluster.net",
+  "port": "8006",
+  "user": "api@pve",
+  "password": "*****",
+  "template": "local:vztmpl/debian-9.0-standard_9.0-2_amd64.tar.gz",
+  "storage_disk": "disks",
+  "exclude_nodes": [""],
+  "weight": 1
+}
+
+{
+  "name": "Cluster_2",
+  "url":"myproxmox2.cluster.net",
+  "port": "8006",
+  "user": "api@pve",
+  "password": "****",
+  "template": "local:vztmpl/debian-9.0-standard_9.0-2_amd64.tar.gz",
+  "storage_disk": "disks",
+  "exclude_nodes": ["node_fail1"],
+  "weight": 1
+}

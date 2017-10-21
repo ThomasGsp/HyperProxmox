@@ -1,0 +1,15 @@
+{
+  "instance":
+  {
+    "name":"John",
+    "ip":"172.16.0.10",
+    "cetmask":"255.255.255.0",
+    "ram": 128,
+    "cpu":1,
+    "vlan":100,
+    "packages":
+    {
+      "list": ["apache2", "php-fpm", "..."]
+    }
+  }
+}
