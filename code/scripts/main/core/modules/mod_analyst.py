@@ -14,7 +14,6 @@ from core.libs.hcrypt import *
 import time
 import operator
 import random
-import bson
 import base64
 
 def add_token(tokens_in_slots, slot_distributions):
@@ -58,17 +57,15 @@ class Analyse:
         for cluster in self.clusters_conf:
             """ Decode data """
 
-            user = pdecrypt(base64.b64decode(cluster["user"]), self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
-            password = pdecrypt(base64.b64decode(cluster["password"]), self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+            user = pdecrypt(base64.b64decode(cluster["user"]),
+                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
-
+            password = pdecrypt(base64.b64decode(cluster["password"]),
+                                self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
             """ AUTH """
             proxmox = Proxmox("Analyse")
-            proxmox.get_ticket("{0}:{1}".format(cluster["url"],
-                                                int(cluster["port"])),
-                               pdecrypt(user, self.generalconf["keys"]["key_pvt"]),
-                               pdecrypt(password, self.generalconf["keys"]["key_pvt"]))
+            proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), user, password)
 
             """ Get excluded nodes """
             exclude_nodes = cluster["exclude_nodes"]
