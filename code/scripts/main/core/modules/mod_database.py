@@ -116,7 +116,13 @@ class MongoDB:
             return json.loads(dumps(self.db[self.collection_clusters].find({})))
 
     def insert_new_cluster(self, data):
-        return self.db[self.collection_clusters].insert(data)
+        try:
+            self.db[self.collection_clusters].insert(data)
+            result = {"value": "{0} {1}".format(data["name"], "is now available")}
+        except BaseException as e:
+            result = {"value": "{0} {1}".format("Invalid request", e)}
+
+        return result
 
     def update_cluster(self, cluster, data):
         return self.db[self.collection_clusters].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
