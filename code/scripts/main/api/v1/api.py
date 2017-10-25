@@ -23,23 +23,40 @@ class Auth:
 
 class Cluster:
     def GET(self, cluster=None):
-        if cluster:
-            return core.get_cluster(cluster)
-        else:
-            return core.get_cluster()
+        try:
+            if cluster:
+                result = core.get_cluster(cluster)
+            else:
+                result = core.get_cluster()
+        except BaseException as e:
+            result = {"value": "{0} {1}".format("Invalid request", e)}
+        return result
 
     def POST(self):
-         data = json.loads(web.data().decode('utf-8'))
-         return core.insert_cluster(data)
+        try:
+            data = json.loads(web.data().decode('utf-8'))
+            result = core.insert_cluster(data)
+        except BaseException as e:
+            result = {"value": "{0} {1}".format("Invalid request", e)}
+        return result
 
     def PUT(self, cluster):
-        data = json.loads(web.data().decode('utf-8'))
-        return core.change_cluster(cluster, data)
+        try:
+            data = json.loads(web.data().decode('utf-8'))
+            result = core.change_cluster(cluster, data)
+        except BaseException as e:
+            result = {"value": "{0} {1}".format("Invalid request", e)}
+        return result
 
     def DELETE(self, cluster):
-        return core.delete_cluste(cluster)
+        try:
+            result = core.delete_cluste(cluster)
+        except BaseException as e:
+            result = {"value": "{0} {1}".format("Invalid request", e)}
+        return result
 
 
+# Ajouter le retour d'erreur des requetes foireuses
 class Instance:
     def GET(self, vmid=None, status=None):
         if status:
