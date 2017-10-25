@@ -1,4 +1,5 @@
 from core.modules.mod_access import *
+import base64
 
 def pcrypt(data, key):
     CritConf = CryticalData()

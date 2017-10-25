@@ -14,7 +14,8 @@ from core.libs.hcrypt import *
 import time
 import operator
 import random
-import codecs
+import bson
+import base64
 
 def add_token(tokens_in_slots, slot_distributions):
     num_tokens = sum(tokens_in_slots)
@@ -55,20 +56,19 @@ class Analyse:
         self.mongo.insert_datekey(insert_time, 'running')
 
         for cluster in self.clusters_conf:
+            """ Decode data """
 
+            user = pdecrypt(base64.b64decode(cluster["user"]), self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+            password = pdecrypt(base64.b64decode(cluster["password"]), self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
-            datamongo=cluster["user"].replace("\\\\x", "x")
-            convert_to_byte=datamongo.encode("utf-8")
-            print(convert_to_byte)
-            print(pdecrypt(datamongo.encode("utf-8"), self.generalconf["keys"]["key_pvt"]))
 
 
             """ AUTH """
             proxmox = Proxmox("Analyse")
             proxmox.get_ticket("{0}:{1}".format(cluster["url"],
                                                 int(cluster["port"])),
-                               pdecrypt(cluster["user"], self.generalconf["keys"]["key_pvt"]),
-                               pdecrypt(cluster["password"], self.generalconf["keys"]["key_pvt"]))
+                               pdecrypt(user, self.generalconf["keys"]["key_pvt"]),
+                               pdecrypt(password, self.generalconf["keys"]["key_pvt"]))
 
             """ Get excluded nodes """
             exclude_nodes = cluster["exclude_nodes"]

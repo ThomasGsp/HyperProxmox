@@ -16,6 +16,8 @@ from netaddr import iter_iprange
 import threading
 import time
 
+import base64
+
 
 def RunAnalyse(clusters_conf, generalconf, delay=300):
     play = Analyse(clusters_conf, generalconf)
@@ -304,8 +306,8 @@ class Core:
     def insert_cluster(self, data):
         testdata = valid_cluster_data(data)
         if not testdata:
-            data["user"] = pcrypt(data["user"], self.generalconf["keys"]["key_pvt"])["data"]
-            data["password"] = pcrypt(data["password"], self.generalconf["keys"]["key_pvt"])["data"]
+            data["user"] = base64.b64encode(pcrypt(data["user"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
+            data["password"] = base64.b64encode(pcrypt(data["password"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
             new_cluster = self.mongo.insert_new_cluster(data)
         else:
             new_cluster = {"error": "{1} {0}".format(testdata, "Invalid or miss paramettrer")}

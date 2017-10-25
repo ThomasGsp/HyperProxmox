@@ -87,16 +87,12 @@ class CryticalData:
         return result_private_key
 
     def data_encryption(self, data, key=None):
-
-        encfrypt = key.encrypt(data.encode("utf-8"), 32)
-        convert_str = str(encfrypt[0])[2:-1]
-
-
+        encfrypt = key.encrypt(data.encode("utf-8"), 64)
         try:
             if key:
                 result_encrypt = {
                     "result": "OK",
-                    "data":  convert_str
+                    "data":  encfrypt[0]
                 }
             else:
                 result_encrypt = {
