@@ -110,26 +110,65 @@ class MongoDB:
 
     """ CLUSTER """
     def get_clusters_conf(self, cluster=None):
-        if cluster:
-            return json.loads(dumps(self.db[self.collection_clusters].find_one({"name": cluster})))
-        else:
-            return json.loads(dumps(self.db[self.collection_clusters].find({})))
+        try:
+            if cluster:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(self.db[self.collection_clusters].find_one({"name": cluster})))
+                }
+            else:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(self.db[self.collection_clusters].find({})))
+                }
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "value": "{0} {1}".format("Invalid request", e)
+            }
+        return result
 
     def insert_new_cluster(self, data):
         try:
             self.db[self.collection_clusters].insert(data)
-            result = {"value": "{0} {1}".format(data["name"], "is now available")}
+            result = {
+                "result": "OK",
+                "value": "{0} {1}".format(data["name"], "is now available")
+            }
         except BaseException as e:
-            result = {"value": "{0} {1}".format("Invalid request", e)}
-
+            result = {
+                "result": "ERROR",
+                "value": "{0} {1}".format("Invalid request", e)
+            }
         return result
 
     def update_cluster(self, cluster, data):
-        return self.db[self.collection_clusters].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
+        try:
+            self.db[self.collection_clusters].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
+            result = {
+                "result": "OK",
+                "value": "{0} {1}".format(data["name"], "has been updated")
+            }
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "value": "{0} {1}".format("Invalid request", e)
+            }
+        return result
 
     def delete_cluster(self, cluster):
-        return self.db[self.collection_clusters].remove({"cluster": str(cluster)})
-
+        try:
+            self.db[self.collection_clusters].remove({"cluster": str(cluster)})
+            result = {
+                "result": "OK",
+                "value": "{0} {1}".format(cluster, "has been deleted")
+            }
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "value": "{0} {1}".format("Invalid request", e)
+            }
+        return result
 
     """ SYSTEM """
     def get_system_info(self):

@@ -25,34 +25,65 @@ class Cluster:
     def GET(self, cluster=None):
         try:
             if cluster:
-                result = core.get_cluster(cluster)
+                result = {
+                    "result": "OK",
+                    "value": core.get_cluster(cluster)
+                }
             else:
-                result = core.get_cluster()
+                result = {
+                    "result": "OK",
+                    "value": core.get_cluster()
+                }
         except BaseException as e:
-            result = {"value": "{0} {1}".format("Invalid request", e)}
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
         return result
 
     def POST(self):
         try:
             data = json.loads(web.data().decode('utf-8'))
-            result = core.insert_cluster(data)
+            result = {
+                "result": "OK",
+                "value": core.insert_cluster(data)
+            }
         except BaseException as e:
-            result = {"value": "{0} {1}".format("Invalid request", e)}
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
         return result
 
     def PUT(self, cluster):
         try:
             data = json.loads(web.data().decode('utf-8'))
-            result = core.change_cluster(cluster, data)
+            result = {
+                "result": "OK",
+                "value": core.change_cluster(cluster, data)
+            }
         except BaseException as e:
-            result = {"value": "{0} {1}".format("Invalid request", e)}
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
         return result
 
     def DELETE(self, cluster):
         try:
-            result = core.delete_cluste(cluster)
+            result = {
+                    "result": "OK",
+                    "value": core.delete_cluste(cluster)
+                }
         except BaseException as e:
-            result = {"value": "{0} {1}".format("Invalid request", e)}
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
         return result
 
 

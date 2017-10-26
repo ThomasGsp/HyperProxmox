@@ -57,56 +57,58 @@ class Analyse:
         for cluster in self.clusters_conf:
             """ Decode data """
 
-            user = pdecrypt(base64.b64decode(cluster["user"]),
+            proxmox_cluster_user = pdecrypt(base64.b64decode(cluster["user"]),
                             self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
-            password = pdecrypt(base64.b64decode(cluster["password"]),
+            proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster["password"]),
                                 self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
             """ AUTH """
             proxmox = Proxmox("Analyse")
-            proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), user, password)
+            proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), proxmox_cluster_user, proxmox_cluster_pwd)
 
             """ Get excluded nodes """
             exclude_nodes = cluster["exclude_nodes"]
 
             """ UPDATE NODES LIST """
-            nodes_list = proxmox.get_nodes("{0}:{1}".format(cluster["url"], int(cluster["port"])))["value"]
+            nodes_list = proxmox.get_nodes("{0}:{1}".format(cluster["url"], int(cluster["port"])))
+            if nodes_list["result"] == "OK":
+                for value_nodes_list in nodes_list["value"]["data"]:
+                    if value_nodes_list["node"] not in exclude_nodes:
+                        """ TOTAL COUNT CPU and RAM allocate"""
+                        list_instances = proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                              value_nodes_list["node"], "lxc")["value"]
 
-            for value_nodes_list in nodes_list["data"]:
-                if value_nodes_list["node"] not in exclude_nodes:
-                    """ TOTAL COUNT CPU and RAM allocate"""
-                    list_instances = proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                          value_nodes_list["node"], "lxc")["value"]
+                        totalcpu = 0
+                        totalram = 0
+                        for key_list_instances, value_list_instances in list_instances.items():
+                            for instances in value_list_instances:
+                                totalcpu = totalcpu + instances["cpus"]
+                                totalram = totalram + instances["maxmem"]
 
-                    totalcpu = 0
-                    totalram = 0
-                    for key_list_instances, value_list_instances in list_instances.items():
-                        for instances in value_list_instances:
-                            totalcpu = totalcpu + instances["cpus"]
-                            totalram = totalram + instances["maxmem"]
+                        value_nodes_list["totalalloccpu"] = totalcpu
+                        value_nodes_list["totalallocram"] = totalram
+                        value_nodes_list["vmcount"] = len(list_instances.items())
 
-                    value_nodes_list["totalalloccpu"] = totalcpu
-                    value_nodes_list["totalallocram"] = totalram
-                    value_nodes_list["vmcount"] = len(list_instances.items())
+                        percent_cpu_alloc = (totalcpu / value_nodes_list["maxcpu"]) * 100
+                        percent_ram_alloc = (totalram / value_nodes_list["mem"]) * 100
 
-                    percent_cpu_alloc = (totalcpu / value_nodes_list["maxcpu"]) * 100
-                    percent_ram_alloc = (totalram / value_nodes_list["mem"]) * 100
+                        """
+                        weight of node =
+                        (((Percent Alloc CPU x coef) + ( Percent Alloc RAM x coef)) / Total coef ) * Cluster weight
+                        """
+                        weight = (((percent_cpu_alloc * 2) + (percent_ram_alloc * 4)) / 6) * int(cluster["weight"])
 
-                    """
-                    weight of node =
-                    (((Percent Alloc CPU x coef) + ( Percent Alloc RAM x coef)) / Total coef ) * Cluster weight
-                    """
-                    weight = (((percent_cpu_alloc * 2) + (percent_ram_alloc * 4)) / 6) * int(cluster["weight"])
+                        value_nodes_list["weight"] = int(weight)
+                        value_nodes_list["date"] = int(insert_time)
+                        value_nodes_list["cluster"] = cluster["name"]
 
-                    value_nodes_list["weight"] = int(weight)
-                    value_nodes_list["date"] = int(insert_time)
-                    value_nodes_list["cluster"] = cluster["name"]
+                        self.mongo.insert_node(value_nodes_list)
 
-                    self.mongo.insert_node(value_nodes_list)
+            else:
+                print(nodes_list)
 
         self.mongo.update_datekey(int(insert_time), "OK")
-
         return
 
     def set_attribution(self, count):

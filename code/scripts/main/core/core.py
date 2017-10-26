@@ -40,7 +40,6 @@ class Core:
 
         """ LOAD REDIS """
         self.redis_msg = Lredis
-        #self.redis_msg.co = self.redis_msg.connect()
 
         if self.mongo.client and self.redis_msg.connect():
             self.mongo.db = self.mongo.client.db
@@ -52,7 +51,7 @@ class Core:
             self.delayrounddeploy = generalconf["deploy"]["delayrounddeploy"]
 
             """ RUN THE ANALYZER IN DEDICATED THEARD"""
-            self.clusters_conf = self.mongo.get_clusters_conf()
+            self.clusters_conf = self.mongo.get_clusters_conf()["value"]
 
             thc = threading.Thread(name="Update statistics",
                                    target=RunAnalyse,
@@ -69,12 +68,15 @@ class Core:
         """ Find cluster informations from node """
         lastkeyvalid = self.mongo.get_last_datekey()
         node_informations = self.mongo.get_nodes_informations((int(lastkeyvalid["value"])), target)
-        cluster_informations = self.mongo.get_clusters_conf(node_informations["cluster"])
+        cluster_informations = self.mongo.get_clusters_conf(node_informations["cluster"])["value"]
 
         proxmox_cluster_url = cluster_informations["url"]
         proxmox_cluster_port = cluster_informations["port"]
-        proxmox_cluster_user = pdecrypt(cluster_informations["user"],self.generalconf["keys"]["key_pvt"])
-        proxmox_cluster_pwd = pdecrypt(cluster_informations["password"], self.generalconf["keys"]["key_pvt"])
+        proxmox_cluster_user = pdecrypt(base64.b64decode(cluster["user"]),
+                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+
+        proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster["password"]),
+                                self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
         proxmox_template = cluster_informations["template"]
         proxmox_storage_disk = cluster_informations["storage_disk"]
@@ -169,7 +171,7 @@ class Core:
             instance_informations = self.mongo.get_instance(vmid)
 
             """ Find cluster informations from node """
-            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])
+            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])["value"]
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
@@ -190,8 +192,12 @@ class Core:
                 self.mongo.delete_instance(vmid)
                 self.mongo.update_system_free_ip(instance_informations['ip'])
 
-        except BaseException:
-            result = {"value": "{0} {1}".format(vmid, "is not a valid VMID")}
+        except IndexError as ierror:
+            result = {
+                "result": "ERROR",
+                "type": "PROXMOX - VALUES",
+                "value": "{0} is not a valid VMID: {1}".format(vmid, ierror)
+            }
 
         return result
 
@@ -201,7 +207,7 @@ class Core:
             instance_informations = self.mongo.get_instance(vmid)
 
             """ Find cluster informations from node """
-            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])
+            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])["value"]
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
@@ -221,8 +227,12 @@ class Core:
                                              "lxc",
                                              vmid, action)
 
-        except IndexError:
-            result = {"value": "{0} {1}".format(vmid, "is not a valid VMID")}
+        except IndexError as ierror:
+            result = {
+                "result": "ERROR",
+                "type": "PROXMOX - VALUES",
+                "value": "{0} is not a valid VMID: {1}".format(vmid, ierror)
+            }
 
         return result
 
@@ -232,7 +242,7 @@ class Core:
             instance_informations = self.mongo.get_instance(vmid)
 
             """ Find cluster informations from node """
-            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])
+            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])["value"]
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
@@ -252,8 +262,12 @@ class Core:
                                              "lxc",
                                              vmid)
 
-        except IndexError:
-            result = {"value": "{0} {1}".format(vmid, "is not a valid VMID")}
+        except IndexError as ierror:
+            result = {
+                "result": "ERROR",
+                "type": "PROXMOX - VALUES",
+                "value": "{0} is not a valid VMID: {1}".format(vmid, ierror)
+            }
 
         return result
 
@@ -263,7 +277,7 @@ class Core:
             instance_informations = self.mongo.get_instance(vmid)
 
             """ Find cluster informations from node """
-            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])
+            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])["value"]
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
@@ -287,8 +301,12 @@ class Core:
             if result['result'] == "OK":
                 self.mongo.update_instance(vmid, data)
 
-        except IndexError:
-            result = {"value": "{0} {1}".format(vmid, "is not a valid VMID")}
+        except IndexError as ierror:
+            result = {
+                "result": "ERROR",
+                "type": "PROXMOX - VALUES",
+                "value": "{0} is not a valid VMID: {1}".format(vmid, ierror)
+            }
 
         return result
 
@@ -300,14 +318,14 @@ class Core:
 
     def get_cluster(self, cluster=None):
         """ Find cluster informations from node """
-        cluster_informations = self.mongo.get_clusters_conf(cluster)
+        cluster_informations = self.mongo.get_clusters_conf(cluster)["value"]
         return cluster_informations
 
     def insert_cluster(self, data):
         testdata = valid_cluster_data(data)
 
         if not testdata:
-            if not self.mongo.get_clusters_conf(data["name"]):
+            if not self.mongo.get_clusters_conf(data["name"])["value"]:
                 data["user"] = base64.b64encode(pcrypt(data["user"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
                 data["password"] = base64.b64encode(pcrypt(data["password"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
                 new_cluster = self.mongo.insert_new_cluster(data)

@@ -47,16 +47,16 @@ class Proxmox:
                 self.csrf = {'CSRFPreventionToken': self.ticket.json()['data']['CSRFPreventionToken']}
             else:
                 result = {"result": "ERROR",
-                          "target": "{0}".format(url),
+                          "target": "{0}".format(request),
                           "type": "PROXMOX - STATUS CODE",
-                          "customerror": "Error nodes informations. Bad HTTP Status code : "
+                          "value": "Error nodes informations. Bad HTTP Status code : "
                                          "{0} -- {1}".format(self.ticket.status_code, self.ticket.text)
                           }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
             result = {"result": "ERROR",
                       "target": "{0}".format(url),
                       "type": "PYTHON",
-                      "customerror": "Cannot get ticket session {0} ({1})".format(url, e)}
+                      "value": "Cannot get ticket session {0} ({1})".format(url, e)}
 
         return result
 
@@ -79,18 +79,18 @@ class Proxmox:
             else:
                 result = {
                     "result": "ERROR",
-                    "target": "{0}".format(url),
+                    "target": "{0}".format(request),
                     "type": "PROXMOX - STATUS CODE",
-                    "customerror": "Error nodes informations. Bad HTTP Status code : "
+                    "value": "Error nodes informations. Bad HTTP Status code : "
                                    "{0} -- {1}".format(nodes.status_code, nodes.text)
                 }
 
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
             result = {
                 "result": "ERROR",
-                "target": "{0}".format(url),
+                "target": "{0}".format(request),
                 "type": "PYTHON",
-                "customerror": "Cannot get node information for {0} ({1})".format(url, e)
+                "value": "Cannot get node information for {0} ({1})".format(url, e)
             }
 
         return result
@@ -107,7 +107,7 @@ class Proxmox:
             result = {"result": "OK"}
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
             result = {"result": "ERROR", "target": "[{3}]",
-                      "customerror": "Cannot get node information for {0} ({1})".format(url, e, nodename)}
+                      "value": "Cannot get node information for {0} ({1})".format(url, e, nodename)}
 
         return result
 
@@ -123,7 +123,7 @@ class Proxmox:
             result = {"result": "OK"}
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
             result = {"result": "ERROR", "target": "[{3}]",
-                      "customerror": "Cannot get storage information for {0} ({1})".format(url, e, nodename)}
+                      "value": "Cannot get storage information for {0} ({1})".format(url, e, nodename)}
 
         return result
 
@@ -140,7 +140,7 @@ class Proxmox:
             result = {"result": "OK"}
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
             result = {"result": "ERROR", "target": "[{3}]",
-                      "customerror": "Cannot get disks information for {0} ({1})".format(url, e, nodename)}
+                      "value": "Cannot get disks information for {0} ({1})".format(url, e, nodename)}
 
         return result
 
@@ -167,7 +167,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(url),
                     "type": "PROXMOX - STATUS CODE",
-                    "customerror": "Error nodes informations. Bad HTTP Status code : "
+                    "value": "Error nodes informations. Bad HTTP Status code : "
                                    "{0} -- {1}".format(instances.status_code, instances.text)
                 }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
@@ -175,7 +175,7 @@ class Proxmox:
                 "result": "ERROR",
                 "target": "{0}".format(url),
                 "type": "PYTHON",
-                "customerror": "Cannot get VM information for {0} {1} ({2})".format(url, nodename, e)
+                "value": "Cannot get VM information for {0} {1} ({2})".format(url, nodename, e)
             }
 
         return result
@@ -201,7 +201,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(url),
                     "type": "PROXMOX - STATUS CODE",
-                    "customerror": "Error nodes informations. Bad HTTP Status code : "
+                    "value": "Error nodes informations. Bad HTTP Status code : "
                                    "{0} -- {1}".format(config.status_code, config.text)
                 }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
@@ -209,7 +209,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(url),
                     "type": "PYTHON",
-                    "customerror": "Cannot get VM information for {0} {1} ({2})".format(url, nodename, e)
+                    "value": "Cannot get VM information for {0} {1} ({2})".format(url, nodename, e)
                 }
 
         return result
@@ -241,7 +241,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(nodename),
                     "type": "PROXMOX - STATUS CODE",
-                    "customerror": "Error creating Container. Bad HTTP Status code : "
+                    "value": "Error creating Container. Bad HTTP Status code : "
                                    "{0} -- {1}".format(createvm.status_code, createvm.text)
                 }
 
@@ -249,7 +249,7 @@ class Proxmox:
             result = {"result": "ERROR",
                       "target": "{0}".format(nodename),
                       "type": "PYTHON",
-                      "customerror": "Cannot create this instance on {0} : ({1})".format(url, e)}
+                      "value": "Cannot create this instance on {0} : ({1})".format(url, e)}
 
         return result
 
@@ -281,7 +281,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(nodename),
                     "type": "PROXMOX - STATUS CODE",
-                    "customerror": "Error delete Container. Bad HTTP Status code : "
+                    "value": "Error delete Container. Bad HTTP Status code : "
                                    "{0} -- {1}".format(deletevm.status_code, deletevm.text)
                 }
 
@@ -289,7 +289,7 @@ class Proxmox:
             result = {"result": "ERROR",
                       "target": "{0}".format(nodename),
                       "type": "PYTHON",
-                      "customerror": "Cannot delete Container ({2}) on {0} : ({1})".format(url, e, vmid)}
+                      "value": "Cannot delete Container ({2}) on {0} : ({1})".format(url, e, vmid)}
 
         return result
 
@@ -326,7 +326,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(nodename),
                     "type": "PROXMOX - STATUS CODE",
-                    "customerror": "Error action Container. Bad HTTP Status code : "
+                    "value": "Error action Container. Bad HTTP Status code : "
                                    "{0} -- {1}".format(statusm.status_code, statusm.text)
                 }
 
@@ -334,7 +334,7 @@ class Proxmox:
             result = {"result": "ERROR",
                       "target": "{0}".format(nodename),
                       "type": "PYTHON",
-                      "customerror": "Cannot do this action this instance ({2}) on {0} : ({1})".format(url, e, vmid)}
+                      "value": "Cannot do this action this instance ({2}) on {0} : ({1})".format(url, e, vmid)}
 
         return result
 
@@ -366,7 +366,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(nodename),
                     "type": "PROXMOX - STATUS CODE",
-                    "customerror": "Error resizing container. Bad HTTP Status code : "
+                    "value": "Error resizing container. Bad HTTP Status code : "
                                    "{0} -- {1}".format(resizevm.status_code, resizevm.text)
                 }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
@@ -374,7 +374,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(nodename),
                     "type": "PYTHON",
-                    "customerror": "Cannot resize this instance {2} on {0} : ({1})".format(url, e, instanceid)
+                    "value": "Cannot resize this instance {2} on {0} : ({1})".format(url, e, instanceid)
                 }
 
         return result
@@ -401,7 +401,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(nodename),
                     "type": "PROXMOX - STATUS CODE",
-                    "customerror": "Error to find statistic for instance {2}. Bad HTTP Status code : "
+                    "value": "Error to find statistic for instance {2}. Bad HTTP Status code : "
                                    "{0} -- {1}".format(statsvm.status_code, statsvm.text, instanceid)
                 }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
@@ -409,7 +409,7 @@ class Proxmox:
                 "result": "ERROR",
                 "target": "{0}".format(nodename),
                 "type": "PYTHON",
-                "customerror": "Cannot find statistic for this instance {2} on {0} : ({1})".format(url, e, instanceid)
+                "value": "Cannot find statistic for this instance {2} on {0} : ({1})".format(url, e, instanceid)
             }
 
         return result
