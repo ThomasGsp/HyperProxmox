@@ -25,15 +25,9 @@ class Cluster:
     def GET(self, cluster=None):
         try:
             if cluster:
-                result = {
-                    "result": "OK",
-                    "value": core.get_cluster(cluster)
-                }
+                result = core.get_cluster(cluster)
             else:
-                result = {
-                    "result": "OK",
-                    "value": core.get_cluster()
-                }
+                result = core.get_cluster()
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -45,10 +39,7 @@ class Cluster:
     def POST(self):
         try:
             data = json.loads(web.data().decode('utf-8'))
-            result = {
-                "result": "OK",
-                "value": core.insert_cluster(data)
-            }
+            result = core.insert_cluster(data)
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -60,10 +51,7 @@ class Cluster:
     def PUT(self, cluster):
         try:
             data = json.loads(web.data().decode('utf-8'))
-            result = {
-                "result": "OK",
-                "value": core.change_cluster(cluster, data)
-            }
+            result = core.change_cluster(cluster, data)
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -74,10 +62,7 @@ class Cluster:
 
     def DELETE(self, cluster):
         try:
-            result = {
-                    "result": "OK",
-                    "value": core.delete_cluste(cluster)
-                }
+            result = core.delete_cluste(cluster)
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -90,57 +75,89 @@ class Cluster:
 # Ajouter le retour d'erreur des requetes foireuses
 class Instance:
     def GET(self, vmid=None, status=None):
-        if status:
-            """ GET INSTANCE STATUS """
-            return core.status_instance(vmid, status)
-        elif vmid:
-            """ GET INSTANCE INFORMATION """
-            return core.info_instance(vmid)
+        try:
+            if status:
+                """ GET INSTANCE STATUS """
+                result = core.status_instance(vmid, status)
+            elif vmid:
+                """ GET INSTANCE INFORMATION """
+                result = core.info_instance(vmid)
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
+        return result
 
     def POST(self, vmid=None, status=None):
-        if vmid:
-            """ GET INSTANCE INFORMATION """
-            return core.status_instance(vmid, status)
-        else:
-            """ CREATE NEWS INSTANCES"""
-            count = json.loads(web.data().decode('utf-8'))["count"]
+        try:
+            if vmid:
+                """ GET INSTANCE INFORMATION """
+                result = core.status_instance(vmid, status)
+            else:
+                """ CREATE NEWS INSTANCES"""
+                count = json.loads(web.data().decode('utf-8'))["count"]
 
-            """ GENERATE UNIQ COMMAND ID """
-            randtext = ''.join(random.choice('0123456789ABCDEF') for i in range(8))
-            command_id = "{0}_{1}_{2}".format(time.time(), count, randtext)
+                """ GENERATE UNIQ COMMAND ID """
+                randtext = ''.join(random.choice('0123456789ABCDEF') for i in range(8))
+                command_id = "{0}_{1}_{2}".format(time.time(), count, randtext)
 
-            """ LOAD CLUSTER CONFIGURATIONS """
-            select = Analyse(core.clusters_conf, generalconf)
-            sorted_nodes = dict(select.set_attribution(count))
+                """ LOAD CLUSTER CONFIGURATIONS """
+                select = Analyse(core.clusters_conf, generalconf)
+                sorted_nodes = dict(select.set_attribution(count))
 
-            """ START ALL Thread """
-            for target, count in sorted_nodes.items():
-                # Limit to 5 instance per block
-                thci = threading.Thread(name="Insert Instance",
-                                   target=core.insert_instance,
-                                   args=(target, str(count), command_id,))
+                """ START ALL Thread """
+                for target, count in sorted_nodes.items():
+                    # Limit to 5 instance per block
+                    thci = threading.Thread(name="Insert Instance",
+                                       target=core.insert_instance,
+                                       args=(target, str(count), command_id,))
 
-                thci.start()
+                    thci.start()
 
-            """ Wait all results of Thread from redis messages queue. Valid or not """
-            timeout = 2 * int(generalconf["deploy"]["concurrencydeploy"]) * int(generalconf["deploy"]["delayrounddeploy"])
-            for t in range(timeout):
-                time.sleep(1)
-                try:
-                    if len(ast.literal_eval(Lredis.get_message(command_id))) == int(count):
-                        break
-                except BaseException as err:
-                    print("Value not found", err)
+                """ Wait all results of Thread from redis messages queue. Valid or not """
+                timeout = 2 * int(generalconf["deploy"]["concurrencydeploy"]) * int(generalconf["deploy"]["delayrounddeploy"])
+                for t in range(timeout):
+                    time.sleep(1)
+                    try:
+                        if len(ast.literal_eval(Lredis.get_message(command_id))) == int(count):
+                            break
+                    except BaseException as err:
+                        print("Value not found", err)
 
-            """ Return messages """
-            return ast.literal_eval(Lredis.get_message(command_id))
+                """ Return messages """
+                return ast.literal_eval(Lredis.get_message(command_id))
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
+        return result
 
     def PUT(self, vmid):
-        data = json.loads(web.data().decode('utf-8'))
-        return core.change_instance(vmid, data)
+        try:
+            data = json.loads(web.data().decode('utf-8'))
+            result = core.change_instance(vmid, data)
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
+        return result
 
     def DELETE(self, vmid):
-        return core.delete_instance(vmid)
+        try:
+            result = core.delete_instance(vmid)
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
+        return result
 
 
 class ThreadAPI(threading.Thread):

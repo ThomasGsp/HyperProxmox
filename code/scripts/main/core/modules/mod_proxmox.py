@@ -40,23 +40,27 @@ class Proxmox:
             self.ticket = self.socket.post(request,  params=params, verify=False, timeout=5)
 
             if self.ticket.status_code == 200:
-                result = {"result": "OK",
-                          "value": self.ticket.json()
-                          }
+                result = {
+                    "result": "OK",
+                    "value": self.ticket.json()
+                }
                 self.PVEAuthCookie = {'PVEAuthCookie': self.ticket.json()['data']['ticket']}
                 self.csrf = {'CSRFPreventionToken': self.ticket.json()['data']['CSRFPreventionToken']}
             else:
-                result = {"result": "ERROR",
-                          "target": "{0}".format(request),
-                          "type": "PROXMOX - STATUS CODE",
-                          "value": "Error nodes informations. Bad HTTP Status code : "
-                                         "{0} -- {1}".format(self.ticket.status_code, self.ticket.text)
-                          }
+                result = {
+                    "result": "ERROR",
+                    "target": "{0}".format(request),
+                    "type": "PROXMOX - STATUS CODE",
+                    "value": "Error nodes informations. Bad HTTP Status code : "
+                             "{0} -- {1}".format(self.ticket.status_code, self.ticket.text)
+                }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
-            result = {"result": "ERROR",
-                      "target": "{0}".format(url),
-                      "type": "PYTHON",
-                      "value": "Cannot get ticket session {0} ({1})".format(url, e)}
+            result = {
+                "result": "ERROR",
+                "target": "{0}".format(url),
+                "type": "PYTHON",
+                "value": "Cannot get ticket session {0} ({1})".format(url, e)
+            }
 
         return result
 
@@ -104,10 +108,18 @@ class Proxmox:
         request = "https://{0}/api2/json/nodes/{1}/status".format(url, nodename)
         try:
             self.status = self.socket.get(request, cookies=self.PVEAuthCookie, verify=False, timeout=5).json()
-            result = {"result": "OK"}
+            result = {
+                "result": "OK",
+                "value": self.status
+
+            }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
-            result = {"result": "ERROR", "target": "[{3}]",
-                      "value": "Cannot get node information for {0} ({1})".format(url, e, nodename)}
+            result = {
+                "result": "ERROR",
+                "target": "{0}".format(nodename),
+                "type": "PYTHON - ERROR",
+                "value": "Cannot get node information for {0} ({1})".format(url, e)
+            }
 
         return result
 
@@ -120,10 +132,17 @@ class Proxmox:
         request = "https://{0}/api2/json/nodes/{1}/storage".format(url, nodename)
         try:
             self.storage = self.socket.get(request,  cookies=self.PVEAuthCookie, verify=False, timeout=5).json()
-            result = {"result": "OK"}
+            result = {
+                "result": "OK",
+                "value": self.storage
+            }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
-            result = {"result": "ERROR", "target": "[{3}]",
-                      "value": "Cannot get storage information for {0} ({1})".format(url, e, nodename)}
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - ERROR",
+                "target": "{0}".format(nodename),
+                "value": "Cannot get storage information for {0} ({1})".format(url, e)
+            }
 
         return result
 
@@ -137,10 +156,17 @@ class Proxmox:
         request = "https://{0}/api2/json/nodes/{1}/storage/{2}/content".format(url, nodename, sto_id)
         try:
             self.disks = self.socket.get(request,  cookies=self.PVEAuthCookie, verify=False, timeout=5).json()
-            result = {"result": "OK"}
+            result = {
+                "result": "OK",
+                "value": self.disks
+            }
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
-            result = {"result": "ERROR", "target": "[{3}]",
-                      "value": "Cannot get disks information for {0} ({1})".format(url, e, nodename)}
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - ERROR",
+                "target": "{0}".format(nodename),
+                "value": "Cannot get disks information for {0} ({1})".format(url, e)
+            }
 
         return result
 

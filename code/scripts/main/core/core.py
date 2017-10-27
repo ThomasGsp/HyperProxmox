@@ -307,8 +307,8 @@ class Core:
                 "type": "PROXMOX - VALUES",
                 "value": "{0} is not a valid VMID: {1}".format(vmid, ierror)
             }
-
-        return result
+        # Voir comment return ça proprement
+        return
 
     """ 
     #######################
@@ -330,9 +330,17 @@ class Core:
                 data["password"] = base64.b64encode(pcrypt(data["password"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
                 new_cluster = self.mongo.insert_new_cluster(data)
             else:
-                new_cluster = {"value": "{0}".format("Duplicate entry, please delete the current cluster or update it")}
+                new_cluster = {
+                    "value": "{0}".format("Duplicate entry, please delete the current cluster or update it")
+                    "result": "ERROR",
+                    "type": "PROXMOX - VALUES"
+                }
         else:
-            new_cluster = {"value": "{1} {0}".format(testdata, "Invalid or miss paramettrer")}
+            new_cluster = {
+                "value": "{1} {0}".format(testdata, "Invalid or miss paramettrer")
+                "result": "ERROR",
+                "type": "PROXMOX - VALUES"
+            }
 
 
         return new_cluster
