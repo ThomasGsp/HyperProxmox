@@ -268,7 +268,7 @@ class Proxmox:
                     "target": "{0}".format(nodename),
                     "type": "PROXMOX - STATUS CODE",
                     "value": "Error creating Container. Bad HTTP Status code : "
-                                   "{0} -- {1}".format(createvm.status_code, createvm.text)
+                                   "{0} -- {1} -- with data: {2} -- Possible problem: Duplicate entry".format(createvm.status_code, createvm.text, data)
                 }
 
         except (TypeError, ValueError, requests.exceptions.RequestException) as e:
