@@ -72,10 +72,10 @@ class Core:
 
         proxmox_cluster_url = cluster_informations["url"]
         proxmox_cluster_port = cluster_informations["port"]
-        proxmox_cluster_user = pdecrypt(base64.b64decode(cluster["user"]),
+        proxmox_cluster_user = pdecrypt(base64.b64decode(cluster_informations["user"]),
                             self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
-        proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster["password"]),
+        proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster_informations["password"]),
                                 self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
         proxmox_template = cluster_informations["template"]
@@ -114,7 +114,7 @@ class Core:
                 ip = str(get_info_system["IP_free"][0])
                 self.mongo.update_system_delete_ip(ip)
 
-
+            # insert check duplicate entry
             """ INSTANCE DEFINITION """
             data = {
                 'ostemplate': proxmox_template,
@@ -134,11 +134,14 @@ class Core:
             }
 
             """ INSTANCE INSERTION """
-            result_new = {}
-            #while not proxmox.retry_on_errorcode(result_new['result']):
             result_new = proxmox.create_instance("{0}:{1}".format(proxmox_cluster_url,
                                                      int(proxmox_cluster_port)), target, "lxc",
                                                     data)
+            """ Get first digest """
+            digest_init = proxmox.get_config("{0}:{1}".format(proxmox_cluster_url,
+                                                         int(proxmox_cluster_port)),
+                                        target, "lxc", next_instance_id)['value']['data']['digest']
+
 
             """ VERIFY THE RESULT BY PROXMOX STATUS REQUEST CODE """
             if result_new['result'] == "OK":
@@ -154,8 +157,11 @@ class Core:
                 data["ip"] = ip
 
                 self.mongo.insert_instance(data)
-                """ BREAK the loop due to valid creation """
-
+                """ Limit creation DDOS based on digest """
+                while digest_init == proxmox.get_config("{0}:{1}".format(proxmox_cluster_url,
+                                                    int(proxmox_cluster_port)),
+                                   target, "lxc", next_instance_id)['value']['data']['digest']:
+                    time.sleep(5)
 
             returnlistresult.append(result_new)
 
@@ -175,9 +181,11 @@ class Core:
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
-            proxmox_cluster_user = pdecrypt(cluster_informations["user"],self.generalconf["keys"]["key_pvt"])
-            proxmox_cluster_pwd = pdecrypt(cluster_informations["password"], self.generalconf["keys"]["key_pvt"])
+            proxmox_cluster_user = pdecrypt(base64.b64decode(cluster_informations["user"]),
+                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
+            proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster_informations["password"]),
+                                           self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
             """ LOAD PROXMOX """
             proxmox = Proxmox(instance_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_cluster_url,
@@ -211,9 +219,11 @@ class Core:
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
-            proxmox_cluster_user = pdecrypt(cluster_informations["user"],self.generalconf["keys"]["key_pvt"])
-            proxmox_cluster_pwd = pdecrypt(cluster_informations["password"], self.generalconf["keys"]["key_pvt"])
+            proxmox_cluster_user = pdecrypt(base64.b64decode(cluster_informations["user"]),
+                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
+            proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster_informations["password"]),
+                                           self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
             """ LOAD PROXMOX """
             proxmox = Proxmox(instance_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_cluster_url,
@@ -246,9 +256,11 @@ class Core:
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
-            proxmox_cluster_user = pdecrypt(cluster_informations["user"],self.generalconf["keys"]["key_pvt"])
-            proxmox_cluster_pwd = pdecrypt(cluster_informations["password"], self.generalconf["keys"]["key_pvt"])
+            proxmox_cluster_user = pdecrypt(base64.b64decode(cluster_informations["user"]),
+                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
+            proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster_informations["password"]),
+                                           self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
             """ LOAD PROXMOX """
             proxmox = Proxmox(instance_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_cluster_url,
@@ -281,9 +293,11 @@ class Core:
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
-            proxmox_cluster_user = pdecrypt(cluster_informations["user"],self.generalconf["keys"]["key_pvt"])
-            proxmox_cluster_pwd = pdecrypt(cluster_informations["password"], self.generalconf["keys"]["key_pvt"])
+            proxmox_cluster_user = pdecrypt(base64.b64decode(cluster_informations["user"]),
+                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
+            proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster_informations["password"]),
+                                           self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
             """ LOAD PROXMOX """
             proxmox = Proxmox(instance_informations['node'])
@@ -307,8 +321,8 @@ class Core:
                 "type": "PROXMOX - VALUES",
                 "value": "{0} is not a valid VMID: {1}".format(vmid, ierror)
             }
-        # Voir comment return ça proprement
-        return
+
+        return result
 
     """ 
     #######################
@@ -331,25 +345,28 @@ class Core:
                 new_cluster = self.mongo.insert_new_cluster(data)
             else:
                 new_cluster = {
-                    "value": "{0}".format("Duplicate entry, please delete the current cluster or update it")
+                    "value": "{0}".format("Duplicate entry, please delete the current cluster or update it"),
                     "result": "ERROR",
                     "type": "PROXMOX - VALUES"
                 }
         else:
             new_cluster = {
-                "value": "{1} {0}".format(testdata, "Invalid or miss paramettrer")
+                "value": "{1} {0}".format(testdata, "Invalid or miss paramettrer"),
                 "result": "ERROR",
                 "type": "PROXMOX - VALUES"
             }
 
-
         return new_cluster
 
     def change_cluster(self, cluster, data):
-        return
+        cluster_update = self.mongo.update_cluster(cluster, data)
+        return cluster_update
+
 
     def delete_cluster(self, cluster):
-        return
+        """ Find cluster informations from node """
+        cluster_delete = self.mongo.delete_cluster(cluster)
+        return cluster_delete
 
 
 def valid_cluster_data(data):

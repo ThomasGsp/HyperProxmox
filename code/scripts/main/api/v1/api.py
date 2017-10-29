@@ -11,6 +11,12 @@ import random
 import ast
 
 
+def cooktheticket(ticket, action, target):
+    if ticket == "aaa":
+        return True
+    else:
+        return False
+
 class Auth:
     def POST(self):
         # '{"username":"fff", "password":"azerty"}'
@@ -19,7 +25,11 @@ class Auth:
         # Test Login
 
         # If true generate an ticket
+        # use date and ip
+        i = web.input(ticket='aaa')
+        web.setcookie('ticket', i.ticket, 3600)
         return
+
 
 class Cluster:
     def GET(self, cluster=None):
@@ -72,21 +82,20 @@ class Cluster:
         return result
 
 
-# Ajouter le retour d'erreur des requetes foireuses
 class Instance:
     def GET(self, vmid=None, status=None):
         try:
             if status:
                 """ GET INSTANCE STATUS """
                 result = core.status_instance(vmid, status)
-            elif vmid:
+            else:
                 """ GET INSTANCE INFORMATION """
                 result = core.info_instance(vmid)
         except BaseException as e:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
