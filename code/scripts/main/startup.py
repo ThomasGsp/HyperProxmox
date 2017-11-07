@@ -62,12 +62,7 @@ if __name__ == "__main__":
             exit(1)
 
     key_pub = CritConf.read_public_key(localconf['system']['key_pub'])
-    """
-    crypttest=CritConf.data_encryption("ploopp")
-    print(type(crypttest['data']))
-    print(CritConf.data_decryption(crypttest['data']))
-    exit(0)
-    """
+
     # URL MAPPING
     urls = \
         (
@@ -81,7 +76,7 @@ if __name__ == "__main__":
             '/api/v1/instance/([0-9]+)/vhost(?:/([0-9]+))', 'vhost',
             '/api/v1/instance/([0-9]+)/database(?:/([0-9]+))', 'database',
 
-            #  MAPPIN NODES
+            #  MAPPING NODES
             '/api/v1/node(?:/([0-9]+))', 'node',
 
             # MAPPING SERVICES

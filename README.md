@@ -5,8 +5,7 @@
 * Status: Dev
 * Object :   Massive LXC CT deploy system for proxmox hypervisor.
 
-
-## Quick start (testings)
+## Quick start
 
 ### Requirement:
 * A proxmox server

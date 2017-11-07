@@ -8,7 +8,6 @@ Minimum version require: 3.4
 import os
 from Crypto.PublicKey import RSA
 import hashlib
-import codecs
 
 def encodepassphrase(passphrase):
     return hashlib.sha512(passphrase.encode("UTF-8")).hexdigest()
@@ -97,7 +96,7 @@ class CryticalData:
             else:
                 result_encrypt = {
                     "result": "OK",
-                    "data":  codecs.encode(self.public_key.encrypt(mutable_bytes, 32)[0], 'base64')
+                    "data": self.public_key.encrypt(data.encode("utf-8"), 64)
                 }
         except BaseException as e:
             result_encrypt = {
