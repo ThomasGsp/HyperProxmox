@@ -10,22 +10,22 @@
 from core.modules.mod_proxmox import *
 from core.modules.mod_database import *
 from core.modules.mod_analyst import *
+from core.modules.mod_crawler import *
 from core.modules.mod_access import *
 from core.libs.hcrypt import *
 from netaddr import iter_iprange
 import threading
 import time
-
 import base64
 
 
 def RunAnalyse(clusters_conf, generalconf, delay=300):
-    play = Analyse(clusters_conf, generalconf)
+    play = Crawler(clusters_conf, generalconf)
+
 
     while True:
         play.run()
         time.sleep(delay)
-
 
 class Core:
 
@@ -63,7 +63,7 @@ class Core:
     # INSTANCE MANAGEMENT #
     #######################
     """
-    def insert_instance(self, target, count=1, command_id=000000):
+    def insert_instance(self, target, count=1, command_id=000000,  instancetype="lxc"):
 
         """ Find cluster informations from node """
         lastkeyvalid = self.mongo.get_last_datekey()
@@ -135,12 +135,12 @@ class Core:
 
             """ INSTANCE INSERTION """
             result_new = proxmox.create_instance("{0}:{1}".format(proxmox_cluster_url,
-                                                     int(proxmox_cluster_port)), target, "lxc",
+                                                     int(proxmox_cluster_port)), target, instancetype,
                                                     data)
             """ Get first digest """
             digest_init = proxmox.get_config("{0}:{1}".format(proxmox_cluster_url,
                                                          int(proxmox_cluster_port)),
-                                        target, "lxc", next_instance_id)['value']['data']['digest']
+                                        target, instancetype, next_instance_id)['value']['data']['digest']
 
 
             """ VERIFY THE RESULT BY PROXMOX STATUS REQUEST CODE """
@@ -160,7 +160,7 @@ class Core:
                 """ Limit creation DDOS based on digest """
                 while digest_init == proxmox.get_config("{0}:{1}".format(proxmox_cluster_url,
                                                     int(proxmox_cluster_port)),
-                                   target, "lxc", next_instance_id)['value']['data']['digest']:
+                                   target, instancetype, next_instance_id)['value']['data']['digest']:
                     time.sleep(5)
 
             returnlistresult.append(result_new)
@@ -170,7 +170,7 @@ class Core:
 
         return
 
-    def delete_instance(self, vmid):
+    def delete_instance(self, vmid, instancetype="lxc"):
 
         try:
             """ Find node/cluster informations from vmid """
@@ -194,7 +194,8 @@ class Core:
                                proxmox_cluster_pwd)
 
             result = proxmox.delete_instance("{0}:{1}".format(proxmox_cluster_url,
-                                                              int(proxmox_cluster_port)), instance_informations['node'], "lxc", vmid)
+                                                              int(proxmox_cluster_port)),
+                                             instance_informations['node'], instancetype, vmid)
 
             if result['result'] == "OK":
                 self.mongo.delete_instance(vmid)
@@ -209,7 +210,7 @@ class Core:
 
         return result
 
-    def status_instance(self, vmid, action):
+    def status_instance(self, vmid, action,  instancetype="lxc"):
         """ Find node/cluster informations from vmid """
         try:
             instance_informations = self.mongo.get_instance(vmid)
@@ -234,7 +235,7 @@ class Core:
             result = proxmox.status_instance("{0}:{1}".format(proxmox_cluster_url,
                                                               int(proxmox_cluster_port)),
                                              instance_informations['node'],
-                                             "lxc",
+                                             instancetype,
                                              vmid, action)
 
         except IndexError as ierror:
@@ -246,7 +247,7 @@ class Core:
 
         return result
 
-    def info_instance(self, vmid):
+    def info_instance(self, vmid, instancetype="lxc"):
         """ Find node/cluster informations from vmid """
         try:
             instance_informations = self.mongo.get_instance(vmid)
@@ -271,7 +272,7 @@ class Core:
             result = proxmox.get_config("{0}:{1}".format(proxmox_cluster_url,
                                                               int(proxmox_cluster_port)),
                                              instance_informations['node'],
-                                             "lxc",
+                                             instancetype,
                                              vmid)
 
         except IndexError as ierror:
@@ -283,7 +284,7 @@ class Core:
 
         return result
 
-    def change_instance(self, vmid, data):
+    def change_instance(self, vmid, data,  instancetype="lxc"):
         """ Find node/cluster informations from vmid """
         try:
             instance_informations = self.mongo.get_instance(vmid)
@@ -309,7 +310,7 @@ class Core:
             result = proxmox.resize_instance("{0}:{1}".format(proxmox_cluster_url,
                                                               int(proxmox_cluster_port)),
                                              instance_informations['node'],
-                                             "lxc",
+                                             instancetype,
                                              vmid, data)
 
             if result['result'] == "OK":

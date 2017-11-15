@@ -49,7 +49,7 @@ class Analyse:
         self.mongo.client = self.mongo.connect()
         self.mongo.db = self.mongo.client.db
 
-    def run(self):
+    def run(self, instancetype="lxc"):
         insert_time = time.time()
 
         self.mongo.insert_datekey(insert_time, 'running')
@@ -77,7 +77,7 @@ class Analyse:
                     if value_nodes_list["node"] not in exclude_nodes:
                         """ TOTAL COUNT CPU and RAM allocate"""
                         list_instances = proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                              value_nodes_list["node"], "lxc")["value"]
+                                                              value_nodes_list["node"], instancetype)["value"]
 
                         totalcpu = 0
                         totalram = 0
