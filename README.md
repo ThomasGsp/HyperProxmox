@@ -3,7 +3,7 @@
 * Author : Tlams
 * Date : 2017/2018
 * Status: Dev
-* Object :   Massive LXC CT deploy system for proxmox hypervisor.
+* Object :   Massive LXC CT / KVM deploy system for proxmox hypervisor.
 
 ## Quick start
 
