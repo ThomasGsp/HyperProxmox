@@ -11,8 +11,6 @@ from core.modules.mod_proxmox import *
 from core.modules.mod_database import *
 from core.libs.hcrypt import *
 import time
-import operator
-import random
 import base64
 
 
@@ -57,8 +55,15 @@ class Crawler:
                                                           value_nodes_list["node"], instancetype)["value"]
 
                     for key_list_instances, value_list_instances in list_instances.items():
-                        for instances in value_list_instances:
-                            instances["node"] = value_nodes_list["node"]
-                            print(instances)
-
+                        for instance in value_list_instances:
+                            instance["cluster"] = cluster["name"]
+                            instance["node"] = value_nodes_list["node"]
+                            # Test si l'instance existe
+                            if not self.mongo.get_instance(instance["vmid"], instance["node"]):
+                                # si non existante, alors il s'agit d'une instance manuelle
+                                instance["commandid"] = "000000"
+                                self.mongo.insert_instance(instance)
+                            # Si elle existe déjà, on l'update:
+                            else:
+                                self.mongo.update_instance(instance, instance["vmid"], instance["node"])
         return

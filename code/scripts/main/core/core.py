@@ -103,6 +103,9 @@ class Core:
             """ FIND NEXT INSTANCE ID AVAILABLE  AND INCREMENT IT"""
             next_instance_id = int(get_info_system["instances_number"]+1)
 
+            """ TEST THIS ID """
+            
+
             """ FIND LAST LAST IP  USE  AND INCREMENT IT"""
             if not get_info_system["IP_free"]:
                 get_instance_ip = get_info_system["IP_current"]
@@ -284,7 +287,7 @@ class Core:
 
         return result
 
-    def change_instance(self, vmid, data,  instancetype="lxc"):
+    def change_instance(self, vmid, data, instancetype="lxc"):
         """ Find node/cluster informations from vmid """
         try:
             instance_informations = self.mongo.get_instance(vmid)

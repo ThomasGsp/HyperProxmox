@@ -8,9 +8,9 @@
 ## Quick start
 
 ### Requirement:
-* A proxmox server
-* A administrative pve user (full access)
-* A Vztemplate uploaded
+* proxmox server
+* administrative pve user (full access)
+* Vztemplate uploaded
 
 ### Init:
 ``` bash

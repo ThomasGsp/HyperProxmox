@@ -211,14 +211,18 @@ class MongoDB:
     def insert_instance(self, data):
         return self.db[self.collection_instance].insert(data)
 
-    def update_instance(self, vmid, data):
-        self.db[self.collection_instance].update({"vmid": int(vmid)}, {'$set': data}, upsert=False)
+    def update_instance(self, data, vmid, node):
+        return self.db[self.collection_instance].update(
+                {"vmid": int(vmid), "node": node}, {'$set': data}, upsert=False
+            )
 
-    def delete_instance(self, vmid):
-        self.db[self.collection_instance].remove({"vmid": int(vmid)})
+    def delete_instance(self, vmid, node):
+        self.db[self.collection_instance].remove({"vmid": int(vmid), "node": node})
 
-    def get_instance(self, vmid):
+    def get_instance(self, vmid, node):
         try:
-            return json.loads(dumps(self.db[self.collection_instance].find_one({"vmid": int(vmid)})))
+            return json.loads(dumps(
+                self.db[self.collection_instance].find_one(
+                    {"vmid": int(vmid), "node": node})))
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
