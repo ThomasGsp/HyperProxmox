@@ -5,7 +5,7 @@
 * Status: Dev
 * Object :   Massive LXC CT / KVM deploy system for Proxmox clusters.
 
-## Quick start
+## Quick start
 
 ### Requirement:
 * Proxmox server or cluster (or multiples clusters !)
