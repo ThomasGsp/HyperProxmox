@@ -3,7 +3,7 @@
 * Author : Tlams
 * Date : 2017/2018
 * Status: Dev
-* Object :   Massive LXC CT / KVM deploy system for Proxmox clusters.
+* Object :   Massive LXC CT / KVM deployment system for Proxmox clusters.
 
 ## Quick start
 
