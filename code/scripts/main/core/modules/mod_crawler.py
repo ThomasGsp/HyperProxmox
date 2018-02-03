@@ -28,6 +28,7 @@ class Crawler:
         self.mongo.client = self.mongo.connect()
         self.mongo.db = self.mongo.client.db
 
+    """ Instances types availables: lxc/qemu/all"""
     def run(self, instancetype="lxc"):
         insert_time = time.time()
 
@@ -50,9 +51,16 @@ class Crawler:
             nodes_list = proxmox.get_nodes("{0}:{1}".format(cluster["url"], int(cluster["port"])))
             if nodes_list["result"] == "OK":
                 for value_nodes_list in nodes_list["value"]["data"]:
+                    list_instances = ""
                     """ TOTAL COUNT CPU and RAM allocate"""
-                    list_instances = proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                          value_nodes_list["node"], instancetype)["value"]
+                    if(instancetype == "all"):
+                        types = ["lxc", "qemu"] # vz...
+                        for type in types:
+                            list_instances.update(proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                 value_nodes_list["node"], type)["value"])
+                    else:
+                        list_instances = proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                              value_nodes_list["node"], instancetype)["value"]
 
                     for key_list_instances, value_list_instances in list_instances.items():
                         for instance in value_list_instances:
@@ -63,7 +71,6 @@ class Crawler:
                                 # si non existante, alors il s'agit d'une instance manuelle
                                 instance["commandid"] = "000000"
                                 self.mongo.insert_instance(instance)
-                            # Si elle existe déjà, on l'update:
+                            # Si elle existe deja, on l'update:
                             else:
                                 self.mongo.update_instance(instance, instance["vmid"], instance["node"], instance["cluster"])
-        return

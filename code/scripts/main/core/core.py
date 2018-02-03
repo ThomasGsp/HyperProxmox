@@ -24,7 +24,8 @@ def RunAnalyse(clusters_conf, generalconf, delay=300):
 
 
     while True:
-        play.run()
+        """ Instances types availables: lxc/qemu/all"""
+        play.run("all")
         time.sleep(delay)
 
 class Core:
@@ -173,14 +174,14 @@ class Core:
 
         return
 
-    def delete_instance(self, vmid, node, cluster, instancetype="lxc"):
+    def delete_instance(self, vmid, instancetype="lxc"):
 
         try:
             """ Find node/cluster informations from vmid """
-            # instance_informations = self.mongo.get_instance(vmid, node, cluster)
+            instance_informations = self.mongo.get_instance(vmid)
 
             """ Find cluster informations from node """
-            cluster_informations = self.mongo.get_clusters_conf(cluster)["value"]
+            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])["value"]
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
@@ -190,7 +191,7 @@ class Core:
             proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster_informations["password"]),
                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
             """ LOAD PROXMOX """
-            proxmox = Proxmox(node)
+            proxmox = Proxmox(instance_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_cluster_url,
                                                 int(proxmox_cluster_port)),
                                proxmox_cluster_user,
@@ -198,10 +199,10 @@ class Core:
 
             result = proxmox.delete_instance("{0}:{1}".format(proxmox_cluster_url,
                                                               int(proxmox_cluster_port)),
-                                             node, instancetype, vmid)
+                                             instance_informations['node'], instancetype, vmid)
 
             if result['result'] == "OK":
-                self.mongo.delete_instance(vmid, node, cluster)
+                self.mongo.delete_instance(vmid)
                 self.mongo.update_system_free_ip(instance_informations['ip'])
 
         except IndexError as ierror:
@@ -213,13 +214,13 @@ class Core:
 
         return result
 
-    def status_instance(self, vmid, node, cluster, action, instancetype="lxc"):
+    def status_instance(self, vmid, action,  instancetype="lxc"):
         """ Find node/cluster informations from vmid """
         try:
-            #instance_informations = self.mongo.get_instance(vmid, node, cluster)
+            instance_informations = self.mongo.get_instance(vmid)
 
             """ Find cluster informations from node """
-            cluster_informations = self.mongo.get_clusters_conf(cluster)["value"]
+            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])["value"]
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
@@ -229,7 +230,7 @@ class Core:
             proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster_informations["password"]),
                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
             """ LOAD PROXMOX """
-            proxmox = Proxmox(node)
+            proxmox = Proxmox(instance_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_cluster_url,
                                                      int(proxmox_cluster_port)),
                                proxmox_cluster_user,
@@ -237,7 +238,7 @@ class Core:
 
             result = proxmox.status_instance("{0}:{1}".format(proxmox_cluster_url,
                                                               int(proxmox_cluster_port)),
-                                             node,
+                                             instance_informations['node'],
                                              instancetype,
                                              vmid, action)
 
@@ -250,13 +251,13 @@ class Core:
 
         return result
 
-    def info_instance(self, vmid, node, cluster,  instancetype="lxc"):
+    def info_instance(self, vmid, instancetype="lxc"):
         """ Find node/cluster informations from vmid """
         try:
-            #instance_informations = self.mongo.get_instance(vmid, node, cluster)
+            instance_informations = self.mongo.get_instance(vmid)
 
             """ Find cluster informations from node """
-            cluster_informations = self.mongo.get_clusters_conf(cluster)["value"]
+            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])["value"]
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
@@ -266,7 +267,7 @@ class Core:
             proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster_informations["password"]),
                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
             """ LOAD PROXMOX """
-            proxmox = Proxmox(node)
+            proxmox = Proxmox(instance_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_cluster_url,
                                                      int(proxmox_cluster_port)),
                                proxmox_cluster_user,
@@ -274,7 +275,7 @@ class Core:
 
             result = proxmox.get_config("{0}:{1}".format(proxmox_cluster_url,
                                                               int(proxmox_cluster_port)),
-                                             node,
+                                             instance_informations['node'],
                                              instancetype,
                                              vmid)
 
@@ -287,13 +288,13 @@ class Core:
 
         return result
 
-    def change_instance(self, vmid, node, cluster, data, instancetype="lxc"):
+    def change_instance(self, vmid, data, instancetype="lxc"):
         """ Find node/cluster informations from vmid """
         try:
-            #instance_informations = self.mongo.get_instance(vmid, node, cluster)
+            instance_informations = self.mongo.get_instance(vmid)
 
             """ Find cluster informations from node """
-            cluster_informations = self.mongo.get_clusters_conf(cluster)["value"]
+            cluster_informations = self.mongo.get_clusters_conf(instance_informations['cluster'])["value"]
 
             proxmox_cluster_url = cluster_informations["url"]
             proxmox_cluster_port = cluster_informations["port"]
@@ -304,7 +305,7 @@ class Core:
                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
             """ LOAD PROXMOX """
-            proxmox = Proxmox(node)
+            proxmox = Proxmox(instance_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_cluster_url,
                                                 int(proxmox_cluster_port)),
                                proxmox_cluster_user,
@@ -312,12 +313,12 @@ class Core:
 
             result = proxmox.resize_instance("{0}:{1}".format(proxmox_cluster_url,
                                                               int(proxmox_cluster_port)),
-                                             node,
+                                             instance_informations['node'],
                                              instancetype,
                                              vmid, data)
 
             if result['result'] == "OK":
-                self.mongo.update_instance(data, vmid, instance_informations['node'], instance_informations['cluster'])
+                self.mongo.update_instance(data, vmid)
 
         except IndexError as ierror:
             result = {
