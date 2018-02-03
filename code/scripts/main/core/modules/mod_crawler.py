@@ -59,11 +59,11 @@ class Crawler:
                             instance["cluster"] = cluster["name"]
                             instance["node"] = value_nodes_list["node"]
                             # Test si l'instance existe
-                            if not self.mongo.get_instance(instance["vmid"], instance["node"]):
+                            if not self.mongo.get_instance(instance["vmid"], instance["node"], instance["cluster"]):
                                 # si non existante, alors il s'agit d'une instance manuelle
                                 instance["commandid"] = "000000"
                                 self.mongo.insert_instance(instance)
                             # Si elle existe déjà, on l'update:
                             else:
-                                self.mongo.update_instance(instance, instance["vmid"], instance["node"])
+                                self.mongo.update_instance(instance, instance["vmid"], instance["node"], instance["cluster"])
         return
