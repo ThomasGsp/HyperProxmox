@@ -108,6 +108,8 @@ class MongoDB:
         except (TypeError, ValueError) as e:
             raise("MongoDB authentification error on {0}:{1} ({2})".format(self.server, self.port, e))
 
+
+
     """ CLUSTER """
     def get_clusters_conf(self, cluster=None):
         try:
@@ -186,15 +188,7 @@ class MongoDB:
     def update_system_delete_ip(self, value):
         self.db[self.collection_system].update({'_id': "0"}, {'$pull': {'IP_free': value}}, upsert=False)
 
-    """ NODES MANAGEMENT"""
-    def insert_node(self, data):
-        return self.db[self.collection_nodes].insert(data)
 
-    def get_nodes_informations(self, time, node=None):
-        if node:
-            return json.loads(dumps(self.db[self.collection_nodes].find_one({'$and': [{'node': node, 'date': time}]})))
-        else:
-            return json.loads(dumps(self.db[self.collection_nodes].find({'date': time})))
 
     """ KEY DATE MANAGEMENT"""
     def insert_datekey(self, date, status):
@@ -207,10 +201,44 @@ class MongoDB:
         last_id = self.db[self.collection_datekey].find({'status': 'OK'}).sort("date", -1).limit(1)
         return {"value": int(json.loads(dumps(last_id))[0]['date'])}
 
+    """ NODES MANAGEMENT"""
+    def insert_node(self, data):
+        try:
+            return self.db[self.collection_nodes].insert(data)
+        except BaseException as serr:
+            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+
+    def get_node(self, date, cluster, node, grata=None):
+        try:
+            if grata:
+                return json.loads(
+                    dumps(self.db[self.collection_nodes].find_one(
+                        {'$and': [{'date': date, 'cluster': cluster, 'node': node, 'grata': 1}]})))
+            else:
+                return json.loads(
+                    dumps(self.db[self.collection_nodes].find_one(
+                        {'$and': [{'date': date, 'cluster': cluster, 'node': node}]})))
+        except BaseException as serr:
+            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+
+
     """ INSTANCE MANAGEMENT"""
     def insert_instance(self, data):
-        return self.db[self.collection_instance].insert(data)
+        try:
+            return self.db[self.collection_instance].insert(data)
+        except BaseException as serr:
+            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
+    # Revoir la multiplicite des instances/nodes
+    def get_instance(self, date, cluster, node, vmid):
+        try:
+            return json.loads(dumps(
+                    self.db[self.collection_instance].find_one(
+                        {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
+        except BaseException as serr:
+            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+
+    """
     def update_instance(self, data, vmid, node=None, cluster=None):
         if node and cluster:
             return self.db[self.collection_instance].update(
@@ -223,15 +251,4 @@ class MongoDB:
             self.db[self.collection_instance].remove({"vmid": int(vmid), "node": node, "cluster": cluster})
         else:
             self.db[self.collection_instance].remove({"_id": vmid})
-
-    def get_instance(self, vmid, node=None, cluster=None):
-        try:
-            if node and cluster:
-                return json.loads(dumps(
-                    self.db[self.collection_instance].find_one(
-                        {"vmid": int(vmid), "node": node, "cluster": cluster})))
-            else:
-                return json.loads(dumps(
-                    self.db[self.collection_instance].find_one({"_id": vmid})))
-        except BaseException as serr:
-            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+    """

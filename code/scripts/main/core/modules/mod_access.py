@@ -9,6 +9,7 @@ import os
 from Crypto.PublicKey import RSA
 import hashlib
 
+
 def encodepassphrase(passphrase):
     return hashlib.sha512(passphrase.encode("UTF-8")).hexdigest()
 
@@ -125,4 +126,3 @@ class CryticalData:
                 "error": "Data decryption failed: {0}".format(e)
             }
         return result_decryption
-

@@ -31,6 +31,46 @@ class Auth:
         return
 
 
+
+""" CLASS MONGO CACHE """
+
+
+class General_Search:
+    def GET(self, id):
+        return core.generalsearch('{ "_id": {0}}'.format(id))
+
+
+class QueryCache_Infra:
+    def GET(self, dest, date, cluster=None, node=None, vmid=None):
+        try:
+            result = core.generalquerycacheinfra(dest, date, cluster, node, vmid)
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
+        return result
+
+
+
+
+class Static_Nodes:
+    def GET(self, date, cluster=None, node=None):
+        if node and cluster:
+            return core.generalsearch('{ "date": {0}, "cluster": {1},  "node": {2} }'.format(date, cluster, node))
+        elif cluster:
+            return core.generalsearch('{ "date": {0}, "cluster": {1} }'.format(date, cluster))
+        else:
+            return core.generalsearch('{ "date": {0}}'.format(date))
+
+
+class Dates:
+    def GET(self):
+        return core.generalsearch('{ "_id": {id} }'.format(id=nodeid))
+
+
+""" CLASS DIRECT """
 class Cluster:
     def GET(self, cluster=None):
         try:
@@ -83,7 +123,7 @@ class Cluster:
 
 
 class Instance:
-    def GET(self, vmid=None, status=None):
+    def GET(self, vmid, status=None):
         try:
             if status:
                 """ GET INSTANCE STATUS """
@@ -117,11 +157,14 @@ class Instance:
                 sorted_nodes = dict(select.set_attribution(count))
 
                 """ START ALL Thread """
-                for target, count in sorted_nodes.items():
+                for nodeid, count in sorted_nodes.items():
+                    """ Find information by id mongodb"""
+                    realnode = core.generalsearch('{ "_id": {id} }'.format(id=nodeid))
+
                     # Limit to 5 instance per block
                     thci = threading.Thread(name="Insert Instance",
                                        target=core.insert_instance,
-                                       args=(target, str(count), command_id,))
+                                       args=(realnode["name"], cluster["cluster"], str(count), command_id,))
 
                     thci.start()
 

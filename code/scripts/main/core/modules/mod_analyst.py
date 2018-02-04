@@ -16,6 +16,7 @@ import operator
 import random
 import base64
 
+
 def add_token(tokens_in_slots, slot_distributions):
     num_tokens = sum(tokens_in_slots)
     if not num_tokens:
@@ -74,44 +75,68 @@ class Analyse:
             nodes_list = proxmox.get_nodes("{0}:{1}".format(cluster["url"], int(cluster["port"])))
             if nodes_list["result"] == "OK":
                 for value_nodes_list in nodes_list["value"]["data"]:
-                    if value_nodes_list["node"] not in exclude_nodes:
-                        """ TOTAL COUNT CPU and RAM allocate"""
-                        if (instancetype == "all"):
-                            types = ["lxc", "qemu"]  # vz...
-                            for type in types:
-                                list_instances.update(
-                                    proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                         value_nodes_list["node"], type)["value"])
-                        else:
-                            list_instances = \
-                            proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                 value_nodes_list["node"], instancetype)["value"]
+                    # if value_nodes_list["node"] not in exclude_nodes:
+                    """ TOTAL COUNT CPU and RAM allocate """
+                    if (instancetype == "all"):
+                        types = ["lxc", "qemu"]  # vz...
+                        for type in types:
+                            list_instances.update(
+                                proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                     value_nodes_list["node"], type)["value"])
+                    else:
+                        list_instances = \
+                        proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                             value_nodes_list["node"], instancetype)["value"]
 
-                        totalcpu = 0
-                        totalram = 0
-                        for key_list_instances, value_list_instances in list_instances.items():
-                            for instances in value_list_instances:
-                                totalcpu = totalcpu + instances["cpus"]
-                                totalram = totalram + instances["maxmem"]
+                    totalcpu = 0
+                    totalram = 0
+                    for key_list_instances, value_list_instances in list_instances.items():
+                        for instances in value_list_instances:
+                            """ Update cpu and ram for node """
+                            totalcpu = totalcpu + instances["cpus"]
+                            totalram = totalram + instances["maxmem"]
 
-                        value_nodes_list["totalalloccpu"] = totalcpu
-                        value_nodes_list["totalallocram"] = totalram
-                        value_nodes_list["vmcount"] = len(list_instances.items())
+                            """ Update instance list """
+                            instance["cluster"] = cluster["name"]
+                            instance["node"] = value_nodes_list["node"]
+                            instance["date"] = int(insert_time)
+                            self.mongo.insert_instance(instance)
+                            """
+                            # Test si l'instance existe
+                            if not self.mongo.get_instance(instance["vmid"], instance["node"], instance["cluster"]):
+                                # si non existante, alors il s'agit d'une instance manuelle
+                                instance["commandid"] = "000000"
+                                self.mongo.insert_instance(instance)
+                                
+                            # Si elle existe deja, on l'update:
+                            else:
+                                self.mongo.update_instance(instance, instance["vmid"], instance["node"], instance["cluster"])
+                            """
 
-                        percent_cpu_alloc = (totalcpu / value_nodes_list["maxcpu"]) * 100
-                        percent_ram_alloc = (totalram / value_nodes_list["mem"]) * 100
+                    value_nodes_list["totalalloccpu"] = totalcpu
+                    value_nodes_list["totalallocram"] = totalram
+                    value_nodes_list["vmcount"] = len(list_instances.items())
 
-                        """
-                        weight of node =
-                        (((Percent Alloc CPU x coef) + ( Percent Alloc RAM x coef)) / Total coef ) * Cluster weight
-                        """
-                        weight = (((percent_cpu_alloc * 2) + (percent_ram_alloc * 4)) / 6) * int(cluster["weight"])
+                    percent_cpu_alloc = (totalcpu / value_nodes_list["maxcpu"]) * 100
+                    percent_ram_alloc = (totalram / value_nodes_list["mem"]) * 100
 
-                        value_nodes_list["weight"] = int(weight)
-                        value_nodes_list["date"] = int(insert_time)
-                        value_nodes_list["cluster"] = cluster["name"]
+                    """
+                    weight of node =
+                    (((Percent Alloc CPU x coef) + ( Percent Alloc RAM x coef)) / Total coef ) * Cluster weight
+                    """
+                    weight = (((percent_cpu_alloc * 2) + (percent_ram_alloc * 4)) / 6) * int(cluster["weight"])
 
-                        self.mongo.insert_node(value_nodes_list)
+                    value_nodes_list["weight"] = int(weight)
+                    value_nodes_list["date"] = int(insert_time)
+                    value_nodes_list["cluster"] = cluster["name"]
+
+                    """ Mark the node as an grata or not grata """
+                    if value_nodes_list["node"] in exclude_nodes:
+                        value_nodes_list["grata"] = 0
+                    else:
+                        value_nodes_list["grata"] = 1
+
+                    self.mongo.insert_node(value_nodes_list)
 
             else:
                 print(nodes_list)
@@ -124,14 +149,14 @@ class Analyse:
         # Search the last valid key
         lastkeyvalid = self.mongo.get_last_datekey()
 
-        # Get nodes weight
-        nodes_availables = self.mongo.get_nodes_informations(int(lastkeyvalid["value"]))
+        # Get nodes weight with good grata !!
+        nodes_availables = self.mongo.get_nodes(int(lastkeyvalid["value"]), None, 1)
 
         if len(nodes_availables) > 1:
             # Select node name with weight
             nodes_values = {}
             for nodes in nodes_availables:
-                nodes_values[nodes["node"]] = nodes["weight"]
+                nodes_values[nodes["_id"]] = nodes["weight"]
 
             # Sort node by weight
             sorted_nodes = sorted(nodes_values.items(), key=operator.itemgetter(1))
@@ -159,6 +184,6 @@ class Analyse:
             final = {k: int(v) for k, v in zip(sorted_nodes_name, distrib_final)}
 
         else:
-            final = {nodes_availables[0]['node']: count}
+            final = {nodes_availables[0]['_id']: count}
 
         return final

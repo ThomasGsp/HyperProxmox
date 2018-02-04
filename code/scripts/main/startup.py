@@ -88,6 +88,19 @@ if __name__ == "__main__":
             # MANAGEMENT
             '/api/v1/administration/cluster', 'Cluster',
             '/api/v1/administration/cluster/new', 'Cluster',
+
+            # CACHE DATA (MONGO)
+            # date/cluster/node/vmid
+            '/api/v1/static/(instances|nodes|clusters)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/([0-9]+)', 'QueryCache_Infra',
+            # date/cluster/node
+            # '/api/v1/static/nodes/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)', 'Static_Nodes',
+            # cluster
+            # '/api/v1/static/clusters/([0-9]+)/([0-9a-zA-Z]+)', 'Static_Clusters',
+            # date
+            '/api/v1/static/dates', 'QueryCache_Dates',
+            # mongoid
+            '/api/v1/static/id/[a-z0-9]+', 'General_Search',
+
         )
 
     generalconf = {

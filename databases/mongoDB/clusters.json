@@ -7,7 +7,9 @@
   "template": "local:vztmpl/debian-9.0-standard_9.0-2_amd64.tar.gz",
   "storage_disk": "disks",
   "exclude_nodes": [""],
-  "weight": 1
+  "weight": 1,
+  "groups" : ["group1", "group2..."],
+  "clients" : ["client1", "client2..."],
 }
 
 {

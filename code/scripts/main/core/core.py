@@ -20,7 +20,7 @@ import base64
 
 
 def RunAnalyse(clusters_conf, generalconf, delay=300):
-    play = Crawler(clusters_conf, generalconf)
+    play = Analyse(clusters_conf, generalconf)
 
 
     while True:
@@ -59,17 +59,49 @@ class Core:
                                    args=(self.clusters_conf, self.generalconf))
             thc.start()
 
+
+    """
+    #######################
+    #  GENERAL FUNCTIONS  #
+    #######################
+    """
+
+    def is_json(myjson):
+        try:
+            json_object = json.loads(myjson)
+        except ValueError, e:
+            return False
+        return True
+
+    def generalsearch(self, data):
+        if is_json(data):
+            return self.mongo.generalmongosearch(data)
+        else:
+            return json_decode({"value": "Bad request"})
+
+    def generalquerycacheinfra(self, dest, date, cluster, node, vmid):
+        if dest == "instances":
+            return self.mongo.get_instance(date, cluster, node, vmid)
+        elif dest == "nodes":
+            return self.mongo.get_nodes_informations(date, cluster, node)
+        elif dest == "clusters":
+            return self.mongo.get_clusters_conf(date, cluster)
+        else:
+            json_decode({"value": "Bad request"})
+
+
+
     """ 
     #######################
     # INSTANCE MANAGEMENT #
     #######################
     """
-    def insert_instance(self, target, count=1, command_id=000000,  instancetype="lxc"):
+    def insert_instance(self, node, cluster, count=1, command_id=000000,  instancetype="lxc"):
 
         """ Find cluster informations from node """
         lastkeyvalid = self.mongo.get_last_datekey()
-        node_informations = self.mongo.get_nodes_informations((int(lastkeyvalid["value"])), target)
-        cluster_informations = self.mongo.get_clusters_conf(node_informations["cluster"])["value"]
+        node_informations = self.mongo.get_nodes_informations((int(lastkeyvalid["value"])), node, cluster)
+        cluster_informations = self.mongo.get_clusters_conf(cluster)["value"]
 
         proxmox_cluster_url = cluster_informations["url"]
         proxmox_cluster_port = cluster_informations["port"]
@@ -83,7 +115,7 @@ class Core:
         proxmox_storage_disk = cluster_informations["storage_disk"]
 
         """ LOAD PROXMOX """
-        proxmox = Proxmox(target)
+        proxmox = Proxmox(node)
 
         proxmox.get_ticket("{0}:{1}".format(proxmox_cluster_url,
                                                  int(proxmox_cluster_port)),
@@ -139,12 +171,12 @@ class Core:
 
             """ INSTANCE INSERTION """
             result_new = proxmox.create_instance("{0}:{1}".format(proxmox_cluster_url,
-                                                     int(proxmox_cluster_port)), target, instancetype,
+                                                     int(proxmox_cluster_port)), node, instancetype,
                                                     data)
             """ Get first digest """
             digest_init = proxmox.get_config("{0}:{1}".format(proxmox_cluster_url,
                                                          int(proxmox_cluster_port)),
-                                        target, instancetype, next_instance_id)['value']['data']['digest']
+                                             node, instancetype, next_instance_id)['value']['data']['digest']
 
 
             """ VERIFY THE RESULT BY PROXMOX STATUS REQUEST CODE """
@@ -164,7 +196,7 @@ class Core:
                 """ Limit creation DDOS based on digest """
                 while digest_init == proxmox.get_config("{0}:{1}".format(proxmox_cluster_url,
                                                     int(proxmox_cluster_port)),
-                                   target, instancetype, next_instance_id)['value']['data']['digest']:
+                                                    node, instancetype, next_instance_id)['value']['data']['digest']:
                     time.sleep(5)
 
             returnlistresult.append(result_new)
@@ -372,6 +404,20 @@ class Core:
         """ Find cluster informations from node """
         cluster_delete = self.mongo.delete_cluster(cluster)
         return cluster_delete
+
+
+    """ 
+    #######################
+    # STORAGES MANAGEMENT #
+    #######################
+    """
+
+    """ 
+    #######################
+    #  NODES  MANAGEMENT  #
+    #######################
+    """
+
 
 
 def valid_cluster_data(data):
