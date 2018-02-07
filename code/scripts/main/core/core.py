@@ -71,10 +71,10 @@ class Core:
             return False
         return True
 
-    def generalsearch(self, data):
-        if is_json(data):
-            return self.mongo.generalmongosearch(data)
-        else:
+    def generalsearch(self, collection, id):
+        try:
+            return self.mongo.generalmongosearch(collection, str(id))
+        except:
             return json_decode({"value": "Bad request"})
 
     def generalquerycacheinfra(self, dest, date, cluster=None, node=None, vmid=None):
