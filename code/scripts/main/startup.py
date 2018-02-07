@@ -91,15 +91,25 @@ if __name__ == "__main__":
 
             # CACHE DATA (MONGO)
             # date/cluster/node/vmid
-            '/api/v1/static/(instances|nodes|clusters)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/([0-9]+)', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/([0-9]+)', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+)/', 'QueryCache_Infra',
+
             # date/cluster/node
-            # '/api/v1/static/nodes/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)', 'Static_Nodes',
+            '/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)', 'QueryCache_Infra',
+            '/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(nodes)/([0-9]+)/', 'QueryCache_Infra',
+
             # cluster
-            # '/api/v1/static/clusters/([0-9]+)/([0-9a-zA-Z]+)', 'Static_Clusters',
+            '/api/v1/static/(clusters)/([0-9]+)/(?:[0-9a-zA-Z]+)',  'QueryCache_Infra',
+            '/api/v1/static/(clusters)/([0-9]+)/', 'QueryCache_Infra',
+
             # date
-            '/api/v1/static/dates', 'QueryCache_Dates',
+            '/api/v1/static/dates/', 'QueryCache_Dates',
+
             # mongoid
-            '/api/v1/static/id/[a-z0-9]+', 'General_Search',
+            '/api/v1/static/(instances|nodes|clusters)/id/[a-z0-9]+', 'General_Search',
 
         )
 

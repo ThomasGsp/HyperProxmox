@@ -10,7 +10,6 @@
 from core.modules.mod_proxmox import *
 from core.modules.mod_database import *
 from core.modules.mod_analyst import *
-from core.modules.mod_crawler import *
 from core.modules.mod_access import *
 from core.libs.hcrypt import *
 from netaddr import iter_iprange
@@ -65,11 +64,10 @@ class Core:
     #  GENERAL FUNCTIONS  #
     #######################
     """
-
-    def is_json(myjson):
+    def is_json(selmyjson):
         try:
-            json_object = json.loads(myjson)
-        except ValueError, e:
+            json.loads(myjson)
+        except ValueError as e:
             return False
         return True
 
@@ -79,7 +77,7 @@ class Core:
         else:
             return json_decode({"value": "Bad request"})
 
-    def generalquerycacheinfra(self, dest, date, cluster, node, vmid):
+    def generalquerycacheinfra(self, dest, date, cluster=None, node=None, vmid=None):
         if dest == "instances":
             return self.mongo.get_instance(date, cluster, node, vmid)
         elif dest == "nodes":

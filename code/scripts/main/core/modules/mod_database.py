@@ -208,19 +208,22 @@ class MongoDB:
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
-    def get_node(self, date, cluster, node, grata=None):
+    def get_node(self, date, cluster, node, grata=0):
         try:
-            if grata:
+            if not cluster:
                 return json.loads(
-                    dumps(self.db[self.collection_nodes].find_one(
-                        {'$and': [{'date': date, 'cluster': cluster, 'node': node, 'grata': 1}]})))
+                    dumps(self.db[self.collection_nodes].find(
+                        {'$and': [{'date': date, 'grata': str(grata)}]})))
+            elif not node:
+                return json.loads(
+                    dumps(self.db[self.collection_nodes].find(
+                        {'$and': [{'date': date, 'cluster': cluster, 'grata': str(grata)}]})))
             else:
                 return json.loads(
                     dumps(self.db[self.collection_nodes].find_one(
-                        {'$and': [{'date': date, 'cluster': cluster, 'node': node}]})))
+                        {'$and': [{'date': date, 'cluster': cluster, 'node': node, 'grata': str(grata)}]})))
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
-
 
     """ INSTANCE MANAGEMENT"""
     def insert_instance(self, data):
@@ -232,9 +235,22 @@ class MongoDB:
     # Revoir la multiplicite des instances/nodes
     def get_instance(self, date, cluster, node, vmid):
         try:
-            return json.loads(dumps(
+            if not cluster:
+                return json.loads(dumps(
+                    self.db[self.collection_instance].find({"date": int(date)})))
+            elif not node:
+                return json.loads(dumps(
+                    self.db[self.collection_instance].find(
+                        {'$and': [{"date": int(date), "cluster": cluster}]})))
+            elif not vmid:
+                return json.loads(dumps(
+                    self.db[self.collection_instance].find(
+                        {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})))
+            else:
+                return json.loads(dumps(
                     self.db[self.collection_instance].find_one(
                         {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
+
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
