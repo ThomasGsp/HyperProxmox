@@ -36,9 +36,16 @@ class Auth:
 
 
 class General_Search:
-    def GET(self, id):
-        return core.generalsearch('{ "_id": {0}}'.format(id))
-
+    def GET(self, query, id):
+        try:
+            return core.generalsearch(query, id)
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "{0} {1}".format("Invalid request:", e)
+            }
+        return result
 
 class QueryCache_Infra:
     def GET(self, dest, date, cluster=None, node=None, vmid=None):
