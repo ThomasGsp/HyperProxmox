@@ -25,7 +25,7 @@ redis_password:
 redis_ip: 192.168.0.138
 redis_port: 6379
 
-[options]
+[deploy]
 ; Maximum deploy instance in same time
 ; A hight value my do overcharge on your physicals servers
 concurrencydeploy: 2
@@ -35,8 +35,21 @@ concurrencydeploy: 2
 ; A low delay my do overcharge on your physicals servers
 delayrounddeploy: 15
 
+[walker]
 ; Delay in secondes between to data crawl
 walker: 300
 
 ; walker lock file
 walker_lock: /tmp/hyperproxmoxwalker.lock
+
+
+
+[logger]
+; Active or not(True/False)
+debug = True
+
+; debug level    1: "INFO",  2: "WARNING", 3: "ERROR", 4: "CRITICAL",  5: "DEBUG"
+debug_level = 5
+
+; log output
+log_file = /var/log/hyperproxmox/errors.log
