@@ -99,6 +99,41 @@ class Proxmox:
 
         return result
 
+    def get_clusters(self, url):
+        """
+        Get Nodes from cluster
+        :param url: Generic node url (node = physical hypervisor)
+        """
+        request = "https://{0}/api2/json/clusters/status".format(url)
+        try:
+            nodes = self.nodes = self.socket.get(request,
+                                                 cookies=self.PVEAuthCookie,
+                                                 verify=False, timeout=5)
+
+            if nodes.status_code == 200:
+                result = {
+                    "result": "OK",
+                    "value": nodes.json()
+                }
+            else:
+                result = {
+                    "result": "ERROR",
+                    "target": "{0}".format(request),
+                    "type": "PROXMOX - STATUS CODE",
+                    "value": "Error nodes informations. Bad HTTP Status code : "
+                                   "{0} -- {1}".format(nodes.status_code, nodes.text)
+                }
+
+        except (TypeError, ValueError, requests.exceptions.RequestException) as e:
+            result = {
+                "result": "ERROR",
+                "target": "{0}".format(request),
+                "type": "PYTHON",
+                "value": "Cannot get node information for {0} ({1})".format(url, e)
+            }
+
+        return result
+
     def get_status(self, url, nodename):
         """
         Get node informations
