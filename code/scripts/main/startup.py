@@ -93,9 +93,6 @@ if __name__ == "__main__":
 
             # date/cluster/node/vmid
 
-            # Cluster mapping
-            '/api/v1/static/(cluster)/([0-9]+)/', 'QueryCache_Infra',
-
             # Disks mapping
             '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/([0-9]+)', 'QueryCache_Infra',
             '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
@@ -126,7 +123,7 @@ if __name__ == "__main__":
             '/api/v1/static/dates/', 'QueryCache_Dates',
 
             # mongoid
-            '/api/v1/static/(instances|nodes|clusters)/id/[a-z0-9]+', 'General_Search',
+            '/api/v1/static/(instances|nodes|clusters|storages|disks)/id/[a-z0-9]+', 'General_Search',
 
         )
 
