@@ -34,3 +34,9 @@ concurrencydeploy: 2
 ; If your infrastructure isn't very large, you should'nt reduce this delay.
 ; A low delay my do overcharge on your physicals servers
 delayrounddeploy: 15
+
+; Delay in secondes between to data crawl
+walker: 300
+
+; walker lock file
+walker_lock: /tmp/hyperproxmoxwalker.lock
