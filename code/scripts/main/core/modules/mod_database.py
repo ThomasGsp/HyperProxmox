@@ -54,6 +54,7 @@ class MongoDB:
         self.collection_instance = "instances"
         self.collection_nodes = "nodes"
         self.collection_clusters = "clusters"
+        self.collection_storages = "storages"
         self.collection_datekey = "dates"
         self.port = port
         self.db = None
@@ -84,7 +85,7 @@ class MongoDB:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "value": "{0} {1}".format("Invalid request", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -105,7 +106,7 @@ class MongoDB:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "value": "{0} {1}".format("Invalid request", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -114,12 +115,12 @@ class MongoDB:
             self.db[self.collection_clusters].insert(data)
             result = {
                 "result": "OK",
-                "value": "{0} {1}".format(data["name"], "is now available")
+                "value": "{0} is now available".format(data["name"])
             }
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "value": "{0} {1}".format("Invalid request", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -128,12 +129,12 @@ class MongoDB:
             self.db[self.collection_clusters].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
             result = {
                 "result": "OK",
-                "value": "{0} {1}".format(data["name"], "has been updated")
+                "value": "{0} has been updated".format(data["name"])
             }
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "value": "{0} {1}".format("Invalid request", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -147,7 +148,7 @@ class MongoDB:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "value": "{0} {1}".format("Invalid request", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -262,18 +263,3 @@ class MongoDB:
                 "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
             }
         return result
-
-    """
-    def update_instance(self, data, vmid, node=None, cluster=None):
-        if node and cluster:
-            return self.db[self.collection_instance].update(
-                {"vmid": int(vmid), "node": node, "cluster": cluster }, {'$set': data}, upsert=False)
-        else:
-            return self.db[self.collection_instance].update({"_id": vmid}, {'$set': data}, upsert=False)
-
-    def delete_instance(self, vmid, node=None, cluster=None):
-        if node and cluster:
-            self.db[self.collection_instance].remove({"vmid": int(vmid), "node": node, "cluster": cluster})
-        else:
-            self.db[self.collection_instance].remove({"_id": vmid})
-    """
