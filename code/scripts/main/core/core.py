@@ -105,7 +105,7 @@ class Core:
             elif dest == "storages":
                 resultmbrequest = self.mongo.get_storage(date, cluster, node)
             elif dest == "clusters":
-                resultmbrequest = self.mongo.get_clusters_conf(date, cluster)
+                resultmbrequest = self.mongo.get_clusters(date, cluster)
             else:
                 resultmbrequest = json_decode({"value": "Bad request"})
 
@@ -392,12 +392,12 @@ class Core:
     #######################
     """
 
-    def get_cluster(self, cluster=None):
+    def get_cluster_conf(self, cluster=None):
         """ Find cluster informations from node """
         cluster_informations = self.mongo.get_clusters_conf(cluster)["value"]
         return cluster_informations
 
-    def insert_cluster(self, data):
+    def insert_cluster_conf(self, data):
         testdata = valid_cluster_data(data)
 
         if not testdata:
@@ -420,12 +420,12 @@ class Core:
 
         return new_cluster
 
-    def change_cluster(self, cluster, data):
+    def change_cluster_conf(self, cluster, data):
         cluster_update = self.mongo.update_cluster_conf(cluster, data)
         return cluster_update
 
 
-    def delete_cluster(self, cluster):
+    def delete_cluster_conf(self, cluster):
         """ Find cluster informations from node """
         cluster_delete = self.mongo.delete_cluster_conf(cluster)
         return cluster_delete

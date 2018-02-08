@@ -73,8 +73,20 @@ class Analyse:
             proxmox = Proxmox("Analyse")
             proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), proxmox_cluster_user, proxmox_cluster_pwd)
 
+            """ 
+            ##############
+            #  CLUSTERS  #
+            ##############
+            """
+
             """ Get excluded nodes """
             exclude_nodes = cluster["exclude_nodes"]
+
+            """ UPDATE CLUSTER STATUS """
+            clusters_status = proxmox.get_clusters("{0}:{1}".format(cluster["url"], int(cluster["port"])))
+            clusters_status["date"] = int(insert_time)
+            clusters_status["cluster"] = cluster["name"]
+            self.mongo.insert_cluster(instance)
 
             """ UPDATE NODES LIST """
             nodes_list = proxmox.get_nodes("{0}:{1}".format(cluster["url"], int(cluster["port"])))

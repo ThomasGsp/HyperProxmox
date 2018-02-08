@@ -54,6 +54,7 @@ class MongoDB:
         self.collection_instance = "instances"
         self.collection_nodes = "nodes"
         self.collection_clusters = "clusters"
+        self.collection_clusters_conf = "clusters_conf"
         self.collection_storages = "storages"
         self.collection_disks = "disks"
         self.collection_datekey = "dates"
@@ -92,17 +93,47 @@ class MongoDB:
 
 
     """ CLUSTER """
+    def get_clusters(self, date, cluster):
+        try:
+            if not cluster:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(
+                        dumps(self.db[self.collection_clusters].find({'date': date, 'grata': str(grata)})))
+                }
+            else:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(
+                        dumps(self.db[self.collection_clusters].find_one(
+                            {'$and': [{'date': date, 'cluster': cluster}]})))
+                }
+
+        except BaseException as serr:
+            result = {
+                "result": "ERROR",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
+
+    def insert_clusters(self, data):
+        try:
+            return self.db[self.collection_clusters].insert(data)
+        except BaseException as serr:
+            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+
+
     def get_clusters_conf(self, cluster=None):
         try:
             if cluster:
                 result = {
                     "result": "OK",
-                    "value": json.loads(dumps(self.db[self.collection_clusters].find_one({"name": cluster})))
+                    "value": json.loads(dumps(self.db[self.collection_clusters_conf].find_one({"name": cluster})))
                 }
             else:
                 result = {
                     "result": "OK",
-                    "value": json.loads(dumps(self.db[self.collection_clusters].find({})))
+                    "value": json.loads(dumps(self.db[self.collection_clusters_conf].find({})))
                 }
         except BaseException as e:
             result = {
@@ -113,7 +144,7 @@ class MongoDB:
 
     def insert_clusters_conf(self, data):
         try:
-            self.db[self.collection_clusters].insert(data)
+            self.db[self.collection_clusters_conf].insert(data)
             result = {
                 "result": "OK",
                 "value": "{0} is now available".format(data["name"])
@@ -127,7 +158,7 @@ class MongoDB:
 
     def update_cluster_conf(self, cluster, data):
         try:
-            self.db[self.collection_clusters].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
+            self.db[self.collection_clusters_conf].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
             result = {
                 "result": "OK",
                 "value": "{0} has been updated".format(data["name"])
@@ -141,7 +172,7 @@ class MongoDB:
 
     def delete_cluster_conf(self, cluster):
         try:
-            self.db[self.collection_clusters].remove({"cluster": str(cluster)})
+            self.db[self.collection_clusters_conf].remove({"cluster": str(cluster)})
             result = {
                 "result": "OK",
                 "value": "{0} has been deleted".format(cluster)
