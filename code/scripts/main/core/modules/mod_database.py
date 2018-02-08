@@ -55,6 +55,7 @@ class MongoDB:
         self.collection_nodes = "nodes"
         self.collection_clusters = "clusters"
         self.collection_storages = "storages"
+        self.collection_disks = "disks"
         self.collection_datekey = "dates"
         self.port = port
         self.db = None
@@ -226,7 +227,6 @@ class MongoDB:
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
-    # Revoir la multiplicite des instances/nodes
     def get_instance(self, date, cluster, node, vmid):
         try:
             if not cluster:
@@ -254,6 +254,89 @@ class MongoDB:
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_instance].find_one(
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
+                }
+
+        except BaseException as serr:
+            result = {
+                "result": "ERROR",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
+
+
+    """ STORAGE MANAGEMENT"""
+    def insert_storage(self, data):
+        try:
+            return self.db[self.collection_storages].insert(data)
+        except BaseException as serr:
+            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+
+    def get_storage(self, date, cluster, node):
+        try:
+            if not cluster:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(
+                        self.db[self.collection_disks].find({"date": int(date)})))
+                }
+            elif not node:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(
+                        self.db[self.collection_disks].find(
+                            {'$and': [{"date": int(date), "cluster": cluster}]})))
+                }
+            else:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(
+                        self.db[self.collection_disks].find_one(
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
+                }
+        except BaseException as serr:
+            result = {
+                "result": "ERROR",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
+
+
+
+    """ DISKS MANAGEMENT"""
+    def insert_disk(self, data):
+        try:
+            return self.db[self.collection_disks].insert(data)
+        except BaseException as serr:
+            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+
+    def get_disk(self, date, cluster, node, vmid):
+        try:
+            if not cluster:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(
+                        self.db[self.collection_disks].find({"date": int(date)})))
+                }
+            elif not node:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(
+                        self.db[self.collection_disks].find(
+                            {'$and': [{"date": int(date), "cluster": cluster}]})))
+                }
+            elif not vmid:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(
+                        self.db[self.collection_disks].find(
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})))
+                }
+            else:
+                result = {
+                    "result": "OK",
+                    "value": json.loads(dumps(
+                        self.db[self.collection_disks].find_one(
                             {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
                 }
 

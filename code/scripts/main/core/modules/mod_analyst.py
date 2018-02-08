@@ -95,6 +95,12 @@ class Analyse:
 
                     totalcpu = 0
                     totalram = 0
+
+                    """ 
+                    #############
+                    # INSTANCES #
+                    #############
+                    """
                     for key_list_instances, value_list_instances in list_instances.items():
                         for instances in value_list_instances:
                             """ Update cpu and ram for node """
@@ -106,18 +112,12 @@ class Analyse:
                             instance["node"] = value_nodes_list["node"]
                             instance["date"] = int(insert_time)
                             self.mongo.insert_instance(instance)
-                            """
-                            # Test si l'instance existe
-                            if not self.mongo.get_instance(instance["vmid"], instance["node"], instance["cluster"]):
-                                # si non existante, alors il s'agit d'une instance manuelle
-                                instance["commandid"] = "000000"
-                                self.mongo.insert_instance(instance)
-                                
-                            # Si elle existe deja, on l'update:
-                            else:
-                                self.mongo.update_instance(instance, instance["vmid"], instance["node"], instance["cluster"])
-                            """
 
+                    """ 
+                    #############
+                    #   NODES   #
+                    #############
+                    """
                     value_nodes_list["totalalloccpu"] = totalcpu
                     value_nodes_list["totalallocram"] = totalram
                     value_nodes_list["vmcount"] = len(list_instances.items())
@@ -142,6 +142,34 @@ class Analyse:
                         value_nodes_list["grata"] = 1
 
                     self.mongo.insert_node(value_nodes_list)
+
+                    """ 
+                    #############
+                    #  STORAGES #
+                    #############
+                    """
+                    storages_list = proxmox.get_storages("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                         value_nodes_list["node"])
+                    for storage in storages_list:
+                        storage["node"] = value_nodes_list["node"]
+                        storage["date"] = int(insert_time)
+                        storage["cluster"] = cluster["name"]
+
+                        self.mongo.insert_storage(storage)
+                        disks_list = proxmox.get_storages("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                         value_nodes_list["node"], storage["storage"])
+
+                        for disk in disks_list:
+                            disk["storage"] = storage["storage"]
+                            disk["node"] = value_nodes_list["node"]
+                            disk["date"] = int(insert_time)
+                            disk["cluster"] = cluster["name"]
+                            self.mongo.insert_disk(disk)
+
+
+
+
+
 
             else:
                 print(nodes_list)
