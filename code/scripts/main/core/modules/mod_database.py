@@ -91,7 +91,6 @@ class MongoDB:
             }
         return result
 
-
     """ CLUSTER """
     def get_clusters(self, date, cluster):
         try:
