@@ -143,7 +143,7 @@ class MongoDB:
             self.db[self.collection_clusters].remove({"cluster": str(cluster)})
             result = {
                 "result": "OK",
-                "value": "{0} {1}".format(cluster, "has been deleted")
+                "value": "{0} has been deleted".format(cluster)
             }
         except BaseException as e:
             result = {
