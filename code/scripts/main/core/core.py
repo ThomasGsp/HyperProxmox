@@ -404,7 +404,7 @@ class Core:
             if not self.mongo.get_clusters_conf(data["name"])["value"]:
                 data["user"] = base64.b64encode(pcrypt(data["user"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
                 data["password"] = base64.b64encode(pcrypt(data["password"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
-                new_cluster = self.mongo.insert_new_cluster(data)
+                new_cluster = self.mongo.insert_clusters_conf(data)
             else:
                 new_cluster = {
                     "value": "{0}".format("Duplicate entry, please delete the current cluster or update it"),
@@ -421,13 +421,13 @@ class Core:
         return new_cluster
 
     def change_cluster(self, cluster, data):
-        cluster_update = self.mongo.update_cluster(cluster, data)
+        cluster_update = self.mongo.update_cluster_conf(cluster, data)
         return cluster_update
 
 
     def delete_cluster(self, cluster):
         """ Find cluster informations from node """
-        cluster_delete = self.mongo.delete_cluster(cluster)
+        cluster_delete = self.mongo.delete_cluster_conf(cluster)
         return cluster_delete
 
 
