@@ -111,7 +111,7 @@ class MongoDB:
             }
         return result
 
-    def insert_new_cluster(self, data):
+    def insert_clusters_conf(self, data):
         try:
             self.db[self.collection_clusters].insert(data)
             result = {
@@ -125,7 +125,7 @@ class MongoDB:
             }
         return result
 
-    def update_cluster(self, cluster, data):
+    def update_cluster_conf(self, cluster, data):
         try:
             self.db[self.collection_clusters].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
             result = {
@@ -139,7 +139,7 @@ class MongoDB:
             }
         return result
 
-    def delete_cluster(self, cluster):
+    def delete_cluster_conf(self, cluster):
         try:
             self.db[self.collection_clusters].remove({"cluster": str(cluster)})
             result = {
