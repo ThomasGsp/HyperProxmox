@@ -1,6 +1,6 @@
 import os
 
-class locker:
+class Locker:
     def createlock(self, lockfile, date=0):
         try:
             if os.path.exists(lockfile):
