@@ -128,11 +128,13 @@ if __name__ == "__main__":
         )
 
     generalconf = {
-        "hyperproxmox": {"walker": localconf['options']['walker'], "walker_lock": localconf['options']['walker_lock']},
+        "logger": {"debug": localconf['logger']['debug'], "debug_level": localconf['logger']['debug_level'],
+                   "logs_file": localconf['logger']['logs_file']},
+        "analyst": {"walker": localconf['walker']['walker'], "walker_lock": localconf['walker']['walker_lock']},
         "keys": {"key_pvt": key_pvt["data"], "key_pub": key_pub["data"]},
         "mongodb": {"ip": localconf['databases']['mongodb_ip'], 'port': localconf['databases']['mongodb_port']},
         "redis": {"ip": localconf['databases']['redis_ip'], 'port': localconf['databases']['redis_port']},
-        "deploy": {'concurrencydeploy': localconf['options']['concurrencydeploy'], 'delayrounddeploy': localconf['options']['delayrounddeploy']}
+        "deploy": {'concurrencydeploy': localconf['deploy']['concurrencydeploy'], 'delayrounddeploy': localconf['deploy']['delayrounddeploy']}
     }
 
     """ First redis connection """
