@@ -166,11 +166,6 @@ class Analyse:
                             disk["cluster"] = cluster["name"]
                             self.mongo.insert_disk(disk)
 
-
-
-
-
-
             else:
                 print(nodes_list)
 
