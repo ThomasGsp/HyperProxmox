@@ -17,12 +17,12 @@ user: hosting_api
 ; NOSQL databases, should use a password
 mongodb_user:
 mongodb_password:
-mongodb_ip: 192.168.66.1
+mongodb_ip: 192.168.0.138
 mongodb_port: 27017
 
 redis_user:
 redis_password:
-redis_ip: 192.168.66.1
+redis_ip: 192.168.0.138
 redis_port: 6379
 
 [options]

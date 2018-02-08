@@ -180,13 +180,13 @@ class Instance:
                 for t in range(timeout):
                     time.sleep(1)
                     try:
-                        if len(ast.literal_eval(Lredis.get_message(command_id))) == int(count):
+                        if len(ast.literal_eval(redis_msg.get_message(command_id))) == int(count):
                             break
                     except BaseException as err:
                         print("Value not found", err)
 
                 """ Return messages """
-                return ast.literal_eval(Lredis.get_message(command_id))
+                return ast.literal_eval(redis_msg.get_message(command_id))
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -220,12 +220,13 @@ class Instance:
 
 
 class ThreadAPI(threading.Thread):
-    def __init__(self, threadid, name, urls, c, g, r):
+    #def __init__(self, threadid, name, urls, c, g, r):
+    def __init__(self, threadid, name, urls, c, g):
         """ Pass Global var in this theard."""
-        global core, generalconf, Lredis
+        global core, generalconf, redis_msg
         core = c
         generalconf = g
-        Lredis = r
+        redis_msg = core.redis_msg
 
         """ RUN API """
         threading.Thread.__init__(self)

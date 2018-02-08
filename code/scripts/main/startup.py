@@ -121,13 +121,15 @@ if __name__ == "__main__":
     }
 
     """ First redis connection """
-    Lredis = Redis_messages(generalconf["redis"]["ip"])
-    Lredis.connect()
+    # Lredis = Redis_wrapper(generalconf["redis"]["ip"], generalconf["redis"]["port"])
+    # Lredis.connect()
 
     """ Init Core thread """
-    core = Core(generalconf, Lredis)
+    # core = Core(generalconf, Lredis)
+    core = Core(generalconf)
 
     """ Init API thread """
-    api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf, Lredis)
+    # api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf, Lredis)
+    api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf)
     api_th.start()
 

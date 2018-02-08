@@ -4,8 +4,14 @@ import json
 import redis
 import time
 
-class Redis_instance_queue:
-    def __init__(self, server="127.0.0.1", port=6379, db=3, password=None):
+class Redis_wrapper:
+    def __init__(self, server="127.0.0.1", port=6379, db=0, password=None):
+        # DB =
+        # messages: 0
+        # logs: 1
+        # queue : 2
+        # cache : 3
+
         self.server = server
         self.port = port
         self.r = None
@@ -26,48 +32,8 @@ class Redis_instance_queue:
     def insert_instance_queue(self,  logtext, expir=3000):
         self.r.set(time.time(), logtext, expir)
 
-
-class Redis_logger:
-    def __init__(self, server="127.0.0.1", port=6379, db=2, password=None):
-        self.server = server
-        self.port = port
-        self.r = None
-        self.db = db
-        self.password = password
-
-    def connect(self):
-        try:
-            conn = self.r = redis.Redis(
-                host=self.server, port=self.port, db=self.db, password=self.password,
-                charset="utf-8", decode_responses=True)
-            self.r.client_list()
-        except BaseException as err:
-            print("Redis connexion error on {0}:{1} ({2})".format(self.server, self.port, err))
-            conn = False
-        return conn
-
     def insert_logs(self,  logtext, expir=86400*4):
         self.r.set(time.time(), logtext, expir)
-
-
-class Redis_messages:
-    def __init__(self, server="127.0.0.1", port=6379, db=1, password=None):
-        self.server = server
-        self.port = port
-        self.r = None
-        self.db = db
-        self.password = password
-
-    def connect(self):
-        try:
-            conn = self.r = redis.Redis(
-                host=self.server, port=self.port, db=self.db, password=self.password,
-                charset="utf-8", decode_responses=True)
-            self.r.client_list()
-        except BaseException as err:
-            print("Redis connexion error on {0}:{1} ({2})".format(self.server, self.port, err))
-            conn = False
-        return conn
 
     def insert_message(self, key, value, expir=86400):
         self.r.set(key, value, expir)

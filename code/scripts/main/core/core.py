@@ -16,6 +16,7 @@ from netaddr import iter_iprange
 import threading
 import time
 import base64
+import hashlib
 
 
 def RunAnalyse(clusters_conf, generalconf, delay=300):
@@ -29,19 +30,23 @@ def RunAnalyse(clusters_conf, generalconf, delay=300):
 
 class Core:
 
-    def __init__(self, generalconf, Lredis):
+    # def __init__(self, generalconf, Lredis):
+    def __init__(self, generalconf):
 
         self.generalconf = generalconf
-        self.Lredis = Lredis
 
         """ LOAD MONGODB """
         self.mongo = MongoDB(generalconf["mongodb"]["ip"])
         self.mongo.client = self.mongo.connect()
 
         """ LOAD REDIS """
-        self.redis_msg = Lredis
+        self.redis_msg = Redis_wrapper(generalconf["redis"]["ip"],
+                                       generalconf["redis"]["port"], 0).connect()
 
-        if self.mongo.client and self.redis_msg.connect():
+        self.redis_cache = Redis_wrapper(generalconf["redis"]["ip"],
+                                       generalconf["redis"]["port"], 3).connect()
+
+        if self.mongo.client and self.redis_msg:
             self.mongo.db = self.mongo.client.db
 
             """ Others """
@@ -78,15 +83,27 @@ class Core:
             return json_decode({"value": "Bad request"})
 
     def generalquerycacheinfra(self, dest, date, cluster=None, node=None, vmid=None):
-        if dest == "instances":
-            return self.mongo.get_instance(date, cluster, node, vmid)
-        elif dest == "nodes":
-            return self.mongo.get_nodes_informations(date, cluster, node)
-        elif dest == "clusters":
-            return self.mongo.get_clusters_conf(date, cluster)
-        else:
-            json_decode({"value": "Bad request"})
 
+        """ Test Redis Cache """
+        hash_object = hashlib.md5(b"{0}-{1}-{2}-{3}-{4}".format(dest, date, cluster, node, vmid))
+        hash_hex = hash_object.hexdigest()
+
+        cache = self.redis_cache.get_message(hash_hex)
+
+        if cache is None:
+            if dest == "instances":
+                resultmbrequest = self.mongo.get_instance(date, cluster, node, vmid)
+            elif dest == "nodes":
+                resultmbrequest = self.mongo.get_nodes_informations(date, cluster, node)
+            elif dest == "clusters":
+                resultmbrequest = self.mongo.get_clusters_conf(date, cluster)
+            else:
+                resultmbrequest = json_decode({"value": "Bad request"})
+
+            self.redis_cache.insert_message(hash_hex, resultmbrequest)
+            return resultmbrequest
+        else:
+            return cache
 
 
     """ 
@@ -189,6 +206,7 @@ class Core:
                 data["cluster"] = node_informations["cluster"]
                 data["node"] = target
                 data["ip"] = ip
+                data["date"] = lastkeyvalid["value"]
 
                 self.mongo.insert_instance(data)
                 """ Limit creation DDOS based on digest """
