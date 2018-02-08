@@ -11,6 +11,7 @@ to allocate news instances.
 from core.modules.mod_proxmox import *
 from core.modules.mod_database import *
 from core.libs.hcrypt import *
+from core.libs.locker import *
 import time
 import operator
 import random
@@ -52,6 +53,10 @@ class Analyse:
 
     def run(self, instancetype="all"):
         insert_time = time.time()
+
+        """ Create lock file """
+        locker = Locker()
+        locker.createlock(self.generalconf["hyperproxmox"]["walker_lock"], insert_time)
 
         self.mongo.insert_datekey(insert_time, 'running')
 
@@ -142,6 +147,10 @@ class Analyse:
                 print(nodes_list)
 
         self.mongo.update_datekey(int(insert_time), "OK")
+
+        """ Unlock file """
+        locker.unlock(self.generalconf["hyperproxmox"]["walker_lock"])
+
         return
 
     def set_attribution(self, count):
