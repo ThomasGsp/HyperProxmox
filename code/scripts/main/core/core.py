@@ -99,7 +99,11 @@ class Core:
             if dest == "instances":
                 resultmbrequest = self.mongo.get_instance(date, cluster, node, vmid)
             elif dest == "nodes":
-                resultmbrequest = self.mongo.get_nodes_informations(date, cluster, node)
+                resultmbrequest = self.mongo.get_node(date, cluster, node)
+            elif dest == "disks":
+                resultmbrequest = self.mongo.get_disk(date, cluster, node, vmid)
+            elif dest == "storages":
+                resultmbrequest = self.mongo.get_storage(date, cluster, node)
             elif dest == "clusters":
                 resultmbrequest = self.mongo.get_clusters_conf(date, cluster)
             else:
