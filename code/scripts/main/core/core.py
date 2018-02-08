@@ -58,9 +58,14 @@ class Core:
             """ RUN THE ANALYZER IN DEDICATED THEARD"""
             self.clusters_conf = self.mongo.get_clusters_conf()["value"]
 
+            """ Clean previous lockers """
+            locker = Locker()
+            locker.unlock(generalconf["hyperproxmox"]["walker_lock"])
+
             thc = threading.Thread(name="Update statistics",
                                    target=RunAnalyse,
-                                   args=(self.clusters_conf, self.generalconf))
+                                   args=(self.clusters_conf, self.generalconf,
+                                         generalconf["hyperproxmox"]["walker"]))
             thc.start()
 
 
@@ -100,7 +105,7 @@ class Core:
             else:
                 resultmbrequest = json_decode({"value": "Bad request"})
 
-            self.redis_cache.insert_message(hash_hex, resultmbrequest)
+            self.redis_cache.insert_message(hash_hex, resultmbrequest, 3600)
             return resultmbrequest
         else:
             return cache
