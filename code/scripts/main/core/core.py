@@ -60,12 +60,12 @@ class Core:
 
             """ Clean previous lockers """
             locker = Locker()
-            locker.unlock(generalconf["hyperproxmox"]["walker_lock"])
+            locker.unlock(generalconf["analyst"]["walker_lock"])
 
             thc = threading.Thread(name="Update statistics",
                                    target=RunAnalyse,
                                    args=(self.clusters_conf, self.generalconf,
-                                         generalconf["hyperproxmox"]["walker"]))
+                                         generalconf["analyst"]["walker"]))
             thc.start()
 
 
