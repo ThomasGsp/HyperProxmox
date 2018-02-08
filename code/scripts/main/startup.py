@@ -114,6 +114,7 @@ if __name__ == "__main__":
         )
 
     generalconf = {
+        "hyperproxmox": {"walker": localconf['options']['walker'], "walker_lock": localconf['options']['walker_lock']},
         "keys": {"key_pvt": key_pvt["data"], "key_pub": key_pub["data"]},
         "mongodb": {"ip": localconf['databases']['mongodb_ip'], 'port': localconf['databases']['mongodb_port']},
         "redis": {"ip": localconf['databases']['redis_ip'], 'port': localconf['databases']['redis_port']},
