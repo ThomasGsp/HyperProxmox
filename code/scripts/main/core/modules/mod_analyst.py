@@ -56,7 +56,7 @@ class Analyse:
 
         """ Create lock file """
         locker = Locker()
-        locker.createlock(self.generalconf["hyperproxmox"]["walker_lock"], insert_time)
+        locker.createlock(self.generalconf["analyst"]["walker_lock"], insert_time)
 
         self.mongo.insert_datekey(insert_time, 'running')
 
@@ -184,7 +184,7 @@ class Analyse:
         self.mongo.update_datekey(int(insert_time), "OK")
 
         """ Unlock file """
-        locker.unlock(self.generalconf["hyperproxmox"]["walker_lock"])
+        locker.unlock(self.generalconf["analyst"]["walker_lock"])
 
         return
 
