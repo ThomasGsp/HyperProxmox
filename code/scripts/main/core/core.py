@@ -26,7 +26,7 @@ def RunAnalyse(clusters_conf, generalconf, delay=300):
     while True:
         """ Instances types availables: lxc/qemu/all"""
         play.run("all")
-        time.sleep(delay)
+        time.sleep(int(delay))
 
 class Core:
 
