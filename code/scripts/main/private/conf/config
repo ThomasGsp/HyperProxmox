@@ -52,4 +52,4 @@ debug = True
 debug_level = 5
 
 ; log output
-log_file = /var/log/hyperproxmox/errors.log
+logs_file = /var/log/hyperproxmox/errors.log
