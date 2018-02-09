@@ -9,6 +9,7 @@
 
 from pathlib import Path
 from api.v1.api import *
+from core.libs.logs import *
 from core.modules.mod_access import *
 import configparser
 import getpass
@@ -19,6 +20,7 @@ global passhash
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 if __name__ == "__main__":
+
     """ Read conf """
     localconf = configparser.ConfigParser()
     localconf.read('private/conf/config')
@@ -77,7 +79,7 @@ if __name__ == "__main__":
             '/api/v1/instance/([0-9]+)/database(?:/([0-9]+))', 'database',
 
             #  MAPPING NODES
-            '/api/v1/node(?:/([0-9]+))', 'node',
+            '/api/v1/nodes(?:/([0-9]+))', 'node',
 
             # MAPPING SERVICES
             '/api/v1/service/([a-z]+)/instance/([0-9]+)/vhost(?:/([0-9]+))', 'service',
@@ -123,19 +125,23 @@ if __name__ == "__main__":
             '/api/v1/static/dates/', 'QueryCache_Dates',
 
             # mongoid
-            '/api/v1/static/(instances|nodes|clusters|storages|disks)/id/[a-z0-9]+', 'General_Search',
+            '/api/v1/static/(instances|nodes|clusters|storages|disks)/id/([a-z0-9]+)', 'General_Search',
 
         )
 
     generalconf = {
         "logger": {"debug": localconf['logger']['debug'], "debug_level": localconf['logger']['debug_level'],
-                   "logs_file": localconf['logger']['logs_file']},
+                   "logs_dir": localconf['logger']['logs_dir']},
         "analyst": {"walker": localconf['walker']['walker'], "walker_lock": localconf['walker']['walker_lock']},
         "keys": {"key_pvt": key_pvt["data"], "key_pub": key_pub["data"]},
         "mongodb": {"ip": localconf['databases']['mongodb_ip'], 'port': localconf['databases']['mongodb_port']},
         "redis": {"ip": localconf['databases']['redis_ip'], 'port': localconf['databases']['redis_port']},
         "deploy": {'concurrencydeploy': localconf['deploy']['concurrencydeploy'], 'delayrounddeploy': localconf['deploy']['delayrounddeploy']}
     }
+
+    """ Active logger"""
+    logger = Logger(generalconf)
+
 
     """ First redis connection """
     # Lredis = Redis_wrapper(generalconf["redis"]["ip"], generalconf["redis"]["port"])
