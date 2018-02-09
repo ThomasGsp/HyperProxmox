@@ -98,14 +98,14 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(
-                        dumps(self.db[self.collection_clusters].find({'date': date, 'grata': str(grata)})))
+                        dumps(self.db[self.collection_clusters].find({'date': int(date)})))
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(
                         dumps(self.db[self.collection_clusters].find_one(
-                            {'$and': [{'date': date, 'cluster': cluster}]})))
+                            {'$and': [{'date': int(date), 'cluster': cluster}]})))
                 }
 
         except BaseException as serr:
@@ -205,11 +205,16 @@ class MongoDB:
         return self.db[self.collection_datekey].insert({'date': int(date), 'status': status})
 
     def update_datekey(self, date, status):
-        self.db[self.collection_datekey].update({'date': date}, {'$set': {'status': status}}, upsert=False)
+        self.db[self.collection_datekey].update({'date': int(date)}, {'$set': {'status': status}}, upsert=False)
 
     def get_last_datekey(self):
-        last_id = self.db[self.collection_datekey].find({'status': 'OK'}).sort("date", -1).limit(1)
+        last_id = self.db[self.collection_datekey].find({'status': 'OK'}, {"date": 1, "_id": 0}).sort("date", -1)
         return {"value": int(json.loads(dumps(last_id))[0]['date'])}
+
+    def get_all_datekey(self):
+        keylist = self.db[self.collection_datekey].find({'status': 'OK'},
+                                                        {"date": 1, "_id": 0}).sort("date", -1)
+        return {"value": json.loads(dumps(keylist))}
 
     """ NODES MANAGEMENT"""
     def insert_nodes(self, data):
@@ -225,21 +230,22 @@ class MongoDB:
                     "result": "OK",
                     "value": json.loads(
                         dumps(self.db[self.collection_nodes].find(
-                            {'$and': [{'date': date, 'grata': str(grata)}]})))
+                            {'date': int(date)})))
                 }
+
             elif not node:
                 result = {
                     "result": "OK",
                     "value": json.loads(
                         dumps(self.db[self.collection_nodes].find(
-                        {'$and': [{'date': date, 'cluster': cluster, 'grata': str(grata)}]})))
+                        {'$and': [{'date': int(date), 'cluster': cluster}]})))
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(
                         dumps(self.db[self.collection_nodes].find_one(
-                            {'$and': [{'date': date, 'cluster': cluster, 'node': node, 'grata': str(grata)}]})))
+                            {'$and': [{'date': int(date), 'cluster': cluster, 'node': node}]})))
                 }
 
         except BaseException as serr:

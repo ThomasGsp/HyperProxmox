@@ -122,7 +122,7 @@ if __name__ == "__main__":
             '/api/v1/static/(clusters)/([0-9]+)/', 'QueryCache_Infra',
 
             # date
-            '/api/v1/static/dates/', 'QueryCache_Dates',
+            '/api/v1/static/dates/(all|last)', 'QueryDates',
 
             # mongoid
             '/api/v1/static/(instances|nodes|clusters|storages|disks)/id/([a-z0-9]+)', 'General_Search',

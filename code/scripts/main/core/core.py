@@ -41,10 +41,13 @@ class Core:
 
         """ LOAD REDIS """
         self.redis_msg = Redis_wrapper(generalconf["redis"]["ip"],
-                                       generalconf["redis"]["port"], 0).connect()
+                                       generalconf["redis"]["port"], 0)
 
         self.redis_cache = Redis_wrapper(generalconf["redis"]["ip"],
-                                       generalconf["redis"]["port"], 3).connect()
+                                       generalconf["redis"]["port"], 3)
+
+        self.redis_msg.connect()
+        self.redis_cache.connect()
 
         if self.mongo.client and self.redis_msg:
             self.mongo.db = self.mongo.client.db
@@ -87,13 +90,21 @@ class Core:
         except:
             return json_decode({"value": "Bad request"})
 
+    def getkey(self, keytype):
+        if keytype == "all":
+            return self.mongo.get_all_datekey()
+        elif keytype == "last":
+            return self.mongo.get_last_datekey()
+
+
+
     def generalquerycacheinfra(self, dest, date, cluster=None, node=None, vmid=None):
 
         """ Test Redis Cache """
-        hash_object = hashlib.md5(b"{0}-{1}-{2}-{3}-{4}".format(dest, date, cluster, node, vmid))
+        hash_object = hashlib.md5("{0}-{1}-{2}-{3}-{4}".format(dest, date, cluster, node, vmid).encode('utf-8'))
         hash_hex = hash_object.hexdigest()
 
-        cache = self.redis_cache.get_message(hash_hex)
+        cache = None # self.redis_cache.get_message(hash_hex)
 
         if cache is None:
             if dest == "instances":

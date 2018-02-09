@@ -43,7 +43,7 @@ class General_Search:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -55,26 +55,23 @@ class QueryCache_Infra:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
 
+class QueryDates:
+    def GET(self, keytype):
+        try:
+            result = core.getkey(keytype)
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "Invalid request: {0}".format(e)
+            }
+        return result
 
-
-class Static_Nodes:
-    def GET(self, date, cluster=None, node=None):
-        if node and cluster:
-            return core.generalsearch('{ "date": {0}, "cluster": {1},  "node": {2} }'.format(date, cluster, node))
-        elif cluster:
-            return core.generalsearch('{ "date": {0}, "cluster": {1} }'.format(date, cluster))
-        else:
-            return core.generalsearch('{ "date": {0}}'.format(date))
-
-
-class Dates:
-    def GET(self):
-        return core.generalsearch('{ "_id": {id} }'.format(id=nodeid))
 
 
 """ CLASS DIRECT """
@@ -89,7 +86,7 @@ class Cluster:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -101,7 +98,7 @@ class Cluster:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -113,7 +110,7 @@ class Cluster:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -124,7 +121,7 @@ class Cluster:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -191,7 +188,7 @@ class Instance:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -203,7 +200,7 @@ class Instance:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 
@@ -214,7 +211,7 @@ class Instance:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "{0} {1}".format("Invalid request:", e)
+                "value": "Invalid request: {0}".format(e)
             }
         return result
 

@@ -104,7 +104,7 @@ class Proxmox:
         Get Nodes from cluster
         :param url: Generic node url (node = physical hypervisor)
         """
-        request = "https://{0}/api2/json/clusters/status".format(url)
+        request = "https://{0}/api2/json/cluster/status".format(url)
         try:
             nodes = self.nodes = self.socket.get(request,
                                                  cookies=self.PVEAuthCookie,
