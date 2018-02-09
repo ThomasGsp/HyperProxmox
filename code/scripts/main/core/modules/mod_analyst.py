@@ -93,18 +93,20 @@ class Analyse:
             if nodes_list["result"] == "OK":
                 for value_nodes_list in nodes_list["value"]["data"]:
                     # if value_nodes_list["node"] not in exclude_nodes:
-                    list_instances = {}
+                    list_instances = { "data" : []}
                     """ TOTAL COUNT CPU and RAM allocate """
                     if (instancetype == "all"):
                         types = ["lxc", "qemu"]  # vz...
                         for type in types:
-                            list_instances.update(
-                                proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                     value_nodes_list["node"], type)["value"])
+                            list_instances["data"] = list_instances["data"] + \
+                                                     proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                     value_nodes_list["node"], type)["value"]["data"]
+
                     else:
                         list_instances = \
                         proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                              value_nodes_list["node"], instancetype)["value"]
+
 
                     totalcpu = 0
                     totalram = 0
@@ -124,9 +126,11 @@ class Analyse:
                             instance["cluster"] = cluster["name"]
                             instance["node"] = value_nodes_list["node"]
                             instance["date"] = int(insert_time)
-                            instance["type"] = "" # a revoir
+                            if "type" not in instance:
+                                instance["type"] = "qemu"
                             self.mongo.insert_instances(instance)
 
+                    print(list_instances)
                     """ 
                     #############
                     #   NODES   #
