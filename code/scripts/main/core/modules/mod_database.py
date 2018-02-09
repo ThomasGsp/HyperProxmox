@@ -4,6 +4,7 @@ import json
 import redis
 import time
 
+
 class Redis_wrapper:
     def __init__(self, server="127.0.0.1", port=6379, db=0, password=None):
         # DB =
@@ -24,10 +25,9 @@ class Redis_wrapper:
                 host=self.server, port=self.port, db=self.db, password=self.password,
                 charset="utf-8", decode_responses=True)
             self.r.client_list()
+            return conn
         except BaseException as err:
             print("Redis connexion error on {0}:{1} ({2})".format(self.server, self.port, err))
-            conn = False
-        return conn
 
     def insert_instances_queue(self,  logtext, expir=3000):
         self.r.set(time.time(), logtext, expir)
@@ -39,8 +39,18 @@ class Redis_wrapper:
         self.r.set(key, value, expir)
 
     def get_message(self, key):
-        return self.r.get(key)
-
+        try:
+            result = {
+                "result": "OK",
+                "value": self.r.get(key)
+            }
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "Redis - Request on get_message",
+                "value": "Invalid request: {0}".format(e)
+            }
+        return result
 
 class MongoDB:
     def __init__(self, server="127.0.0.1", port=27017):
@@ -66,17 +76,15 @@ class MongoDB:
         try:
             conn = MongoClient(self.server + ':' + str(self.port))
             conn.server_info()
+            return conn
         except BaseException as err:
             print("MongoDB connexion error on {0}:{1} ({2})".format(self.server, self.port, err))
-            conn = False
-        return conn
 
     def authenticate(self, user=None, password=None, mechanism='SCRAM-SHA-1'):
         try:
             self.client.db.authenticate(user, password, mechanism)
         except (TypeError, ValueError) as e:
-            raise("MongoDB authentification error on {0}:{1} ({2})".format(self.server, self.port, e))
-
+            print("MongoDB authentification error on {0}:{1} ({2})".format(self.server, self.port, e))
 
     def generalmongosearch(self, collection, id):
         try:
@@ -87,6 +95,7 @@ class MongoDB:
         except BaseException as e:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on generalmongosearch",
                 "value": "Invalid request: {0}".format(e)
             }
         return result
@@ -111,15 +120,25 @@ class MongoDB:
         except BaseException as serr:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on get_clusters",
                 "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
             }
         return result
 
     def insert_clusters(self, data):
         try:
-            return self.db[self.collection_clusters].insert(data)
+            result = {
+                "result": "OK",
+                "value": self.db[self.collection_clusters].insert(data)
+            }
+
         except BaseException as serr:
-            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+            result = {
+                "result": "ERROR",
+                "type": "MongoDB - Request on insert_clusters",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
 
     def get_clusters_conf(self, cluster=None):
         try:
@@ -136,6 +155,7 @@ class MongoDB:
         except BaseException as e:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on get_cluster_conf",
                 "value": "Invalid request: {0}".format(e)
             }
         return result
@@ -150,6 +170,7 @@ class MongoDB:
         except BaseException as e:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on insert_cluster_conf",
                 "value": "Invalid request: {0}".format(e)
             }
         return result
@@ -164,6 +185,7 @@ class MongoDB:
         except BaseException as e:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on update_cluster_conf",
                 "value": "Invalid request: {0}".format(e)
             }
         return result
@@ -178,6 +200,7 @@ class MongoDB:
         except BaseException as e:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on delete_cluster_conf",
                 "value": "Invalid request: {0}".format(e)
             }
         return result
@@ -219,9 +242,17 @@ class MongoDB:
     """ NODES MANAGEMENT"""
     def insert_nodes(self, data):
         try:
-            return self.db[self.collection_nodes].insert(data)
+            result = {
+                "result": "OK",
+                "value": self.db[self.collection_nodes].insert(data)
+            }
         except BaseException as serr:
-            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+            result = {
+                "result": "ERROR",
+                "type": "MongoDB - Request on insert_instances",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
 
     def get_nodes(self, date, cluster, node, grata=0):
         try:
@@ -251,6 +282,7 @@ class MongoDB:
         except BaseException as serr:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on get_nodes",
                 "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
             }
         return result
@@ -258,9 +290,18 @@ class MongoDB:
     """ INSTANCE MANAGEMENT"""
     def insert_instances(self, data):
         try:
-            return self.db[self.collection_instances].insert(data)
+            result = {
+                "result": "OK",
+                "value": self.db[self.collection_instances].insert(data)
+            }
         except BaseException as serr:
-            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+            result = {
+                "result": "ERROR",
+                "type": "MongoDB - Request on insert_instances",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
+
 
     def get_instances(self, date, cluster, node, vmid):
         try:
@@ -295,6 +336,7 @@ class MongoDB:
         except BaseException as serr:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on get_instances",
                 "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
             }
         return result
@@ -303,9 +345,17 @@ class MongoDB:
     """ STORAGE MANAGEMENT"""
     def insert_storages(self, data):
         try:
-            return self.db[self.collection_storages].insert(data)
+            result = {
+                "result": "OK",
+                "value": self.db[self.collection_storages].insert(data)
+            }
         except BaseException as serr:
-            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+            result = {
+                "result": "ERROR",
+                "type": "MongoDB - Request on insert_storages",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
 
     def get_storages(self, date, cluster, node):
         try:
@@ -332,6 +382,7 @@ class MongoDB:
         except BaseException as serr:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on get_storages",
                 "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
             }
         return result
@@ -341,9 +392,17 @@ class MongoDB:
     """ DISKS MANAGEMENT"""
     def insert_disks(self, data):
         try:
-            return self.db[self.collection_disks].insert(data)
+            result = {
+                "result": "OK",
+                "value": self.db[self.collection_disks].insert(data)
+            }
         except BaseException as serr:
-            raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
+            result = {
+                "result": "ERROR",
+                "type": "MongoDB - Request on get_storages",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
 
     def get_disks(self, date, cluster, node, vmid):
         try:
@@ -378,6 +437,7 @@ class MongoDB:
         except BaseException as serr:
             result = {
                 "result": "ERROR",
+                "type": "MongoDB - Request on get_disks",
                 "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
             }
         return result
