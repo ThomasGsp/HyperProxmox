@@ -205,7 +205,7 @@ class Proxmox:
 
         return result
 
-    def get_instance(self, url, nodename, category):
+    def get_instances(self, url, nodename, category):
         """
         Get basic VMs informations from nodes
         :param url: Generic qemu url
@@ -241,7 +241,7 @@ class Proxmox:
 
         return result
 
-    def get_config(self, url, nodename, category, instanceid):
+    def get_configs(self, url, nodename, category, instanceid):
         """
         Get avanced VM information from nodes
         :param url: Generic qemu config url
@@ -275,7 +275,7 @@ class Proxmox:
 
         return result
 
-    def create_instance(self, url, nodename, category, data):
+    def create_instances(self, url, nodename, category, data):
         """
         :param url: 
         :param nodename: 
@@ -314,7 +314,7 @@ class Proxmox:
 
         return result
 
-    def delete_instance(self, url, nodename, category, vmid):
+    def delete_instances(self, url, nodename, category, vmid):
         """
         :param url: 
         :param nodename: 
@@ -354,7 +354,7 @@ class Proxmox:
 
         return result
 
-    def status_instance(self, url, nodename, category, vmid, action):
+    def status_instances(self, url, nodename, category, vmid, action):
         """
         :param url: 
         :param nodename: 
@@ -399,7 +399,7 @@ class Proxmox:
 
         return result
 
-    def resize_instance(self, url, nodename, category, instanceid, data):
+    def resize_instances(self, url, nodename, category, instanceid, data):
         """
         :param url: 
         :param nodename: 
@@ -440,7 +440,7 @@ class Proxmox:
 
         return result
 
-    def stats_instance(self, url, nodename, category, instanceid):
+    def stats_instances(self, url, nodename, category, instanceid):
         """
         :param url: 
         :param nodename: 

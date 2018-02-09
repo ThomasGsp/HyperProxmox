@@ -56,22 +56,22 @@ class Analyse:
 
         """ Create lock file """
         locker = Locker()
-        locker.createlock(self.generalconf["analyst"]["walker_lock"], insert_time)
+        locker.createlock(self.generalconf["analyst"]["walker_lock"], "analyst", insert_time)
 
         self.mongo.insert_datekey(insert_time, 'running')
 
         for cluster in self.clusters_conf:
             """ Decode data """
 
-            proxmox_cluster_user = pdecrypt(base64.b64decode(cluster["user"]),
+            proxmox_clusters_user = pdecrypt(base64.b64decode(cluster["user"]),
                             self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
-            proxmox_cluster_pwd = pdecrypt(base64.b64decode(cluster["password"]),
+            proxmox_clusters_pwd = pdecrypt(base64.b64decode(cluster["password"]),
                                 self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
 
             """ AUTH """
             proxmox = Proxmox("Analyse")
-            proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), proxmox_cluster_user, proxmox_cluster_pwd)
+            proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), proxmox_clusters_user, proxmox_clusters_pwd)
 
             """ 
             ##############
@@ -86,7 +86,7 @@ class Analyse:
             clusters_status = proxmox.get_clusters("{0}:{1}".format(cluster["url"], int(cluster["port"])))
             clusters_status["date"] = int(insert_time)
             clusters_status["cluster"] = cluster["name"]
-            self.mongo.insert_cluster(instance)
+            self.mongo.insert_clusters(instance)
 
             """ UPDATE NODES LIST """
             nodes_list = proxmox.get_nodes("{0}:{1}".format(cluster["url"], int(cluster["port"])))
@@ -98,11 +98,11 @@ class Analyse:
                         types = ["lxc", "qemu"]  # vz...
                         for type in types:
                             list_instances.update(
-                                proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                                      value_nodes_list["node"], type)["value"])
                     else:
                         list_instances = \
-                        proxmox.get_instance("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                        proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                              value_nodes_list["node"], instancetype)["value"]
 
                     totalcpu = 0
@@ -123,7 +123,7 @@ class Analyse:
                             instance["cluster"] = cluster["name"]
                             instance["node"] = value_nodes_list["node"]
                             instance["date"] = int(insert_time)
-                            self.mongo.insert_instance(instance)
+                            self.mongo.insert_instances(instance)
 
                     """ 
                     #############
@@ -153,7 +153,7 @@ class Analyse:
                     else:
                         value_nodes_list["grata"] = 1
 
-                    self.mongo.insert_node(value_nodes_list)
+                    self.mongo.insert_nodes(value_nodes_list)
 
                     """ 
                     #############
@@ -167,7 +167,7 @@ class Analyse:
                         storage["date"] = int(insert_time)
                         storage["cluster"] = cluster["name"]
 
-                        self.mongo.insert_storage(storage)
+                        self.mongo.insert_storages(storage)
                         disks_list = proxmox.get_storages("{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                                          value_nodes_list["node"], storage["storage"])
 
@@ -176,7 +176,7 @@ class Analyse:
                             disk["node"] = value_nodes_list["node"]
                             disk["date"] = int(insert_time)
                             disk["cluster"] = cluster["name"]
-                            self.mongo.insert_disk(disk)
+                            self.mongo.insert_disks(disk)
 
             else:
                 print(nodes_list)
@@ -184,7 +184,7 @@ class Analyse:
         self.mongo.update_datekey(int(insert_time), "OK")
 
         """ Unlock file """
-        locker.unlock(self.generalconf["analyst"]["walker_lock"])
+        locker.unlock(self.generalconf["analyst"]["walker_lock"], "alanyst")
 
         return
 

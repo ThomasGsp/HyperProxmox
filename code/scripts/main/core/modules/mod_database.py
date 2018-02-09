@@ -29,7 +29,7 @@ class Redis_wrapper:
             conn = False
         return conn
 
-    def insert_instance_queue(self,  logtext, expir=3000):
+    def insert_instances_queue(self,  logtext, expir=3000):
         self.r.set(time.time(), logtext, expir)
 
     def insert_logs(self,  logtext, expir=86400*4):
@@ -51,7 +51,7 @@ class MongoDB:
         self.server = server
         self.port = port
         self.collection_system = "system"
-        self.collection_instance = "instances"
+        self.collection_instances = "instances"
         self.collection_nodes = "nodes"
         self.collection_clusters = "clusters"
         self.collection_clusters_conf = "clusters_conf"
@@ -121,7 +121,6 @@ class MongoDB:
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
-
     def get_clusters_conf(self, cluster=None):
         try:
             if cluster:
@@ -155,7 +154,7 @@ class MongoDB:
             }
         return result
 
-    def update_cluster_conf(self, cluster, data):
+    def update_clusters_conf(self, cluster, data):
         try:
             self.db[self.collection_clusters_conf].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
             result = {
@@ -169,7 +168,7 @@ class MongoDB:
             }
         return result
 
-    def delete_cluster_conf(self, cluster):
+    def delete_clusters_conf(self, cluster):
         try:
             self.db[self.collection_clusters_conf].remove({"cluster": str(cluster)})
             result = {
@@ -187,10 +186,10 @@ class MongoDB:
     def get_system_info(self):
         return self.db[self.collection_system].find_one({"_id": "0"})
 
-    def update_system_instance_id(self, value):
+    def update_system_instances_id(self, value):
         self.db[self.collection_system].update({'_id': "0"}, {'$set': {'instances_number': value}})
 
-    def update_system_instance_ip(self, value):
+    def update_system_instances_ip(self, value):
         self.db[self.collection_system].update({'_id': "0"}, {'$set': {'IP_current': value}})
 
     def update_system_free_ip(self, value):
@@ -213,13 +212,13 @@ class MongoDB:
         return {"value": int(json.loads(dumps(last_id))[0]['date'])}
 
     """ NODES MANAGEMENT"""
-    def insert_node(self, data):
+    def insert_nodes(self, data):
         try:
             return self.db[self.collection_nodes].insert(data)
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
-    def get_node(self, date, cluster, node, grata=0):
+    def get_nodes(self, date, cluster, node, grata=0):
         try:
             if not cluster:
                 result = {
@@ -251,39 +250,39 @@ class MongoDB:
         return result
 
     """ INSTANCE MANAGEMENT"""
-    def insert_instance(self, data):
+    def insert_instances(self, data):
         try:
-            return self.db[self.collection_instance].insert(data)
+            return self.db[self.collection_instances].insert(data)
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
-    def get_instance(self, date, cluster, node, vmid):
+    def get_instances(self, date, cluster, node, vmid):
         try:
             if not cluster:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_instance].find({"date": int(date)})))
+                        self.db[self.collection_instances].find({"date": int(date)})))
                 }
             elif not node:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_instance].find(
+                        self.db[self.collection_instances].find(
                             {'$and': [{"date": int(date), "cluster": cluster}]})))
                 }
             elif not vmid:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_instance].find(
+                        self.db[self.collection_instances].find(
                             {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})))
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_instance].find_one(
+                        self.db[self.collection_instances].find_one(
                             {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
                 }
 
@@ -296,13 +295,13 @@ class MongoDB:
 
 
     """ STORAGE MANAGEMENT"""
-    def insert_storage(self, data):
+    def insert_storages(self, data):
         try:
             return self.db[self.collection_storages].insert(data)
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
-    def get_storage(self, date, cluster, node):
+    def get_storages(self, date, cluster, node):
         try:
             if not cluster:
                 result = {
@@ -334,13 +333,13 @@ class MongoDB:
 
 
     """ DISKS MANAGEMENT"""
-    def insert_disk(self, data):
+    def insert_disks(self, data):
         try:
             return self.db[self.collection_disks].insert(data)
         except BaseException as serr:
             raise ("MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr))
 
-    def get_disk(self, date, cluster, node, vmid):
+    def get_disks(self, date, cluster, node, vmid):
         try:
             if not cluster:
                 result = {

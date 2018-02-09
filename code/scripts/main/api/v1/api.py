@@ -82,9 +82,9 @@ class Cluster:
     def GET(self, cluster=None):
         try:
             if cluster:
-                result = core.get_cluster(cluster)
+                result = core.get_clusters_conf(cluster)
             else:
-                result = core.get_cluster()
+                result = core.get_clusters_conf()
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -96,7 +96,7 @@ class Cluster:
     def POST(self):
         try:
             data = json.loads(web.data().decode('utf-8'))
-            result = core.insert_cluster(data)
+            result = core.insert_clusters_conf(data)
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -108,7 +108,7 @@ class Cluster:
     def PUT(self, cluster):
         try:
             data = json.loads(web.data().decode('utf-8'))
-            result = core.change_cluster(cluster, data)
+            result = core.change_clusters_conf(cluster, data)
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -119,7 +119,7 @@ class Cluster:
 
     def DELETE(self, cluster):
         try:
-            result = core.delete_cluste(cluster)
+            result = core.delete_clusters_conf(cluster)
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -134,10 +134,10 @@ class Instance:
         try:
             if status:
                 """ GET INSTANCE STATUS """
-                result = core.status_instance(vmid, status)
+                result = core.status_instances(vmid, status)
             else:
                 """ GET INSTANCE INFORMATION """
-                result = core.info_instance(vmid)
+                result = core.info_instances(vmid)
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -150,7 +150,7 @@ class Instance:
         try:
             if vmid:
                 """ GET INSTANCE INFORMATION """
-                result = core.status_instance(vmid, status)
+                result = core.status_instances(vmid, status)
             else:
                 """ CREATE NEWS INSTANCES"""
                 count = json.loads(web.data().decode('utf-8'))["count"]
@@ -198,7 +198,7 @@ class Instance:
     def PUT(self, vmid):
         try:
             data = json.loads(web.data().decode('utf-8'))
-            result = core.change_instance(vmid, data)
+            result = core.change_instances(vmid, data)
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -209,7 +209,7 @@ class Instance:
 
     def DELETE(self, vmid):
         try:
-            result = core.delete_instance(vmid)
+            result = core.delete_instances(vmid)
         except BaseException as e:
             result = {
                 "result": "ERROR",
