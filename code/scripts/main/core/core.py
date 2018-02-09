@@ -104,9 +104,9 @@ class Core:
         hash_object = hashlib.md5("{0}-{1}-{2}-{3}-{4}".format(dest, date, cluster, node, vmid).encode('utf-8'))
         hash_hex = hash_object.hexdigest()
 
-        cache = None # self.redis_cache.get_message(hash_hex)
+        cache = self.redis_cache.get_message(hash_hex)
 
-        if cache is None:
+        if cache is None or self.generalconf["logger"]["debug"] == True:
             if dest == "instances":
                 resultmbrequest = self.mongo.get_instances(date, cluster, node, vmid)
             elif dest == "nodes":
