@@ -16,10 +16,8 @@ class StreamToLogger(object):
         for line in buf.rstrip().splitlines():
             self.logger.log(self.log_level, line.rstrip())
 
-    def flush(self):
-        pass
 
-
+"""
 class VAction(argparse.Action):
     def __call__(self, parser, args, values, option_string=None):
         # print 'values: {v!r}'.format(v=values)
@@ -30,12 +28,14 @@ class VAction(argparse.Action):
         except ValueError:
             values = values.count('v') + 1
         setattr(args, self.dest, values)
+"""
 
 
 class Logger(object):
-    def __init__(self, config):
-        self.debug = config['common']['debug']
-        self.error_log = config['common']['error_log']
+    def __init__(self, generalconf):
+        self.debug = generalconf['logger']['debug']
+        self.logs_dir = generalconf['logger']['logs_dir']
+        self.debug_level = generalconf['logger']['debug_level']
         self.stdout_logger = None
 
     def run(self):
@@ -45,14 +45,14 @@ class Logger(object):
             logging.basicConfig(
                 level=logging.DEBUG,
                 format='%(asctime)s:%(levelname)s:%(name)s:%(threadName)s:%(message)s',
-                filename=str(self.error_log),
+                filename="{0}/debug.log".format(self.logs_dir),
                 filemode='a'
             )
 
             http_client.HTTPConnection.debuglevel = 1
             requests_log = logging.getLogger("requests.packages.urllib3")
             requests_log.propagate = True
-            sl = StreamToLogger(requests_log, str(self.debug))
+            sl = StreamToLogger(self.stdout_logger, logging.DEBUG)
             sys.stdout = sl
 
         else:
@@ -60,7 +60,7 @@ class Logger(object):
             logging.basicConfig(
                 level=logging.ERROR,
                 format='%(asctime)s:%(levelname)s:%(name)s:%(threadName)s:%(message)s',
-                filename=str(self.error_log),
+                filename="{0}/errors.log".format(self.logs_dir),
                 filemode='a'
             )
 
@@ -72,17 +72,18 @@ class Logger(object):
 
         return self.stdout_logger
 
-    def write_error(self, node, errortxt, destfile):
+    def errorout(self, node, errortxt):
         now = datetime.datetime.now()
         date = now.strftime("%Y-%m-%d %H:%M")
         errortxt = re.sub(r"ticket\?(.*?) ", "ticket?username=***YOUR_USER***&password=***PWD***", errortxt)
 
         error = "[{date} -- {node}] : {error} \n".format(date=date, node=node, error=errortxt)
-        errorlog = open(destfile, "ab")
+        errorlog = open("{0}/proxmox.log".format(self.logs_dir), "ab")
         errorlog.write(error.encode('utf-8'))
         errorlog.close()
 
 
+"""
 def vtype(verbose):
     switcher = {
         1: "INFO",
@@ -92,3 +93,4 @@ def vtype(verbose):
         5: "DEBUG"
     }
     return switcher.get(verbose, "DEBUG")
+"""
