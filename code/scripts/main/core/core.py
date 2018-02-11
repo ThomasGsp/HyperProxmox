@@ -49,7 +49,7 @@ class Core:
         self.redis_msg.connect()
         self.redis_cache.connect()
 
-        if self.mongo.client and self.redis_msg:
+        if self.mongo.client and self.redis_msg.connect() and self.redis_cache.connect():
             self.mongo.db = self.mongo.client.db
 
             """ Others """
@@ -70,6 +70,8 @@ class Core:
                                    args=(self.clusters_conf, self.generalconf,
                                          generalconf["analyst"]["walker"]))
             thc.start()
+        else:
+            exit(1)
 
 
     """
@@ -104,7 +106,7 @@ class Core:
         hash_object = hashlib.md5("{0}-{1}-{2}-{3}-{4}".format(dest, date, cluster, node, vmid).encode('utf-8'))
         hash_hex = hash_object.hexdigest()
 
-        cache = self.redis_cache.get_message(hash_hex)
+        cache = None # self.redis_cache.get_message(hash_hex)["value"]
 
         if cache is None or self.generalconf["logger"]["debug"] == True:
             if dest == "instances":
@@ -123,6 +125,7 @@ class Core:
             self.redis_cache.insert_message(hash_hex, resultmbrequest, 3600)
             return resultmbrequest
         else:
+            print("Cache")
             return cache
 
 
@@ -405,7 +408,7 @@ class Core:
 
     def get_clusters_conf(self, cluster=None):
         """ Find cluster informations from node """
-        clusters_informations = self.mongo.get_clusters_conf(cluster)["value"]
+        clusters_informations = self.mongo.get_clusters_conf(cluster)
         return clusters_informations
 
     def insert_clusters_conf(self, data):
@@ -457,7 +460,7 @@ class Core:
 
 
 def valid_clusters_data(data):
-    key_required = ["name", "url", "port", "user", "password", "template", "storages_disk", "weight", "exclude_nodes"]
+    key_required = ["name", "url", "port", "user", "password", "template", "storage_disk", "weight", "exclude_nodes"]
     result = []
     for key in key_required:
         if key not in data:
