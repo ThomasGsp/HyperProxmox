@@ -68,6 +68,9 @@ if __name__ == "__main__":
     # URL MAPPING
     urls = \
         (
+
+            # FRESH DATA
+
             # MAPPING INSTANCES
             '/api/v1/instance', 'Instance',
             '/api/v1/instance/new', 'Instance',
@@ -88,22 +91,21 @@ if __name__ == "__main__":
             '/api/v1/auth', 'Auth',
 
             # MANAGEMENT
-            '/api/v1/administration/cluster', 'Cluster',
+            '/api/v1/administration/cluster/(?:[0-9a-zA-Z\_\-]+)', 'Cluster',
+            '/api/v1/administration/cluster/', 'Cluster',
             '/api/v1/administration/cluster/new', 'Cluster',
 
             # CACHE DATA (MONGO)
-
             # date/cluster/node/vmid
-
             # Disks mapping
-            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/([0-9]+)', 'QueryCache_Infra',
-            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)', 'QueryCache_Infra',
+            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
             '/api/v1/static/(disks)/([0-9]+)/', 'QueryCache_Infra',
 
             # Storages mapping
-            '/api/v1/static/(storages)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(storages)/([0-9]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(storages)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(storages)/([0-9]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
             '/api/v1/static/(storages)/([0-9]+)/', 'QueryCache_Infra',
 
             # Instances mapping
@@ -142,17 +144,10 @@ if __name__ == "__main__":
     """ Active logger"""
     logger = Logger(generalconf)
 
-
-    """ First redis connection """
-    # Lredis = Redis_wrapper(generalconf["redis"]["ip"], generalconf["redis"]["port"])
-    # Lredis.connect()
-
     """ Init Core thread """
-    # core = Core(generalconf, Lredis)
     core = Core(generalconf)
 
     """ Init API thread """
-    # api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf, Lredis)
     api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf)
     api_th.start()
 
