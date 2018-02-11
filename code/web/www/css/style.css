@@ -1,0 +1,26 @@
+
+#wrapper-mac
+{
+    white-space: nowrap;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+div.tooltip-inner {
+    white-space:pre;
+    max-width:none;
+}
+
+td.details-control {
+    background: url('../images/details_open.png') no-repeat center center;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('../images/details_close.png') no-repeat center center;
+}
+
+#dialog-form
+{
+
+}
