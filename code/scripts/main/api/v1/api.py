@@ -57,7 +57,7 @@ class QueryCache_Infra:
                 "type": "PYTHON - API",
                 "value": "Invalid request: {0}".format(e)
             }
-        return result
+        return json.dumps(result)
 
 
 class QueryDates:
@@ -70,7 +70,7 @@ class QueryDates:
                 "type": "PYTHON - API",
                 "value": "Invalid request: {0}".format(e)
             }
-        return result
+        return json.dumps(result)
 
 
 
@@ -88,7 +88,7 @@ class Cluster:
                 "type": "PYTHON - API",
                 "value": "Invalid request: {0}".format(e)
             }
-        return result
+        return json.dumps(result)
 
     def POST(self):
         try:
@@ -177,13 +177,13 @@ class Instance:
                 for t in range(timeout):
                     time.sleep(1)
                     try:
-                        if len(ast.literal_eval(redis_msg.get_message(command_id))) == int(count):
+                        if len(ast.literal_eval(redis_msg.get_message(command_id)["value"])) == int(count):
                             break
                     except BaseException as err:
                         print("Value not found", err)
 
                 """ Return messages """
-                return ast.literal_eval(redis_msg.get_message(command_id))
+                return ast.literal_eval(redis_msg.get_message(command_id)["value"])
         except BaseException as e:
             result = {
                 "result": "ERROR",
