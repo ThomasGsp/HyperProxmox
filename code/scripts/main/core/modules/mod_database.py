@@ -129,7 +129,7 @@ class MongoDB:
         try:
             result = {
                 "result": "OK",
-                "value": self.db[self.collection_clusters].insert(data)
+                "value": json.loads(dumps(self.db[self.collection_clusters].insert(data)))
             }
 
         except BaseException as serr:
@@ -302,7 +302,6 @@ class MongoDB:
             }
         return result
 
-
     def get_instances(self, date, cluster, node, vmid):
         try:
             if not cluster:
@@ -363,21 +362,21 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_disks].find({"date": int(date)})))
+                        self.db[self.collection_storages].find({"date": int(date)})))
                 }
             elif not node:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_disks].find(
+                        self.db[self.collection_storages].find(
                             {'$and': [{"date": int(date), "cluster": cluster}]})))
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_disks].find_one(
-                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
+                        self.db[self.collection_storages].find(
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})))
                 }
         except BaseException as serr:
             result = {
