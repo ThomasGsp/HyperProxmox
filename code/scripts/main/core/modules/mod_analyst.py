@@ -16,6 +16,7 @@ import time
 import operator
 import random
 import base64
+import re
 
 
 def add_token(tokens_in_slots, slot_distributions):
@@ -93,6 +94,9 @@ class Analyse:
             if nodes_list["result"] == "OK":
                 for value_nodes_list in nodes_list["value"]["data"]:
                     # if value_nodes_list["node"] not in exclude_nodes:
+
+                    node_status = proxmox.get_status("{0}:{1}".format(cluster["url"], int(cluster["port"])), value_nodes_list["node"])["value"]["data"]
+
                     list_instances = { "data" : []}
                     """ TOTAL COUNT CPU and RAM allocate """
                     if (instancetype == "all"):
@@ -118,6 +122,7 @@ class Analyse:
                     """
                     for key_list_instances, value_list_instances in list_instances.items():
                         for instance in value_list_instances:
+
                             """ Update cpu and ram for node """
                             totalcpu = totalcpu + instance["cpus"]
                             totalram = totalram + instance["maxmem"]
@@ -128,17 +133,32 @@ class Analyse:
                             instance["date"] = int(insert_time)
                             if "type" not in instance:
                                 instance["type"] = "qemu"
+
+                            config_av = proxmox.get_configs("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                         value_nodes_list["node"], instance["type"], instance["vmid"])["value"]
+
+                            print(config_av)
+
+                            maclist = []
+                            for key, value in config_av['data'].items():
+                                if 'net' in key:
+                                    mac = re.search(r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})', value, re.I).group()
+                                    maclist.append(mac)
+                            instance["macaddr"] = maclist
+
                             self.mongo.insert_instances(instance)
 
-                    print(list_instances)
                     """ 
                     #############
                     #   NODES   #
                     #############
                     """
-                    value_nodes_list["totalalloccpu"] = totalcpu
-                    value_nodes_list["totalallocram"] = totalram
-                    value_nodes_list["vmcount"] = len(list_instances.items())
+                    node_status["totalalloccpu"] = totalcpu
+                    node_status["totalallocram"] = totalram
+                    node_status["vmcount"] = len(list_instances["data"])
+                    node_status["status"] = value_nodes_list["status"]
+                    node_status["type"] = value_nodes_list["type"]
+                    node_status["node"] = value_nodes_list["node"]
 
                     percent_cpu_alloc = (totalcpu / value_nodes_list["maxcpu"]) * 100
                     percent_ram_alloc = (totalram / value_nodes_list["mem"]) * 100
@@ -149,17 +169,17 @@ class Analyse:
                     """
                     weight = (((percent_cpu_alloc * 2) + (percent_ram_alloc * 4)) / 6) * int(cluster["weight"])
 
-                    value_nodes_list["weight"] = int(weight)
-                    value_nodes_list["date"] = int(insert_time)
-                    value_nodes_list["cluster"] = cluster["name"]
+                    node_status["weight"] = int(weight)
+                    node_status["date"] = int(insert_time)
+                    node_status["cluster"] = cluster["name"]
 
                     """ Mark the node as an grata or not grata """
                     if value_nodes_list["node"] in exclude_nodes:
-                        value_nodes_list["grata"] = 0
+                        node_status["grata"] = 0
                     else:
-                        value_nodes_list["grata"] = 1
+                        node_status["grata"] = 1
 
-                    self.mongo.insert_nodes(value_nodes_list)
+                    self.mongo.insert_nodes(node_status)
 
                     """ 
                     #############
@@ -174,20 +194,21 @@ class Analyse:
                         storage["date"] = int(insert_time)
                         storage["cluster"] = cluster["name"]
 
-                        self.mongo.insert_storages(storage)
+
                         disks_list = proxmox.get_disks("{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                                          value_nodes_list["node"], storage["storage"])
 
+                        totalsize = 0
                         for disk in disks_list["value"]["data"]:
                             disk["storage"] = storage["storage"]
                             disk["node"] = value_nodes_list["node"]
                             disk["date"] = int(insert_time)
                             disk["cluster"] = cluster["name"]
+                            totalsize += disk["size"]
                             self.mongo.insert_disks(disk)
 
-            else:
-                print(nodes_list)
-
+                        storage["totalallocdisk"] = totalsize
+                        self.mongo.insert_storages(storage)
         self.mongo.update_datekey(int(insert_time), "OK")
 
         """ Unlock file """
