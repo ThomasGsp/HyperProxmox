@@ -28,10 +28,17 @@ class API_GET_INFO
         return $nodes;
     }
 
-    public function GET_sto($date, $node = null, $storage = null)
+    public function GET_sto($date, $cluster=null, $node = null, $storage = null)
     {
         
-        $storages = curl("api/v1/static/storages/".$date."/");
+        if (!empty($storage))
+            $storages = curl("api/v1/static/storages/".$date."/".$cluster."/".$node."/".$storage);
+        else if (!empty($node))
+            $storages = curl("api/v1/static/storages/".$date."/".$cluster."/".$node."/");
+        else if (!empty($cluster))
+            $storages = curl("api/v1/static/storages/".$date."/".$cluster."/");
+        else
+            $storages = curl("api/v1/static/storages/".$date."/");
         return $storages;
     }
 
@@ -45,9 +52,13 @@ class API_GET_INFO
         return $groups;
     }
 
-    public function GET_Disk($date, $cluster = null, $node = null)
+    public function GET_Disk($date, $cluster = null, $node = null, $vmid = null)
     {
-        $disks = curl("api/v1/static/disks/".$date."/".$cluster."/".$node."/");
+        if (!empty($vmid))
+            $disks = curl("api/v1/static/disks/".$date."/".$cluster."/".$node."/".$vmid);
+        else   
+            $disks = curl("api/v1/static/disks/".$date."/".$cluster."/".$node."/");
+        
         return $disks;
         
     }
@@ -148,16 +159,47 @@ class API_Gen_HTML
         $html = '';
         $d = new API_GET_INFO; 
         $vms_list = json_decode($d->GET_qemu($date), true)['value'];       
-         
-
+        $last_clust = "";
+        $last_disk = "";
+        
         foreach ($vms_list as $qemu)
         {
             $qemu = (object) $qemu;
             $macs = "";
-            $clusters_info = json_decode($d->GET_clusters_conf($qemu->cluster), true)['value'][0];
-            $clusters_info = (object) $clusters_info;
+            $volids = "";
+            $volsize = 0;
 
+            if($last_clust != $qemu->cluster)
+            {
+                $last_clust = $qemu->cluster;
+                $clusters_info = json_decode($d->GET_clusters_conf($qemu->cluster), true)['value'][0];
+                $clusters_info = (object) $clusters_info;
+            }
+ 
+            //$disklists  = json_decode($d->GET_Disk($date, $qemu->cluster, $qemu->node, $qemu->vmid), true)['value'];
+            // Disk selection. Dump all disk from node ismore quickly to dump all disk from vmid (less requests on api)
+            if($last_disk != $date.$qemu->cluster.$qemu->node)
+            {
+                $last_disk = $date.$qemu->cluster.$qemu->node;
+                $disklists  = json_decode($d->GET_Disk($date, $qemu->cluster, $qemu->node), true)['value'];
+             
+            }
+           
+            foreach($disklists as $vol) 
+            { 
+                $vol = (object) $vol; 
+                if (property_exists($vol, 'vmid'))
+                {
+                    if ($vol->vmid == $qemu->vmid)
+                    {
+                        $volids =  $vol->volid.",".$volids ; 
+                        $volsize =  $volsize + $vol->size ; 
+                    }
+                } 
+            }
+            
             foreach($qemu->macaddr as $mac) { $macs =  $mac.",".$macs ; }
+            
             $html = $html.'
                 <tr>
                     <td></td>
@@ -165,33 +207,18 @@ class API_Gen_HTML
                     <td><a href="node.php?hyp='.$qemu->node.'&date='.$date.'"> '.$qemu->node.'</a> 
                      
                     <a data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'" href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=qemu%2F'.$qemu->vmid.':4::::::" target="_blank"> <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a></td>                    
-                    <td><a href="vm.php?hyp='.$qemu->node.'&id='.$qemu->vmid.'&date='.$date.'"> '.$qemu->name.'</a></td>
-
+                    <td><a href="vm.php?id='.$qemu->_id["\$oid"].'&date='.$date.'"> '.$qemu->name.'</a></td>
 
                     <td>'.$qemu->vmid.'</td>
                     <td  data-order="'.$qemu->maxmem.'">'.formatBytes(round($qemu->maxmem)).'</td>
                     <td>'.$qemu->cpus.'</td>
-                    <td>xx GB</td>
+                    <td data-order="'.$volsize.'" id="wrapper-mac"> <a data-toggle="tooltip" data-html="true" title="'.str_replace(",", "<br/>", $volids).'">'.formatBytes($volsize).'</a></td>
                     <td id="wrapper-mac"> <a data-toggle="tooltip" data-html="true" title="'.str_replace(",", "<br/>", $macs).'">'.$macs.'</a></td>
                     <td>'.secondsToDays($qemu->uptime).'</td>
                     <td>'.$qemu->status.'</td>
                     <td>
-                        <select class="selectaction" data-width="auto" >
-                        <option  value="{\'node\':\''.$qemu->node.'\',\'vmid\':\''.$qemu->vmid.'\',\'action\':\'none\'} ">Choice </option>
-                            <optgroup label="No unavailability risk">                   
-                                <option value="{\'node\':\''.$qemu->node.'\',\'vmid\':\''.$qemu->vmid.'\',\'action\':\'status\'}">Status</option>
-                                <option value="{\'node\':\''.$qemu->node.'\',\'vmid\':\''.$qemu->vmid.'\',\'action\':\'start\'} ">Start</option>
-                            </optgroup>
-                            <optgroup label="Hight unavailability risk">   
-                                <option value="{\'node\':\''.$qemu->node.'\',\'vmid\':\''.$qemu->vmid.'\',\'action\':\'stop\'} ">Stop</option>
-                                <option value="{\'node\':\''.$qemu->node.'\',\'vmid\':\''.$qemu->vmid.'\',\'action\':\'shutdown\'} ">Shutdown</option>
-                                <option value="{\'node\':\''.$qemu->node.'\',\'vmid\':\''.$qemu->vmid.'\',\'action\':\'reset\'} ">Reset</option>
-                            </optgroup>
-                            <optgroup label="Others">   
-                                <option disabled value="{\'node\':\''.$qemu->node.'\',\'vmid\':\''.$qemu->vmid.'\',\'action\':\'migration\'} ">Migration</option>
-                            </optgroup>
-                        </select>
-                    <!-- <img src="images/configuration_13194.png" alt="ExternalProxmoxLink" style="width:30px;height:30px;"> --> </td>
+                        <a href="?id='.$qemu->_id["\$oid"].'&date='.$date.'" class="btn btn-info" role="button">Link Button</a>
+                     </td>
                 </tr>';
         }
         return $html;
@@ -206,6 +233,8 @@ class API_Gen_HTML
 
         $q = new API_GET_INFO;
         $nodes = json_decode($q->GET_hyp($date, $cluster), true)['value'];
+        
+        
         arsort($nodes);
       
         $row_non_grata = [];
@@ -217,13 +246,14 @@ class API_Gen_HTML
         */
 
         $html = '';
-        
+        $last_sto = "";
+        $last_clust = "";
         foreach ($nodes as $node)
         {
             $node = (object) $node;
-          
-            $sto_info =  json_decode($q->GET_sto($date, $node->cluster, $node->name), true)['value'];
-            
+      
+            $sto_info  = json_decode($q->GET_sto($date, $node->cluster, $node->node), true)['value'];
+           
             if ($this->sto_regx_status == true)
             {
                 foreach ($sto_info as $sto)
@@ -250,12 +280,13 @@ class API_Gen_HTML
             }
            
 
-            $sto_el_node = json_decode($q->GET_sto($date, $node->cluster, $node->name, $sto_el), true)['value'][0];
-            $sto_el_node = (object) $sto_el_node;
-
-    
-            $clusters_info = json_decode($q->GET_clusters_conf($node->cluster), true)['value'][0];
-            $clusters_info = (object) $clusters_info;
+            
+            if($last_clust != $node->cluster)
+            {
+                $last_clust = $node->cluster;
+                $clusters_info = json_decode($q->GET_clusters_conf($node->cluster), true)['value'][0];
+                $clusters_info = (object) $clusters_info;
+            }
             
             $ram_use_percent = round(($node->memory['used']/$node->memory['total'])*100);
             $ram_alloc_percent = round(($node->totalallocram/$node->memory['total'])*100);
@@ -287,7 +318,7 @@ class API_Gen_HTML
                     </td>
                     <td style="color:'.testcolor("ram_use", $ram_use_percent).'" data-order="'.$ram_use_percent.'">'.formatBytes($node->memory['used']).' ('.$ram_use_percent.'%)</td>
                     <td style="color:'.testcolor("ram_alloc", $ram_alloc_percent).'"  data-order="'.$ram_alloc_percent.'">'.formatBytes($node->totalallocram).'/'.formatBytes($node->memory['total']).' ('.$ram_alloc_percent.'%)</td>
-                    <td style="color:'.testcolor("cpu_alloc", $cpu_alloc_percent).'" data-order="'.$cpu_alloc_percent.'">'.$node->totalalloccpu.'/'.$node->maxcpu.' ('.$cpu_alloc_percent.'%)</td>
+                    <td style="color:'.testcolor("cpu_alloc", $cpu_alloc_percent).'" data-order="'.$cpu_alloc_percent.'">'.$node->totalalloccpu.'/'.$node->cpuinfo['cpus'].' ('.$cpu_alloc_percent.'%)</td>
                     <td style="color:'.testcolor("disk_use", $disk_use_percent).'" data-order="'.$sto_el_node->used.'">'.formatBytes($sto_el_node->used).'('.$disk_use_percent.'% - '.$sto_el.')</td>
                     <td style="color:'.testcolor("disk_alloc", $disk_alloc_percent).'"  data-order="'.$sto_el_node->used.'">'.formatBytes($sto_el_node->totalallocdisk).'/'.formatBytes($sto_el_node->total).' ('.$disk_alloc_percent.'%) </td>
                     <td style="color:'.testcolor("cpu_use", $load_percent).'" >'.$load_percent.'%</td>
@@ -312,14 +343,20 @@ class API_Gen_HTML
         $q = new API_GET_INFO;
         $stos_list = json_decode($q->GET_sto($date), true)['value'];
         $html = '';
+        $last_clust = "";
+        $last_disk = "";
         
         foreach ($stos_list as $sto)
         {
             $sto = (object) $sto;
-            
-            $clusters_info = json_decode($q->GET_clusters_conf($sto->cluster), true)['value'][0];
-            $clusters_info = (object) $clusters_info;
-            
+            // Limit requests
+            if($last_clust != $sto->cluster)
+            {
+                $last_clust = $sto->cluster;
+                $clusters_info = json_decode($q->GET_clusters_conf($sto->cluster), true)['value'][0];
+                $clusters_info = (object) $clusters_info;
+            }
+
             try {
                 $stoavail = round(($sto->avail * 100 ) / $sto->total);
                 $stoused = round(100 - ($sto->avail * 100) / $sto->total);
@@ -339,7 +376,13 @@ class API_Gen_HTML
                             </tr>
                         </thead>';
 
-            $disklists  = json_decode($q->GET_Disk($date, $sto->cluster, $sto->node), true)['value'];
+            // Limit requests
+            if($last_disk != $date.$sto->cluster.$sto->node)
+            {
+                $last_disk = $date.$sto->cluster.$sto->node;
+                $disklists  = json_decode($q->GET_Disk($date, $sto->cluster, $sto->node), true)['value'];
+            }
+            
             
             foreach ($disklists as $disklist) {
                 $disklist = (object) $disklist;
@@ -354,7 +397,7 @@ class API_Gen_HTML
                     <td> <a href="node.php?hyp='.$sto->node.'&date='.$date.'"> '.$sto->node.'</a> <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=storage%2F'.$sto->node.'%2F'.$sto->storage.':4::::::" target="_blank"> <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a> </td>
                     <td> '.$sto->storage.'</td>
                     <td data-order="'.$sto->total.'"> '.formatBytes($sto->total).'</td>
-                    <td data-order="'.$sto->totalalloc.'"> '.formatBytes($sto->totalallocdisk).' ('.$disk_alloc_percent.'%)</td>
+                    <td data-order="'.$sto->totalallocdisk.'"> '.formatBytes($sto->totalallocdisk).' ('.$disk_alloc_percent.'%)</td>
                     <td data-order="'.$sto->avail.'"> '.formatBytes($sto->avail).' ('.$stoavail.'%)</td>
                     <td data-order="'.$sto->used.'"> '.formatBytes($sto->used).' ('.$stoused.'%)</td>
                     <td> '.$htmldisk.' </td>
