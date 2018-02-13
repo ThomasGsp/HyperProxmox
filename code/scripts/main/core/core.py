@@ -106,7 +106,7 @@ class Core:
         hash_object = hashlib.md5("{0}-{1}-{2}-{3}-{4}".format(dest, date, cluster, node, vmid).encode('utf-8'))
         hash_hex = hash_object.hexdigest()
 
-        cache = None # self.redis_cache.get_message(hash_hex)["value"]
+        cache = self.redis_cache.get_message(hash_hex)
 
         if cache is None or self.generalconf["logger"]["debug"] == True:
             if dest == "instances":
@@ -125,8 +125,8 @@ class Core:
             self.redis_cache.insert_message(hash_hex, resultmbrequest, 3600)
             return resultmbrequest
         else:
-            print("Cache")
-            return cache
+
+            return json.loads(cache.replace("'", "\"").replace("None", "\"\""))
 
 
     """ 
@@ -407,9 +407,21 @@ class Core:
     """
 
     def get_clusters_conf(self, cluster=None):
-        """ Find cluster informations from node """
-        clusters_informations = self.mongo.get_clusters_conf(cluster)
-        return clusters_informations
+
+        """ Test Redis Cache """
+        hash_object = hashlib.md5("{0}-{1}".format("administration", cluster).encode('utf-8'))
+        hash_hex = hash_object.hexdigest()
+
+        cache = self.redis_cache.get_message(hash_hex)
+
+        if cache is None or self.generalconf["logger"]["debug"] == True:
+            clusters_informations = self.mongo.get_clusters_conf(cluster)
+            self.redis_cache.insert_message(hash_hex, clusters_informations, 500)
+            return clusters_informations
+        else:
+            print("cache admin")
+            return json.loads(cache.replace("'", "\""))
+
 
     def insert_clusters_conf(self, data):
         testdata = valid_clusters_data(data)
