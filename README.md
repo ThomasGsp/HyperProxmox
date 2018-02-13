@@ -5,12 +5,55 @@
 * Status: Dev
 * Object :   Massive LXC CT / KVM deployment system for Proxmox clusters.
 
-## Quick start
+## Requirement:
+* Proxmox infrastructure (standalone, clusters...)
+    * Administrative pve user (full access)
+    * Vztemplate uploaded
 
-### Requirement:
-* Proxmox server or cluster (or multiples clusters !)
-* administrative pve user (full access)
-* Vztemplate uploaded
+* MongoDB server
+    * Version 3.6
+    * Standalone or with replicats for hight availability
+    
+* Redis server
+
+* Web stack
+    * Nginx
+    * PHP7
+        * php-curl, php-mysql, php7.0-json
+
+* Python softwares
+    * Version 3.5 min
+    * python-redis
+    * pymongo
+    * web.py
+    * python-requests
+    * Crypto
+    
+    
+## Installation (Debian type - Full standalone stack)
+
+### Install all packages
+``` bash
+apt-get nginx php-fpm php-curl php-json python3-pip python3-redis python3-netaddr mongodb redis-server
+pip3 install pymongo db utils web.py requests
+```
+
+### Configurations (bases)
+
+#### NGINX
+``` bash
+...
+
+```
+#### PHP
+``` bash
+...
+```
+
+#### Hyperproxmox
+``` bash
+...
+```
 
 ### Init:
 ``` bash
