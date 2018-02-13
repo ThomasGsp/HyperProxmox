@@ -109,18 +109,18 @@ if __name__ == "__main__":
             '/api/v1/static/(storages)/([0-9]+)/', 'QueryCache_Infra',
 
             # Instances mapping
-            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/([0-9]+)', 'QueryCache_Infra',
-            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
             '/api/v1/static/(instances)/([0-9]+)/', 'QueryCache_Infra',
 
             # Nodes mapping
-            '/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)', 'QueryCache_Infra',
-            '/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)', 'QueryCache_Infra',
+            '/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
             '/api/v1/static/(nodes)/([0-9]+)/', 'QueryCache_Infra',
 
             # cluster mapping
-            '/api/v1/static/(clusters)/([0-9]+)/(?:[0-9a-zA-Z]+)',  'QueryCache_Infra',
+            '/api/v1/static/(clusters)/([0-9]+)/(?:[0-9a-zA-Z\_\-]+)',  'QueryCache_Infra',
             '/api/v1/static/(clusters)/([0-9]+)/', 'QueryCache_Infra',
 
             # date
