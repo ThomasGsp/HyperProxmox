@@ -4,7 +4,6 @@ import json
 import redis
 import time
 
-
 class Redis_wrapper:
     def __init__(self, server="127.0.0.1", port=6379, db=0, password=None):
         # DB =
@@ -21,7 +20,7 @@ class Redis_wrapper:
 
     def connect(self):
         try:
-            conn = self.r = redis.Redis(
+            conn = self.r = redis.StrictRedis(
                 host=self.server, port=self.port, db=self.db, password=self.password,
                 charset="utf-8", decode_responses=True)
             self.r.client_list()
@@ -40,10 +39,7 @@ class Redis_wrapper:
 
     def get_message(self, key):
         try:
-            result = {
-                "result": "OK",
-                "value": self.r.get(key)
-            }
+            result = json.loads(dumps(self.r.get(key)))
         except BaseException as e:
             result = {
                 "result": "ERROR",
@@ -429,8 +425,8 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_disks].find_one(
-                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
+                        self.db[self.collection_disks].find(
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": str(vmid)}]})))
                 }
 
         except BaseException as serr:
