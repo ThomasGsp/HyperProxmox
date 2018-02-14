@@ -3,7 +3,10 @@
 * Author : Tlams
 * Date : 2017/2018
 * Status: Dev
-* Object :   Massive LXC CT / KVM deployment system for Proxmox clusters.
+* Object :   Massive LXC CT / KVM deployment system and  for Proxmox clusters.
+* Information : 
+This project is currently in active development. 
+You shouldn't use in production mode, use at your risks !
 
 ## Requirement:
 * Proxmox infrastructure (standalone, clusters...)
@@ -34,7 +37,7 @@
 
 ### Install all packages
 ``` bash
-apt-get nginx php-fpm php-curl php-json python3-pip python3-redis python3-netaddr mongodb redis-server
+apt-get nginx php-fpm php-curl php-json python3-pip python3-redis python3-netaddr mongodb nginx redis-server git
 pip3 install pymongo db utils web.py requests
 ```
 
@@ -42,28 +45,119 @@ pip3 install pymongo db utils web.py requests
 
 #### NGINX
 ``` bash
-...
+server {
+   listen *:443 ssl;
+   server_name youdomain.name;
+   root /var/www/hyperproxmox;
+   
+   ssl on;
+   ssl_certificate /etc/nginx/ssl/nginx.crt;
+   ssl_certificate_key /etc/nginx/ssl/nginx.key;
+   ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+   ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+   ssl_prefer_server_ciphers on;
+   add_header Strict-Transport-Security "max-age=86400";
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php-hyperproxmox.sock;
+    }
+}
 
 ```
 #### PHP
 ``` bash
-...
+[www]
+
+user                         = www-data
+group                        = www-data
+
+listen                       = /var/run/php-www.sock
+listen.owner                 = www-data
+listen.group                 = www-data
+listen.mode                  = 0660
+
+pm                           = dynamic
+pm.start_servers             = 5
+pm.min_spare_servers         = 5
+pm.max_spare_servers         = 35
+pm.max_children              = 50
+
+pm.max_requests              = 200
+
+pm.status_path               = /fpm-status
+ping.path                    = /ping
+ping.response                = pong
+
+request_slowlog_timeout = 0
+
+request_terminate_timeout    = 0
+catch_workers_output = yes
+
 ```
 
 #### Hyperproxmox
 ``` bash
-...
+useradd hyperproxmox
+cd /opt/ && git git@github.com:ThomasGsp/HyperProxmox.git
+
+# set www dir
+mkdir /var/www/hyperproxmox
+cp -R /opt/HyperProxmox/ /var/www/hyperproxmox/
+chown www-data: -R /var/www/hyperproxmox
+# No www-data write (useless)
+chmod 550 -R /opt/HyperProxmox
+
+# Set hyperproxmox
+chown hyperproxmox: -R /opt/HyperProxmox
+chmod 760 -R /opt/HyperProxmox
+
+# Log dir (you can change it)
+mkdir /var/log/hyperproxmox/
+```
+
+``` bash
+# Create system.d file
+vi  /etc/systemd/system/hyperproxmox.service
+
+[Unit]
+Description=hyperproxmox - Service for Proxmox infrastructure
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=hyperproxmox
+Group=hyperproxmox
+WorkingDirectory=/opt/HyperProxmox/code/scripts/main
+ExecStart=/usr/bin/python3.5 /opt/HyperProxmox/code/scripts/main/startup.py
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
+
+# enable it
+systemctl enable mailman.service
+
+```
+
+``` bash
+# Configurations
+vi /opt/HyperProxmox/code/scripts/main/private/conf/config
+< set your values >
 ```
 
 ### Init:
 ``` bash
 # Start & generate your key
-python3.5 startup.py
+systemctl start hyperproxmox.service
+
+< generate a key, with strong passphrase (SAVE IT!) >
 ```
 
 ### Insert your first cluster
 ``` bash
-curl -H -XPOST -d '{ "name": "Cluster_1",
+curl -H -XPOST -d '{    "name": "Cluster_1",
                         "url":"proxmox.cluster.net",
                         "port": "8006",
                         "user": "user@pve",
@@ -71,15 +165,18 @@ curl -H -XPOST -d '{ "name": "Cluster_1",
                         "template": "local:vztmpl/debian-9.0-standard_9.0-2_amd64.tar.gz",
                         "storage_disk": "disks",
                         "exclude_nodes": [""],
-                        "weight": 1 }'  localhost:8080/api/v1/administration/cluster/new\
+                        "groups" : ["group1", "group2..."],
+                        "weight": 1 
+                    }'  localhost:8080/api/v1/administration/cluster/new\
 ```
 
-### Create your first CT
-``` bash
-curl -H -XPOST -d '{"count":"1"}' localhost:8080/api/v1/instance/new
-```
-
-### Delete it
-``` bash
-curl -XDELETE  localhost:8080/api/v1/instance/<id>
-```
+* "name": Symbolic cluster name. Should be uniq (string)
+* "url":  Proxmox - Web GUI URL access (string)
+* "port": Proxmox - Web PORT access (string)
+* "user": Proxmox - Administrative PVE user (string)
+* "password": Proxmox - PVE password (string)
+* "template": Default template for LXC (string)
+* "storage_disk": Default shared disk for KVM/LXC (string)
+* "exclude_nodes": Do not use this nodes - Not visible (list) 
+* "groups" : Symbolics groups for this node (list)
+* "weight": Weight for the cluster auto-selection (int)
