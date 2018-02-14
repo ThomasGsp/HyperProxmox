@@ -137,7 +137,7 @@ RestartSec=30
 WantedBy=multi-user.target
 
 # enable it
-systemctl enable mailman.service
+systemctl enable hyperproxmox.service
 
 ```
 
