@@ -128,86 +128,29 @@ $(document).ready(function()
     {
 
         /* VM GESTION */
-        var dialog, form,
-            name = $( "#name" ),
-            password = $( "#password" ),
-            allFields = $( [] ).add( name ).add( password );
-
-        function sendrequest() {
-            // J'initialise le variable box
-            var box = $('.result');
-
+		function sendrequest() 
+		{
+			
             var action = $( "#action" );
-            var vmid = $( "#vmid" );
-            var node = $( "#node" );
+            var id = $( "#bbaction" );
+            var box = $('.result');
+            
             var commandinfo = "The status available in the table is not dynamically update, you must wait the next cron rotate. <br /> You can play the status command to have an updated informations";
             box.html('<center> <img src="images/icon-load.gif"  height="60" width="60"></center>');
-            $('.selectaction').prop('selectedIndex',0);
-            // Je définis ma requête ajax
+            		
+
             $.ajax({
-
-                // Adresse à laquelle la requête est envoyée
-                url: 'requires/pveaction.php',
-                type : 'POST',
-                data : 'user=' + name.val() + '&password=' + password.val() + '&action=' + action.val() + '&vmid=' + vmid.val() + '&node=' + node.val(),
-                // Le délai maximun en millisecondes de traitement de la demande
+                url: 'requires/pveaction.php?id='+id.val()+'&action=status',
+                type : 'GET',
                 timeout: 32000,
-
-                // La fonction à apeller si la requête aboutie
                 success: function (data) {
-                    // Je charge les données dans box
                     box.html('<div class="alert alert-info"> <strong>Command return: </strong> '+data+' <br /> '+ commandinfo +'</div>');
                 },
-
-                // La fonction à appeler si la requête n'a pas abouti
                 error: function() {
-                    // J'affiche un message d'erreur
                     box.html('<div class="alert alert-danger"> <strong>Error: </strong> Command failed, try again or contact an true admin. </div>');
                 }
-
             });
-
-            dialog.dialog( "close" );
-            $("html, body").animate({ scrollTop: $(document).height() }, "slow");
         }
-
-        dialog = $( "#dialog-form" ).dialog({
-            autoOpen: false,
-            height: 250,
-            width: 350,
-            modal: true,
-            resizable: false,
-            buttons: {
-                "Send": sendrequest,
-                Cancel: function() {
-                    dialog.dialog( "close" );
-                }
-            },
-            close: function() {
-                form[ 0 ].reset();
-                allFields.removeClass( "ui-state-error" );
-                $('.selectaction').prop('selectedIndex',0);
-            }
-        });
-
-        form = dialog.find( "form" ).on( "submit", function( event ) {
-            event.preventDefault();
-            sendrequest();
-
-        });
-
-        $('.dataTables-vm').on('change', '.selectaction',function() {
-            var jsonout = JSON.parse(this.value.replace(/'/g, '"'));
-            if (jsonout["action"] != "none") {
-
-                $('#action').val(jsonout["action"]);
-                $('#vmid').val(jsonout["vmid"]);
-                $('#node').val(jsonout["node"]);
-                dialog.dialog( "open" );
-            }
-        });
-
-
 
         /* NODE NON GRATA */
 
@@ -258,12 +201,13 @@ $(document).ready(function()
             return false; // return false so the browser will not scroll your page
         });
         /* NEWVM -- SEARCH NODES */
-
-        form = dialog.find( "form" ).on( "submit", function( event ) {
-            event.preventDefault();
-            sendrequest();
-
+        
+        
+        $('#bbaction').on('click', function(event) {
+        	  event.preventDefault(); // To prevent following the link (optional)
+        	  sendrequest();
         });
+ 
 
         function newvm() {
             // J'initialise le variable box

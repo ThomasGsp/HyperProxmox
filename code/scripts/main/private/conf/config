@@ -1,8 +1,8 @@
 [system]
 ; System configurations
-user: hosting
+user: hyperproxmox
 
-; If not exist on start, the key is auto-generate.
+; If not exist on start, the key will be auto-generate.
 key_pvt: private/keys/Ragnarok.pvt.key
 key_pub: private/keys/Ragnarok.pub.key
 
@@ -10,7 +10,7 @@ key_pub: private/keys/Ragnarok.pub.key
 user: www-data
 
 [api]:
-user: hosting_api
+user: hyperproxmox
 
 [databases]
 ; Databases configurations
@@ -45,11 +45,11 @@ walker_lock: /tmp/hyperproxmoxwalker.lock
 
 
 [logger]
-; Active or not(True/False)
+; Active or not(True/False - Case !)
 debug = True
 
 ; debug level    1: "INFO",  2: "WARNING", 3: "ERROR", 4: "CRITICAL",  5: "DEBUG"
-debug_level = 5
+debug_level = 2
 
 ; log output
 logs_dir = /var/log/hyperproxmox/
