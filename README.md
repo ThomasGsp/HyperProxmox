@@ -60,7 +60,7 @@ server {
 
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php-hyperproxmox.sock;
+        fastcgi_pass unix:/var/run/php-www.sock;
     }
 }
 
@@ -106,7 +106,7 @@ mkdir /var/www/hyperproxmox
 cp -R /opt/HyperProxmox/ /var/www/hyperproxmox/
 chown www-data: -R /var/www/hyperproxmox
 # No www-data write (useless)
-chmod 550 -R /opt/HyperProxmox
+chmod 550 -R /var/www/hyperproxmox
 
 # Set hyperproxmox
 chown hyperproxmox: -R /opt/HyperProxmox
@@ -114,6 +114,7 @@ chmod 760 -R /opt/HyperProxmox
 
 # Log dir (you can change it)
 mkdir /var/log/hyperproxmox/
+chown hyperproxmox: /var/log/hyperproxmox/
 ```
 
 ``` bash
