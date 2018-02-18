@@ -18,12 +18,12 @@ $lastdate = "";
 
 if(!empty($_POST['date']))
 {
-    $html_dates = $html->List_Dates($_POST['date']);
+    $html_dates = $html->List_Dates(intval($_POST['date']));
     $lastdate = intval($_POST['date']);
 }
 else if(!empty($_GET['date']))
 {
-    $html_dates = $html->List_Dates($_GET['date']);
+    $html_dates = $html->List_Dates(intval($_GET['date']));
     $lastdate = intval($_GET['date']);
 }
 else
