@@ -19,17 +19,17 @@ $lastdate = "";
 if(!empty($_POST['date']))
 {
     $html_dates = $html->List_Dates($_POST['date']);
-    $lastdate = $_POST['date'];
+    $lastdate = intval($_POST['date']);
 }
 else if(!empty($_GET['date']))
 {
     $html_dates = $html->List_Dates($_GET['date']);
-    $lastdate = $_GET['date'];
+    $lastdate = intval($_GET['date']);
 }
 else
 {
     $html_dates = $html->List_Dates();
-    $lastdate = json_decode($q->GET_Dates("last"), true)['value'];
+    $lastdate = intval(json_decode($q->GET_Dates("last"), true)['value']);
 }
 
 //$html_groups = $html->List_Groups($lastdate);
