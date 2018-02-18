@@ -3,6 +3,19 @@
 class API_GET_INFO
 {
 
+    
+    public function GET_status($action, $id)
+    {
+        $info = curl("api/v1/instance/id/".$id."/status/".$action);
+        return $info;
+    }
+    
+    public function GET_byid($selector, $id)
+    {
+        $info = curl("api/v1/static/".$selector."/id/".$id);
+        return $info;
+    }
+    
     public function GET_Dates($select="all")
     {
         $dates = curl("api/v1/static/dates/".$select);
@@ -204,11 +217,12 @@ class API_Gen_HTML
                 <tr>
                     <td></td>
                     <td>'.$qemu->cluster.'</td>
-                    <td><a href="node.php?hyp='.$qemu->node.'&date='.$date.'"> '.$qemu->node.'</a> 
+                    <td><a href="node.php?id='.$qemu->_id["\$oid"].'&type=vm&date='.$date.'"> '.$qemu->node.'</a> 
                      
-                    <a data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'" href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=qemu%2F'.$qemu->vmid.':4::::::" target="_blank"> <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a></td>                    
-                    <td><a href="vm.php?id='.$qemu->_id["\$oid"].'&date='.$date.'"> '.$qemu->name.'</a></td>
-
+                    <a data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'" href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=qemu%2F'.$qemu->vmid.':4::::::" target="_blank"> 
+                    <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a></td>
+                    <td> <a target="_blank" href="actionvm.php?id='.$qemu->_id["\$oid"].'&date='.$date.'" >'.$qemu->name.'</td>
+                    <td>'.$qemu->type.'</td>
                     <td>'.$qemu->vmid.'</td>
                     <td  data-order="'.$qemu->maxmem.'">'.formatBytes(round($qemu->maxmem)).'</td>
                     <td>'.$qemu->cpus.'</td>
@@ -216,9 +230,6 @@ class API_Gen_HTML
                     <td id="wrapper-mac"> <a data-toggle="tooltip" data-html="true" title="'.str_replace(",", "<br/>", $macs).'">'.$macs.'</a></td>
                     <td>'.secondsToDays($qemu->uptime).'</td>
                     <td>'.$qemu->status.'</td>
-                    <td>
-                        <a href="?id='.$qemu->_id["\$oid"].'&date='.$date.'" class="btn btn-info" role="button">Link Button</a>
-                     </td>
                 </tr>';
         }
         return $html;
@@ -244,7 +255,7 @@ class API_Gen_HTML
             $row_non_grata[] = $rows->name;
         }
         */
-
+        $sto_selection = "";
         $html = '';
         $last_sto = "";
         $last_clust = "";
@@ -253,28 +264,28 @@ class API_Gen_HTML
             $node = (object) $node;
       
             $sto_info  = json_decode($q->GET_sto($date, $node->cluster, $node->node), true)['value'];
-           
-            if ($this->sto_regx_status == true)
+            
+            if ($sto_regx_status == true)
             {
                 foreach ($sto_info as $sto)
                 {
                     $sto = (object)$sto;
-                    if (preg_match($this->sto_regx, $sto->storage))
+                    if (preg_match($sto_regx, $sto->storage))
                     {
-                        $sto_el = $sto->storage;
+                        $sto_selection = $sto;
                         break;
                     }
                 }
             }
 
-            if($sto_el == "" or $this->sto_regx_status == false)
+            if($sto_selection == "" or $sto_regx_status == false)
             {
                 foreach ($sto_info as $sto) {
                     $sto = (object)$sto;
                     $sto_new = $sto->total;
                     if ($sto_new > $sto_max) {
                         $sto_max = $sto_new;
-                        $sto_el = $sto->storage;
+                        $sto_selection = $sto;
                     }
                 }
             }
@@ -291,19 +302,20 @@ class API_Gen_HTML
             $ram_use_percent = round(($node->memory['used']/$node->memory['total'])*100);
             $ram_alloc_percent = round(($node->totalallocram/$node->memory['total'])*100);
             $cpu_alloc_percent = round(($node->totalalloccpu/$node->cpuinfo['cpus'])*100);
-            $disk_use_percent = round((100/$sto_el_node->total)*$sto_el_node->used);
-            $disk_alloc_percent = round(($sto_el_node->totalallocdisk/$sto_el_node->total)*100); // revoir param 1
-            $load_percent = round($node->load*100);
+            $disk_use_percent = round((100/$sto_selection->total)*$sto_selection->used);
+            
+            $disk_alloc_percent = round(($sto_selection->totalallocdisk/$sto_selection->total)*100); // revoir param 1
+            $load_percent = round($node->loadavg[0]);
 
             $eligibility = eligibility($ram_use_percent, $ram_alloc_percent, $cpu_alloc_percent, $disk_use_percent, $disk_alloc_percent, $load_percent);
             
 
-            if (in_array($node->name, $row_non_grata)) {
-                $grata = '<a class="nongratalink" data-toggle="tooltip" title="Switch to grata" id="'.$node->node.'" action="sw_ON" node="'.$node->name.'" href="#" > <img src="images/nongrata_on.png" alt="Nongrataimg" style="width:16px;height:16px;"></a>';
+            if (in_array($node->node, $row_non_grata)) {
+                $grata = '<a class="nongratalink" data-toggle="tooltip" title="Switch to grata" id="'.$node->node.'" action="sw_ON" node="'.$node->node.'" href="#" > <img src="images/nongrata_on.png" alt="Nongrataimg" style="width:16px;height:16px;"></a>';
                 $eligibility = round($eligibility +  $non_grata_weight);
             }
             else{
-                $grata = '<a class="nongratalink" data-toggle="tooltip" title="Switch to non grata" id="'.$node->node.'"  action="sw_OFF" node="'.$node->name.'"  href="#" > <img src="images/nongrata_off.png" alt="Nongrataimg" style="width:16px;height:16px;"></a>';
+                $grata = '<a class="nongratalink" data-toggle="tooltip" title="Switch to non grata" id="'.$node->node.'"  action="sw_OFF" node="'.$node->node.'"  href="#" > <img src="images/nongrata_off.png" alt="Nongrataimg" style="width:16px;height:16px;"></a>';
             }
 
 
@@ -312,15 +324,15 @@ class API_Gen_HTML
                     <td></td>
                     <td>'.$node->cluster.'</td>
                     <td> 
-                        <a href="node.php?hyp='.$node->node.'&date='.$date.'"> '.$node->node.'</a> 
-                        <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=node%2F'.$node->name.':4:5:::::" target="_blank"> <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a>
+                        <a href="node.php?id='.$node->_id["\$oid"].'&type=node&date='.$date.'"> '.$node->node.'</a> 
+                        <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=node%2F'.$node->node.':4:5:::::" target="_blank"> <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a>
                         '.$grata.'                    
                     </td>
                     <td style="color:'.testcolor("ram_use", $ram_use_percent).'" data-order="'.$ram_use_percent.'">'.formatBytes($node->memory['used']).' ('.$ram_use_percent.'%)</td>
                     <td style="color:'.testcolor("ram_alloc", $ram_alloc_percent).'"  data-order="'.$ram_alloc_percent.'">'.formatBytes($node->totalallocram).'/'.formatBytes($node->memory['total']).' ('.$ram_alloc_percent.'%)</td>
                     <td style="color:'.testcolor("cpu_alloc", $cpu_alloc_percent).'" data-order="'.$cpu_alloc_percent.'">'.$node->totalalloccpu.'/'.$node->cpuinfo['cpus'].' ('.$cpu_alloc_percent.'%)</td>
-                    <td style="color:'.testcolor("disk_use", $disk_use_percent).'" data-order="'.$sto_el_node->used.'">'.formatBytes($sto_el_node->used).'('.$disk_use_percent.'% - '.$sto_el.')</td>
-                    <td style="color:'.testcolor("disk_alloc", $disk_alloc_percent).'"  data-order="'.$sto_el_node->used.'">'.formatBytes($sto_el_node->totalallocdisk).'/'.formatBytes($sto_el_node->total).' ('.$disk_alloc_percent.'%) </td>
+                    <td style="color:'.testcolor("disk_use", $disk_use_percent).'" data-order="'.$sto_selection->used.'">'.formatBytes($sto_selection->used).'('.$disk_use_percent.'% - '.$sto_selection->storage.')</td>
+                    <td style="color:'.testcolor("disk_alloc", $disk_alloc_percent).'"  data-order="'.$sto_selection->used.'">'.formatBytes($sto_selection->totalallocdisk).'/'.formatBytes($sto_selection->total).' ('.$disk_alloc_percent.'%) </td>
                     <td style="color:'.testcolor("cpu_use", $load_percent).'" >'.$load_percent.'%</td>
                     <td data-order="'.secondsToDays($node->uptime).'">'.secondsToDays($node->uptime).'d</td>
                     <td>'.$eligibility.'</td>  
@@ -370,9 +382,10 @@ class API_Gen_HTML
             $htmldisk = '<table class="display nowrap responsive table table-striped table-bordered table-hover">
                             <thead class="thead-inverse">
                             <tr>
-                                <th>Type</th>
-                                <th>Vol.id</th>
-                                <th>Size</th>
+                                <th>type</th>
+                                <th>vol.id</th>
+                                <th>size</th>
+                                <th>format</th>  
                             </tr>
                         </thead>';
 
@@ -387,14 +400,19 @@ class API_Gen_HTML
             foreach ($disklists as $disklist) {
                 $disklist = (object) $disklist;
                 if ($disklist->storage == $sto->storage)
-                    $htmldisk = $htmldisk.' <tr><td>'.$disklist->content.'</td>  <td>'.$disklist->volid.'</td>  <td>'.formatBytes($disklist->size).'</td></tr>';
+                    $htmldisk = $htmldisk.' <tr>
+                                                <td>'.$disklist->content.'</td>  
+                                                <td>'.$disklist->volid.'</td>  
+                                                <td>'.formatBytes($disklist->size).'</td>
+                                                <td>'.$disklist->format.'</td>
+                                            </tr>';
             }
             $htmldisk = $htmldisk.'</table>';
 
             $html = $html.'
                 <tr>
                     <td></td>
-                    <td> <a href="node.php?hyp='.$sto->node.'&date='.$date.'"> '.$sto->node.'</a> <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=storage%2F'.$sto->node.'%2F'.$sto->storage.':4::::::" target="_blank"> <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a> </td>
+                    <td> <a href="node.php?id='.$sto->_id["\$oid"].'&type=sto&date='.$date.'"> '.$sto->node.'</a> <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=storage%2F'.$sto->node.'%2F'.$sto->storage.':4::::::" target="_blank"> <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a> </td>
                     <td> '.$sto->storage.'</td>
                     <td data-order="'.$sto->total.'"> '.formatBytes($sto->total).'</td>
                     <td data-order="'.$sto->totalallocdisk.'"> '.formatBytes($sto->totalallocdisk).' ('.$disk_alloc_percent.'%)</td>
