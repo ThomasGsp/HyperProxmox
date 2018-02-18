@@ -2,7 +2,6 @@
 require(dirname(__DIR__).'/requires/configs.php');
 require(dirname(__DIR__).'/requires/functions.php');
 
-
 //SESSION
 session_start();
 if (!isset($_SESSION['uid']) && ($useldap == true)) {
@@ -10,17 +9,22 @@ if (!isset($_SESSION['uid']) && ($useldap == true)) {
     die();
 }
 
-
 // GEN HTML LIST Dates
 $html = new API_Gen_HTML;
 $q = new API_GET_INFO;
 $html_dates = [];
 $lastdate = "";
 
+
 if(!empty($_POST['date']))
 {
     $html_dates = $html->List_Dates($_POST['date']);
     $lastdate = $_POST['date'];
+}
+else if(!empty($_GET['date']))
+{
+    $html_dates = $html->List_Dates($_GET['date']);
+    $lastdate = $_GET['date'];
 }
 else
 {
@@ -115,7 +119,7 @@ else
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.php">PCM V0.1</a>
+            <a class="navbar-brand" href="index.php">Hyperproxmox - alpha 1.0</a>
 
             <form method="POST" class="navbar-brand" action="" style="margin-top: -7px">
                     <?php echo $html_dates; ?> &nbsp;&nbsp; <INPUT type="submit" class="btn btn-default pull-right" value="OK">
@@ -148,65 +152,21 @@ else
                     ';
                 }
                 ?>
-
-                <!-- /.dropdown-user -->
             </li>
-            <!-- /.dropdown -->
         </ul>
-        <!-- /.navbar-top-links -->
-
         <div class="navbar-default sidebar" role="navigation">
             <div class="sidebar-nav navbar-collapse">
                 <ul class="nav" id="side-menu">
+                    <li><a href="vms.php?date=<?php echo $lastdate; ?>"><i class="fa fa-table fa-fw"></i>Instances</a></li>
+                    <li><a href="nodes.php?date=<?php echo $lastdate; ?>"><i class="fa fa-table fa-fw"></i>Nodes</a></li>
+                    <li><a href="storages.php?date=<?php echo $lastdate; ?>"><i class="fa fa-table fa-fw"></i>Storages</a></li>
                     <!--
-                    <li class="sidebar-search">
-                        <div class="input-group custom-search-form">
-                            <input type="text" class="form-control" placeholder="Search...">
-                                <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
-
-                    </li>
-                    -->
-
-
-                    <li>
-                        <a href="index.php"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a href="vmalloc.php"><i class="fa fa-street-view fa-fw"></i>VM Allocation</a>
-                    </li>
-
-                    <li>
-                        <a href="vms.php"><i class="fa fa-table fa-fw"></i>VMs</a>
-                    </li>
-
-                    <li>
-                        <a href="nodes.php"><i class="fa fa-table fa-fw"></i>Hypervisors</a>
-                    </li>
-
-                    <li>
-                        <a href="storages.php"><i class="fa fa-table fa-fw"></i>Storages</a>
-                    </li>
-
-
-
                     <li>
                         <a href="#"><i class="fa fa-sitemap fa-fw"></i> Groups <span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <?php // echo $html_groups;  ?>
                         </ul>
-                        <!-- /.nav-second-level -->
                     </li>
-
-
-                    <li>
-                        <a href="informations.php"><i class="fa  fa-info  fa-fw"></i>Informations</a>
-                    </li>
-
                 </ul>
             </div>
             <!-- /.sidebar-collapse -->
