@@ -137,10 +137,9 @@ $(document).ready(function()
             
             var commandinfo = "The status available in the table is not dynamically update, you must wait the next cron rotate. <br /> You can play the status command to have an updated informations";
             box.html('<center> <img src="images/icon-load.gif"  height="60" width="60"></center>');
-            		
 
             $.ajax({
-                url: 'requires/pveaction.php?id='+id.val()+'&action=status',
+                url: 'requires/pveaction.php?id='+id.val()+'&action='+action.val(),
                 type : 'GET',
                 timeout: 32000,
                 success: function (data) {
