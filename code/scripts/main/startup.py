@@ -75,7 +75,7 @@ if __name__ == "__main__":
             '/api/v1/instance', 'Instance',
             '/api/v1/instance/new', 'Instance',
             '/api/v1/instance/([0-9]+)', 'Instance',
-            '/api/v1/instance/([a-z0-9]+)/status/(start|stop|status|restart|reset|shutdown)', 'Instance',
+            '/api/v1/instance/id/([a-z0-9]+)/status/(start|stop|current|reset|shutdown)', 'Instance',
 
             '/api/v1/instance/([0-9]+)/package', 'package',
             '/api/v1/instance/([0-9]+)/vhost(?:/([0-9]+))', 'vhost',
