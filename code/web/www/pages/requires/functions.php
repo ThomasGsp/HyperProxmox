@@ -221,7 +221,7 @@ class API_Gen_HTML
                      
                     <a data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'" href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=qemu%2F'.$qemu->vmid.':4::::::" target="_blank"> 
                     <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a></td>
-                    <td> <a target="_blank" href="actionvm.php?id='.$qemu->_id["\$oid"].'&date='.$date.'" >'.$qemu->name.'</td>
+                    <td> <a href="actionvm.php?id='.$qemu->_id["\$oid"].'&date='.$date.'" >'.$qemu->name.'</td>
                     <td>'.$qemu->type.'</td>
                     <td>'.$qemu->vmid.'</td>
                     <td  data-order="'.$qemu->maxmem.'">'.formatBytes(round($qemu->maxmem)).'</td>
