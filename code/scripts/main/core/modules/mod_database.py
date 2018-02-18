@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 from bson.json_util import dumps
 import json
 import redis
@@ -86,7 +87,7 @@ class MongoDB:
         try:
             result = {
                 "result": "OK",
-                "value": json.loads(dumps(self.db[collection].find({"_id": id})))
+                "value": json.loads(dumps(self.db[collection].find_one({"_id": ObjectId(id)})))
             }
         except BaseException as e:
             result = {
