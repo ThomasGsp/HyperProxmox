@@ -285,13 +285,14 @@ class Core:
 
         return result
 
-    def status_instances(self, vmid, action,  instancetype="lxc"):
+    def status_instances(self, id, action):
         """ Find node/cluster informations from vmid """
         try:
-            instances_informations = self.mongo.get_instances(vmid)
+            instances_informations = self.mongo.generalmongosearch("instances", id)["value"]
 
             """ Find cluster informations from node """
             clusters_informations = self.mongo.get_clusters_conf(instances_informations['cluster'])["value"]
+
 
             proxmox_clusters_url = clusters_informations["url"]
             proxmox_clusters_port = clusters_informations["port"]
@@ -310,8 +311,8 @@ class Core:
             result = proxmox.status_instances("{0}:{1}".format(proxmox_clusters_url,
                                                               int(proxmox_clusters_port)),
                                              instances_informations['node'],
-                                             instancetype,
-                                             vmid, action)
+                                              instances_informations['type'],
+                                              instances_informations['vmid'], action)
 
         except IndexError as ierror:
             result = {
