@@ -110,7 +110,7 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(
-                        dumps(self.db[self.collection_clusters].find_one(
+                        dumps(self.db[self.collection_clusters].find(
                             {'$and': [{'date': int(date), 'cluster': cluster}]})))
                 }
 
@@ -272,7 +272,7 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(
-                        dumps(self.db[self.collection_nodes].find_one(
+                        dumps(self.db[self.collection_nodes].find(
                             {'$and': [{'date': int(date), 'cluster': cluster, 'node': node}]})))
                 }
 
@@ -325,7 +325,7 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_instances].find_one(
+                        self.db[self.collection_instances].find(
                             {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
                 }
 
