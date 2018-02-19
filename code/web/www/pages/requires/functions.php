@@ -28,16 +28,28 @@ class API_GET_INFO
         return $cluster_conf;
     }
     
-    public function GET_qemu($date, $cluster=null, $node=null, $vmid= null)
+    public function GET_qemu($date, $cluster=null, $node=null, $vmid=null)
     {
-        
-        $qemu = curl("api/v1/static/instances/".$date."/");
+        if (!empty($vmid))
+            $qemu = curl("api/v1/static/instances/".$date."/".$cluster."/".$node."/".$vmid);
+        else if (!empty($node))
+            $qemu = curl("api/v1/static/instances/".$date."/".$cluster."/".$node."/");
+        else if (!empty($cluster))
+            $qemu = curl("api/v1/static/instances/".$date."/".$cluster."/");
+        else
+            $qemu = curl("api/v1/static/instances/".$date."/");
         return $qemu;
     }
 
     public function GET_hyp($date, $cluster=null, $node=null)
     {
-        $nodes = curl("api/v1/static/nodes/".$date."/");
+        if (!empty($node))
+            $nodes = curl("api/v1/static/nodes/".$date."/".$cluster."/".$node);
+        else if (!empty($cluster))
+            $nodes = curl("api/v1/static/nodes/".$date."/".$cluster."/");
+        else
+            $nodes = curl("api/v1/static/nodes/".$date."/");
+    
         return $nodes;
     }
 
@@ -167,14 +179,14 @@ class API_Gen_HTML
     }
 
 
-    public function List_VMs($date, $node=null)
+    public function List_VMs($date, $cluster=null, $node=null)
     {
         $html = '';
         $d = new API_GET_INFO; 
-        $vms_list = json_decode($d->GET_qemu($date), true)['value'];       
+        $vms_list = json_decode($d->GET_qemu($date, $cluster, $node), true)['value'];       
         $last_clust = "";
         $last_disk = "";
-        
+
         foreach ($vms_list as $qemu)
         {
             $qemu = (object) $qemu;
@@ -240,7 +252,7 @@ class API_Gen_HTML
         return $html;
     }
 
-    public function List_HYPs($date, $cluster = null)
+    public function List_HYPs($date, $cluster=null, $node=null)
     {
         require(dirname(__DIR__).'/requires/configs.php');
         //$m = new REQUESTS_MYSQL;
@@ -248,11 +260,9 @@ class API_Gen_HTML
 
 
         $q = new API_GET_INFO;
-        $nodes = json_decode($q->GET_hyp($date, $cluster), true)['value'];
-        
-        
+        $nodes = json_decode($q->GET_hyp($date, $cluster, $node), true)['value'];
+ 
         arsort($nodes);
-      
         $row_non_grata = [];
     
         /*
@@ -264,6 +274,8 @@ class API_Gen_HTML
         $html = '';
         $last_sto = "";
         $last_clust = "";
+   
+        
         foreach ($nodes as $node)
         {
             $node = (object) $node;
@@ -357,11 +369,11 @@ class API_Gen_HTML
     }
 
 
-    public function List_STO($date, $node=null, $sto=null)
+    public function List_STO($date, $cluster=null, $node=null, $sto=null)
     {
         
         $q = new API_GET_INFO;
-        $stos_list = json_decode($q->GET_sto($date), true)['value'];
+        $stos_list = json_decode($q->GET_sto($date, $cluster, $node, $sto), true)['value'];
         $html = '';
         $last_clust = "";
         $last_disk = "";
@@ -422,7 +434,7 @@ class API_Gen_HTML
                     <td></td>
                     <td> 
                         <a href="node.php?id='.$sto->_id["\$oid"].'&type=sto&date='.$date.'"> '.$sto->node.'</a> 
-                        <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=node%2F'.$node->node.':4:5:::::"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=storage%2F'.$sto->node.'%2F'.$sto->storage.':4::::::" target="_blank">
+                        <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=node%2F'.$sto->node.':4:5:::::"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=storage%2F'.$sto->node.'%2F'.$sto->storage.':4::::::" target="_blank">
                         <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a> </td>
                     <td> '.$sto->storage.'</td>
                     <td data-order="'.$sto->total.'"> '.formatBytes($sto->total).'</td>
