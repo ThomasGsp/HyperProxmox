@@ -420,7 +420,6 @@ class Core:
             self.redis_cache.insert_message(hash_hex, clusters_informations, 500)
             return clusters_informations
         else:
-            print("cache admin")
             return json.loads(cache.replace("'", "\""))
 
 
