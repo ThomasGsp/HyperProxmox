@@ -41,7 +41,8 @@ if __name__ == "__main__":
                   "\n - Public Key: {1}"
                   .format(localconf['system']['key_pvt'], localconf['system']['key_pvt']))
             print("Passphrase HASH: {0}".format(passhash))
-            print("You must save your passphrase hash in a security place !")
+            print("You MUST save your passphrase hash in a security place !")
+            key_pvt = CritConf.read_private_key(localconf['system']['key_pvt'], passhash)
         else:
             print(gen['Error'])
             exit(1)
@@ -56,7 +57,7 @@ if __name__ == "__main__":
 
     """ Step two"""
     if 'passhash' not in vars():
-        passhash = encodepassphrase(getpass.getpass("This system need a passphrase to start:"))
+        passhash = getpass.getpass("This system need a passphrase to start:")
         key_pvt = CritConf.read_private_key(localconf['system']['key_pvt'], passhash)
         if key_pvt['result'] != "OK":
             print("{0}: {1}"
@@ -68,9 +69,7 @@ if __name__ == "__main__":
     # URL MAPPING
     urls = \
         (
-
             # FRESH DATA
-
             # MAPPING INSTANCES
             '/api/v1/instance', 'Instance',
             '/api/v1/instance/new', 'Instance',
@@ -148,4 +147,3 @@ if __name__ == "__main__":
     """ Init API thread """
     api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf)
     api_th.start()
-
