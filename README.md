@@ -2,7 +2,7 @@
 
 * Author : Tlams
 * Date : 2017/2018
-* Version : Alpha 1.O
+* Version : Alpha 1.0
 * Status: Dev
 * Object :   Massive LXC CT / KVM deployment and management system for Proxmox clusters.
 * Information : 
