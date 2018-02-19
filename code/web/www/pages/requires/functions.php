@@ -217,11 +217,16 @@ class API_Gen_HTML
                 <tr>
                     <td></td>
                     <td>'.$qemu->cluster.'</td>
-                    <td><a href="node.php?id='.$qemu->_id["\$oid"].'&type=vm&date='.$date.'"> '.$qemu->node.'</a> 
-                     
-                    <a data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'" href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=qemu%2F'.$qemu->vmid.':4::::::" target="_blank"> 
-                    <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a></td>
-                    <td> <a href="actionvm.php?id='.$qemu->_id["\$oid"].'&date='.$date.'" >'.$qemu->name.'</td>
+                    <td>
+                        <a href="node.php?id='.$qemu->_id["\$oid"].'&type=vm&date='.$date.'"> '.$qemu->node.'</a> 
+                        <a data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'" href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=qemu%2F'.$qemu->vmid.':4::::::" target="_blank"> 
+                        <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a>
+                    </td>
+                    <td> 
+                        <a href="actionvm.php?id='.$qemu->_id["\$oid"].'&date='.$date.'" >'.$qemu->name.'
+                        <a data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=qemu%2F'.$qemu->vmid.':4::::::" href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=qemu%2F'.$qemu->vmid.':4::::::" target="_blank">
+                        <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a>
+                    </td>
                     <td>'.$qemu->type.'</td>
                     <td>'.$qemu->vmid.'</td>
                     <td  data-order="'.$qemu->maxmem.'">'.formatBytes(round($qemu->maxmem)).'</td>
@@ -309,16 +314,19 @@ class API_Gen_HTML
 
             $eligibility = eligibility($ram_use_percent, $ram_alloc_percent, $cpu_alloc_percent, $disk_use_percent, $disk_alloc_percent, $load_percent);
             
-
+            
             if (in_array($node->node, $row_non_grata)) {
-                $grata = '<a class="nongratalink" data-toggle="tooltip" title="Switch to grata" id="'.$node->node.'" action="sw_ON" node="'.$node->node.'" href="#" > <img src="images/nongrata_on.png" alt="Nongrataimg" style="width:16px;height:16px;"></a>';
+                //$grata = '<a class="nongratalink" data-toggle="tooltip" title="Switch to grata" id="'.$node->node.'" action="sw_ON" node="'.$node->node.'" href="#" > <img src="images/nongrata_on.png" alt="Nongrataimg" style="width:16px;height:16px;"></a>';
                 $eligibility = round($eligibility +  $non_grata_weight);
             }
+            /*
             else{
                 $grata = '<a class="nongratalink" data-toggle="tooltip" title="Switch to non grata" id="'.$node->node.'"  action="sw_OFF" node="'.$node->node.'"  href="#" > <img src="images/nongrata_off.png" alt="Nongrataimg" style="width:16px;height:16px;"></a>';
             }
-
-
+            */
+            
+            $grata = "";
+            
             $html = $html.'
                 <tr>
                     <td></td>
@@ -412,7 +420,10 @@ class API_Gen_HTML
             $html = $html.'
                 <tr>
                     <td></td>
-                    <td> <a href="node.php?id='.$sto->_id["\$oid"].'&type=sto&date='.$date.'"> '.$sto->node.'</a> <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=storage%2F'.$sto->node.'%2F'.$sto->storage.':4::::::" target="_blank"> <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a> </td>
+                    <td> 
+                        <a href="node.php?id='.$sto->_id["\$oid"].'&type=sto&date='.$date.'"> '.$sto->node.'</a> 
+                        <a  data-toggle="tooltip" title="External Link: https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=node%2F'.$node->node.':4:5:::::"  href="https://'.$clusters_info->url.':'.$clusters_info->port.'/#v1:0:=storage%2F'.$sto->node.'%2F'.$sto->storage.':4::::::" target="_blank">
+                        <img src="images/fb-lien-420.png" alt="ExternalProxmoxLink" style="width:20px;height:20px;"></a> </td>
                     <td> '.$sto->storage.'</td>
                     <td data-order="'.$sto->total.'"> '.formatBytes($sto->total).'</td>
                     <td data-order="'.$sto->totalallocdisk.'"> '.formatBytes($sto->totalallocdisk).' ('.$disk_alloc_percent.'%)</td>
