@@ -2,11 +2,28 @@
 
 * Author : Tlams
 * Date : 2017/2018
+* Version : Alpha 1.O
 * Status: Dev
 * Object :   Massive LXC CT / KVM deployment and management system for Proxmox clusters.
 * Information : 
 This project is currently in active development. 
 You shouldn't use in production mode, use at your risks !
+
+## Version informations:
+* Provide:
+    - Basic web interface to list instances, nodes and clusters (with details)
+    - Basic instance management by the web interface(stop/start/restart...)
+    - Proxmox data crawler 
+    - API for the system management and data
+    - Encipher the critical data (cluster access)
+
+* Not provide:
+    - Advanced security (No API/Web interface authentification)
+    - Instance deployment
+    - Group & cluster viewing in web interface
+    - Advanced logs system
+    - Purge data system
+    - Lot of others things
 
 ## Requirement:
 * Proxmox infrastructure (standalone, clusters...)
