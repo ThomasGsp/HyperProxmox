@@ -137,7 +137,6 @@ class Analyse:
                             config_av = proxmox.get_configs("{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                                          value_nodes_list["node"], instance["type"], instance["vmid"])["value"]
 
-                            print(config_av)
 
                             maclist = []
                             for key, value in config_av['data'].items():
@@ -209,6 +208,7 @@ class Analyse:
 
                         storage["totalallocdisk"] = totalsize
                         self.mongo.insert_storages(storage)
+
         self.mongo.update_datekey(int(insert_time), "OK")
 
         """ Unlock file """
