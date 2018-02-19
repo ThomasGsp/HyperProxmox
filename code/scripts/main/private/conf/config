@@ -17,12 +17,12 @@ user: hyperproxmox
 ; NOSQL databases, should use a password
 mongodb_user:
 mongodb_password:
-mongodb_ip: 192.168.0.138
+mongodb_ip: 192.168.0.78
 mongodb_port: 27017
 
 redis_user:
 redis_password:
-redis_ip: 192.168.0.138
+redis_ip: 192.168.0.78
 redis_port: 6379
 
 [deploy]
