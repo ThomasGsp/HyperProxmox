@@ -18,7 +18,8 @@ include(dirname(__DIR__).'/pages/includes/header.php');
                 - Author : Tlams <br/>
                 - Date : 2017/2018 <br/>
                 - Status: Dev <br/>
-                - Object : Massive LXC CT / KVM deployment system and for Proxmox clusters. <br/>
+                - Version: Alpha 1.0 <br/>
+                - Object : Massive LXC CT / KVM deployment system and management for Proxmox clusters. <br/>
                 Information : This project is currently in active development.  <br/>
                 You shouldn't use in production mode, use at your risks ! <br/>
 				</h3>
