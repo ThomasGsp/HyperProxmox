@@ -38,14 +38,14 @@ class Auth:
 class General_Search:
     def GET(self, query, id):
         try:
-            return core.generalsearch(query, id)
+            result = core.generalsearch(query, id)
         except BaseException as e:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
                 "value": "Invalid request: {0}".format(e)
             }
-        return result
+        return json.dumps(result)
 
 class QueryCache_Infra:
     def GET(self, dest, date, cluster=None, node=None, vmid=None):
@@ -57,8 +57,8 @@ class QueryCache_Infra:
                 "type": "PYTHON - API",
                 "value": "Invalid request: {0}".format(e)
             }
-        return json.dumps(result)
 
+        return json.dumps(result)
 
 class QueryDates:
     def GET(self, keytype):
@@ -127,21 +127,21 @@ class Cluster:
 
 
 class Instance:
-    def GET(self, vmid, status=None):
+    def GET(self, id, action=None):
         try:
-            if status:
+            if action:
                 """ GET INSTANCE STATUS """
-                result = core.status_instances(vmid, status)
+                result = core.status_instances(id, action)
             else:
                 """ GET INSTANCE INFORMATION """
-                result = core.info_instances(vmid)
+                result = core.info_instances(id)
         except BaseException as e:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
                 "value": "Invalid request: {0}".format(e)
             }
-        return result
+        return json.dumps(result)
 
     def POST(self, vmid=None, status=None):
         try:
