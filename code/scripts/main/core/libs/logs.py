@@ -72,7 +72,7 @@ class Logger(object):
 
         return self.stdout_logger
 
-    def errorout(self, node, errortxt):
+    def logsout(self, node, errortxt):
         now = datetime.datetime.now()
         date = now.strftime("%Y-%m-%d %H:%M")
         errortxt = re.sub(r"ticket\?(.*?) ", "ticket?username=***YOUR_USER***&password=***PWD***", errortxt)
