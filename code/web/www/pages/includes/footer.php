@@ -1,5 +1,5 @@
 
-        <center> PCM - Proxmox Central Management -- V0.1 by Tlams</center>
+        <center> HyperProxmox -- Alpha 1.0 by Tlams</center>
     </body>
 
 </html>
