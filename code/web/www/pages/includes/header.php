@@ -47,7 +47,7 @@ else
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>PCM</title>
+    <title>HyperProxmox</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="../css/jquery-ui.css" rel="stylesheet">
@@ -82,7 +82,6 @@ else
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
     <script src="../vendor/bootstrap-select/js/bootstrap-select.js"></script>
 
-
     <!-- Metis Menu Plugin JavaScript -->
     <script src="../vendor/metisMenu/metisMenu.min.js"></script>
 
@@ -109,8 +108,6 @@ else
 
 <body>
 <div id="wrapper">
-
-    <!-- Navigation -->
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
