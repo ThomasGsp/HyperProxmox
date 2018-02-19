@@ -18,7 +18,7 @@ You shouldn't use in production mode, use at your risks !
     - Encipher the critical data (cluster access)
 
 * Not provide:
-    - Advanced security (No API/Web interface authentification)
+    - Advanced security (No API/Web interface authentification - DO NOT EXPOSE API ON "0.0.0.0")
     - Instance deployment
     - Group & cluster viewing in web interface
     - Advanced logs system
@@ -198,3 +198,8 @@ curl -H -XPOST -d '{    "name": "Cluster_1",
 * "exclude_nodes": Do not use this nodes - Not visible (list) 
 * "groups" : Symbolics groups for this node (list)
 * "weight": Weight for the cluster auto-selection (int)
+
+
+![alt text](https://github.com/ThomasGsp/HyperProxmox/blob/master/doc/screenshots/h-nodes.jpg)
+![alt text](https://github.com/ThomasGsp/HyperProxmox/blob/master/doc/screenshots/h-vms.jpg)
+![alt text](https://github.com/ThomasGsp/HyperProxmox/blob/master/doc/screenshots/h-sto.jpg)
