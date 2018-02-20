@@ -54,7 +54,7 @@ You shouldn't use in production mode, use at your risks !
 
 ### Install all packages
 ``` bash
-apt-get nginx php-fpm php-curl php-json python3-pip python3-redis python3-netaddr mongodb nginx redis-server git
+apt-get install php-fpm php-curl php-json python3-pip python3-redis python3-netaddr mongodb nginx redis-server git
 pip3 install pymongo db utils web.py requests
 ```
 
@@ -116,11 +116,11 @@ catch_workers_output = yes
 #### Hyperproxmox
 ``` bash
 useradd hyperproxmox
-cd /opt/ && git git@github.com:ThomasGsp/HyperProxmox.git
+cd /opt/ && git clone https://github.com/ThomasGsp/HyperProxmox.git
 
 # set www dir
 mkdir /var/www/hyperproxmox
-cp -R /opt/HyperProxmox/ /var/www/hyperproxmox/
+cp -R /opt/HyperProxmox/code/web/www/* /var/www/hyperproxmox/
 chown www-data: -R /var/www/hyperproxmox
 # No www-data write (useless)
 chmod 550 -R /var/www/hyperproxmox
@@ -132,30 +132,10 @@ chmod 760 -R /opt/HyperProxmox
 # Log dir (you can change it)
 mkdir /var/log/hyperproxmox/
 chown hyperproxmox: /var/log/hyperproxmox/
+
+#Rm demo keys
+rm /opt/HyperProxmox/code/scripts/main/private/keys/Ragnarok.p*
 ```
-
-``` bash
-# Create system.d file
-vi  /etc/systemd/system/hyperproxmox.service
-
-[Unit]
-Description=hyperproxmox - Service for Proxmox infrastructure
-After=syslog.target network.target
-
-[Service]
-Type=simple
-User=hyperproxmox
-Group=hyperproxmox
-WorkingDirectory=/opt/HyperProxmox/code/scripts/main
-ExecStart=/usr/bin/python3.5 /opt/HyperProxmox/code/scripts/main/startup.py
-Restart=always
-RestartSec=30
-
-[Install]
-WantedBy=multi-user.target
-
-# enable it
-systemctl enable hyperproxmox.service
 
 ```
 
@@ -168,12 +148,13 @@ vi /opt/HyperProxmox/code/scripts/main/private/conf/config
 ### Init:
 ``` bash
 # Start & generate your key
-systemctl start hyperproxmox.service
+cd /opt/HyperProxmox/code/scripts/main/
+/usr/bin/python3.5 /opt/HyperProxmox/code/scripts/main/startup.py
 
 < generate a key, with strong passphrase (SAVE IT!) >
 ```
 
-### Insert your first cluster
+### Insert your first cluster (from host)
 ``` bash
 curl -H -XPOST -d '{    "name": "Cluster_1",
                         "url":"proxmox.cluster.net",
