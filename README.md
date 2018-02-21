@@ -213,7 +213,7 @@ curl -H -XPOST -d '{    "name": "Cluster_1",
 ```
 
 
-### Manage instance status
+### Instance status management
 ``` bash
 '/api/v1/instance/id/([a-z0-9]+)/status/(start|stop|current|reset|shutdown)' | GET 
 ```
@@ -225,7 +225,7 @@ curl -H -XPOST -d '{    "name": "Cluster_1",
 '/api/v1/administration/cluster/new'                  | POST - Inster a new cluster
 ```
 
-### Cache Data - Mongo data
+### Cache Data - MongoDB
 ``` bash
 # date/cluster/node/vmid
 # Disks mapping
