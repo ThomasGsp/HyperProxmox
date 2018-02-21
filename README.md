@@ -48,10 +48,10 @@ You shouldn't use in production mode, use at your risks !
     * web.py
     * python-requests
     * Crypto
-    
-    
-## Installation (Debian type - Full standalone stack)
 
+
+
+## Installation (Debian type - Full standalone stack)
 ### Install all packages
 ``` bash
 apt-get install php-fpm php-curl php-json python3-pip python3-redis python3-netaddr mongodb nginx redis-server git
@@ -264,8 +264,7 @@ This data are manage by the crawler, you can't insert or change data yourself
 '/api/v1/static/(instances|nodes|clusters|storages|disks)/id/([a-z0-9]+)'          | GET - Return an information by mongoid
 ```
 
-
-### Typical use
+### Typical use
 ``` bash
 curl  http://127.0.0.1:8080/api/v1/static/nodes/1519040226/Cluster_1/sd-817348
 ```
