@@ -207,9 +207,8 @@ curl -H -XPOST -d '{    "name": "Cluster_1",
 ### General informations
 ``` bash
 ([a-z0-9]+) = MongoID
-([0-9]+) = Timestamp
+([0-9]+) = Timestamp/vmid
 ([0-9a-zA-Z\_\-]+) = Cluster/node name
-([0-9]+) = vmid
 ```
 
 
@@ -221,11 +220,15 @@ curl -H -XPOST -d '{    "name": "Cluster_1",
 ### Cluster management
 ``` bash
 '/api/v1/administration/cluster/(?:[0-9a-zA-Z\_\-]+)' | GET - Return the informations for an specific cluster
+                                                      | PUT - Update the configurations for an specific cluster
+                                                      | DELETE - Delete the configuration for an specific cluster
+                                                      
 '/api/v1/administration/cluster/'                     | GET - Return all clusters information
 '/api/v1/administration/cluster/new'                  | POST - Inster a new cluster
 ```
 
 ### Cache Data - MongoDB
+This data are manage by the crawler, you can't insert or change data yourself
 ``` bash
 # date/cluster/node/vmid
 # Disks mapping
