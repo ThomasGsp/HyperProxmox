@@ -6,13 +6,13 @@ include(dirname(__DIR__).'/pages/includes/header.php');
 
 switch (htmlspecialchars($_GET["type"])) {
     case "sto":
-        $node = json_decode($q->GET_byid("storages", $_GET['id']), true)['value'];
+        $node = json_decode($q->GET_byid("storages", htmlspecialchars($_GET['id'])), true)['value'];
         break;
     case "node":
-        $node = json_decode($q->GET_byid("nodes", $_GET['id']), true)['value'];
+        $node = json_decode($q->GET_byid("nodes", htmlspecialchars($_GET['id'])), true)['value'];
         break;
     case "vm":
-        $node = json_decode($q->GET_byid("instances", $_GET['id']), true)['value'];
+        $node = json_decode($q->GET_byid("instances", htmlspecialchars($_GET['id'])), true)['value'];
         break;
 }
 
