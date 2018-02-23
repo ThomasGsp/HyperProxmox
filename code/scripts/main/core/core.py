@@ -472,7 +472,7 @@ class Core:
 
 
 def valid_clusters_data(data):
-    key_required = ["name", "url", "port", "user", "password", "template", "storage_disk", "weight", "exclude_nodes"]
+    key_required = ["name", "url", "port", "user", "password", "template", "storage_disk", "weight", "exclude_nodes", "groups"]
     result = []
     for key in key_required:
         if key not in data:
