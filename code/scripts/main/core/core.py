@@ -408,7 +408,6 @@ class Core:
     """
 
     def get_clusters_conf(self, cluster=None):
-        ## DELETE USER/PW DATA
         """ Test Redis Cache """
         hash_object = hashlib.md5("{0}-{1}".format("administration", cluster).encode('utf-8'))
         hash_hex = hash_object.hexdigest()
@@ -425,7 +424,6 @@ class Core:
 
     def insert_clusters_conf(self, data):
         testdata = valid_clusters_data(data)
-
         if not testdata:
             if not self.mongo.get_clusters_conf(data["name"])["value"]:
                 data["user"] = base64.b64encode(pcrypt(data["user"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
