@@ -16,11 +16,12 @@ You shouldn't use in production mode, use at your risks !
     - Proxmox data crawler 
     - API for the system management and data
     - Encipher the critical data (cluster access)
+    - LDAP authentication for web interface
+    - Group & cluster viewing in web interface
 
 * Not provide:
-    - Advanced security (No API/Web interface authentification - DO NOT EXPOSE API ON "0.0.0.0")
+    - Advanced security **(Not API authentication - DO NOT EXPOSE API ON "0.0.0.0")**
     - Instance deployment
-    - Group & cluster viewing in web interface
     - Advanced logs system
     - Purge data system
     - Lot of others things
