@@ -2,21 +2,20 @@
 
 include(dirname(__DIR__).'/pages/includes/header.php');
 
-$instanceinfo = json_decode($q->GET_byid("instances", $_GET['id']), true)['value'];
+$instanceinfo = json_decode($q->GET_byid("instances", htmlspecialchars($_GET['id'])), true)['value'];
 $instanceinfo = (object) $instanceinfo;
 
-$status = json_decode($q->GET_status('current', $_GET['id']), true)['value']['data'];
+$status = json_decode($q->GET_status('current', htmlspecialchars($_GET['id'])), true)['value']['data'];
 $status = (object) $status;    
 ?>
 <div id="page-wrapper">
 
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header"> VM - Informations & actions </h1>
+            <h1 class="page-header"> VM - actions </h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
-    
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -41,8 +40,6 @@ $status = (object) $status;
                 </div>
  				<div class="result"></div>
             </div>
-            
-            <?php echo json_encode($status, JSON_PRETTY_PRINT); ?>
         </div>
     </div>
     <?php
