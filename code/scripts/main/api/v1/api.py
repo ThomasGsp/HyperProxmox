@@ -30,11 +30,7 @@ class Auth:
         web.setcookie('ticket', i.ticket, 3600)
         return
 
-
-
 """ CLASS MONGO CACHE """
-
-
 class General_Search:
     def GET(self, query, id):
         try:
@@ -71,7 +67,6 @@ class QueryDates:
                 "value": "Invalid request: {0}".format(e)
             }
         return json.dumps(result)
-
 
 
 """ CLASS DIRECT """
