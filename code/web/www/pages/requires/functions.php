@@ -24,7 +24,10 @@ class API_GET_INFO
 
     public function GET_clusters_conf($cluster=null)
     {
-        $cluster_conf = curl("api/v1/administration/cluster/".$cluster);
+        if (!empty($cluster))
+            $cluster_conf = curl("api/v1/administration/cluster/".$cluster);
+        else
+            $cluster_conf = curl("api/v1/administration/cluster/");
         return $cluster_conf;
     }
     
@@ -67,13 +70,9 @@ class API_GET_INFO
         return $storages;
     }
 
-    public function GET_Groups($date, $group = null)
+    public function GET_Groups()
     {
-        if (!empty($group))
-            $groups = curl($date."/groups/".$group);
-        else
-            $groups = curl($date."/groups/");
-
+        $groups = curl("api/v1/administration/cluster/");
         return $groups;
     }
 
@@ -118,39 +117,41 @@ class API_Gen_HTML
     }
 
 
-    public function List_Groups($timestamp = "")
+    public function List_Groups($date)
     {
         $d = new API_GET_INFO;
-        $groups = $d->GET_Groups($timestamp);
         $html = '';
 
-        $arr_groups = json_decode($groups, true);
-
-
-        foreach ($arr_groups as $group)
+        $clusters = json_decode($d->GET_Groups(), true)['value'];
+       
+        
+        $group_arr = array();
+        foreach ($clusters as $cluster)
         {
-            $clusters = $d->GET_Groups($timestamp, $group);
-
-            $arr_clusters = json_decode($clusters, true);
-            sort($arr_clusters);
-
-            reset($arr_clusters);
-            if (!empty($group))
+            $cluster = (object) $cluster;
+            foreach ($cluster->groups as $group)
             {
-                $html = $html.'<li><a href="#">'.$group.'<span class="fa arrow"></span></a>';
-                $html = $html.'<ul class="nav nav-third-level">';
-                foreach ($arr_clusters as $cluster)
+                if(!array_key_exists($group, $group_arr))
                 {
-                    $cluster = (object) $cluster;
-                    $html = $html.'<li><a href="cluster.php?cluster='.$cluster->cluster.'">'.$cluster->cluster.'</a></li>';
+                    $group_arr[$group] = array($cluster->name);
                 }
-                $html = $html.'</ul></li>';
-            }
-            else {
-                $html = $html.'<li><a href="#">'.$group.'<span class="fa arrow"></span></a>';
-                $html = $html.'<ul class="nav nav-second-level"></ul></li>';
+                else {
+                    array_push($group_arr[$group], $cluster->name);
+                }
             }
         }
+        
+        foreach ($group_arr as $keygroup => $group)
+        {
+            $html = $html.'<li><a href="#">'.$keygroup.'<span class="fa arrow"></span></a>';
+            $html = $html.'<ul class="nav nav-third-level">';
+            foreach ($group as $cluster)
+            {;
+                $html = $html.'<li><a href="cluster.php?date='.$date.'&cluster='.$cluster.'">'.$cluster.'</a></li>';
+            }
+            $html = $html.'</ul></li>';
+        }
+        
         $html = $html.'';
 
         return $html;
