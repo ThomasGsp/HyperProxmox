@@ -408,7 +408,7 @@ class Core:
     """
 
     def get_clusters_conf(self, cluster=None):
-
+        ## DELETE USER/PW DATA
         """ Test Redis Cache """
         hash_object = hashlib.md5("{0}-{1}".format("administration", cluster).encode('utf-8'))
         hash_hex = hash_object.hexdigest()
@@ -439,7 +439,7 @@ class Core:
                 }
         else:
             new_cluster = {
-                "value": "{1} {0}".format(testdata, "Invalid or miss paramettrer"),
+                "value": "{1} {0}".format(testdata, "Invalid or miss parametrer"),
                 "result": "ERROR",
                 "type": "PROXMOX - VALUES"
             }
