@@ -9,6 +9,8 @@
 This project is currently in active development. 
 You shouldn't use in production mode, use at your risks !
 
+* Proxmox version supported: 4.x/5/x (not tested on 3.x)
+
 ## Version informations:
 * Provide:
     - Basic web interface to list instances, nodes and clusters (with details)
