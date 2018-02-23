@@ -83,6 +83,15 @@ class Cluster:
                 "type": "PYTHON - API",
                 "value": "Invalid request: {0}".format(e)
             }
+
+        ## Revoir pour un truc plus clean
+        keyv = 0
+        for cluster in result["value"]:
+            for key in cluster:
+                if key == "password" or key == "user":
+                    result["value"][keyv][key] = "Information not available"
+            keyv += 1
+
         return json.dumps(result)
 
     def POST(self):
