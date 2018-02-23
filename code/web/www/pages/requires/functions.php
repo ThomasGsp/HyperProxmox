@@ -523,7 +523,7 @@ class DbConn
             $this->conn = new PDO('mysql:host=' . $host . ';dbname=' . $db_name . ';charset=utf8', $username, $password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e)  {
             error_log("Database connection error:".$e);
             die('Database connection error');
         }
