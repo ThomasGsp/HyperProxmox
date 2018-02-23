@@ -171,29 +171,43 @@ If you loose it, you must delete the keys, delete the different entries in the c
 
 ### Insert your first cluster (from host)
 ``` bash
-curl -H -XPOST -d '{    "name": "Cluster_1",
+# Minimum:
+curl -H -XPOST -d '{    "name": "Cluster_A",
+                        "url":"proxmox.cluster.net",
+                        "port": "8006",
+                        "user": "user@pve",
+                        "password": "******",
+                        "template": "",
+                        "storage_disk": "",
+                        "exclude_nodes": [""],
+                        "groups" : [""],
+                        "weight": 1 
+                    }'  localhost:8080/api/v1/administration/cluster/new
+
+# Other example:
+curl -H -XPOST -d '{    "name": "Cluster_B",
                         "url":"proxmox.cluster.net",
                         "port": "8006",
                         "user": "user@pve",
                         "password": "******",
                         "template": "local:vztmpl/debian-9.0-standard_9.0-2_amd64.tar.gz",
                         "storage_disk": "disks",
-                        "exclude_nodes": [""],
+                        "exclude_nodes": ["node_shit1"],
                         "groups" : ["group1", "group2..."],
                         "weight": 1 
-                    }'  localhost:8080/api/v1/administration/cluster/new\
+                    }'  localhost:8080/api/v1/administration/cluster/new
 ```
 
-* "name": Symbolic cluster name. Should be uniq (string)
-* "url":  Proxmox - Web GUI URL access (string)
-* "port": Proxmox - Web PORT access (string)
-* "user": Proxmox - Administrative PVE user (string)
-* "password": Proxmox - PVE password (string)
+* "name": Symbolic cluster name. Should be uniq (string)  [VALUE NOT EMPTY REQUIRED]
+* "url":  Proxmox - Web GUI URL access (string)           [VALUE NOT EMPTY REQUIRED] 
+* "port": Proxmox - Web PORT access (string)              [VALUE NOT EMPTY REQUIRED]
+* "user": Proxmox - Administrative PVE user (string)      [VALUE NOT EMPTY REQUIRED]
+* "password": Proxmox - PVE password (string)             [VALUE NOT EMPTY REQUIRED]
 * "template": Default template for LXC (string)
 * "storage_disk": Default shared disk for KVM/LXC (string)
 * "exclude_nodes": Do not use this nodes - Not visible (list) 
 * "groups" : Symbolics groups for this node (list)
-* "weight": Weight for the cluster auto-selection (int)
+* "weight": Weight for the cluster auto-selection (int) [VALUE NOT EMPTY REQUIRED]
 
 
 ![alt text](https://github.com/ThomasGsp/HyperProxmox/blob/master/doc/screenshots/h-nodes.jpg)
