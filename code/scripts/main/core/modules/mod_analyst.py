@@ -155,9 +155,14 @@ class Analyse:
                     node_status["totalalloccpu"] = totalcpu
                     node_status["totalallocram"] = totalram
                     node_status["vmcount"] = len(list_instances["data"])
-                    node_status["status"] = value_nodes_list["status"]
                     node_status["type"] = value_nodes_list["type"]
                     node_status["node"] = value_nodes_list["node"]
+
+                    """ Proxmox-v4 compatibility """
+                    try:
+                        node_status["status"] = value_nodes_list["status"]
+                    except BaseException:
+                        node_status["status"] = "Online"
 
                     percent_cpu_alloc = (totalcpu / value_nodes_list["maxcpu"]) * 100
                     percent_ram_alloc = (totalram / value_nodes_list["mem"]) * 100
