@@ -76,16 +76,16 @@ if __name__ == "__main__":
             '/api/v1/instance/([0-9]+)', 'Instance',
             '/api/v1/instance/id/([a-z0-9]+)/status/(start|stop|current|reset|shutdown)', 'Instance',
 
-            '/api/v1/instance/([0-9]+)/package', 'package',
-            '/api/v1/instance/([0-9]+)/vhost(?:/([0-9]+))', 'vhost',
-            '/api/v1/instance/([0-9]+)/database(?:/([0-9]+))', 'database',
+            # '/api/v1/instance/([0-9]+)/package', 'package',
+            # '/api/v1/instance/([0-9]+)/vhost(?:/([0-9]+))', 'vhost',
+            # '/api/v1/instance/([0-9]+)/database(?:/([0-9]+))', 'database',
 
 
             # MAPPING SERVICES
-            '/api/v1/service/([a-z]+)/instance/([0-9]+)/vhost(?:/([0-9]+))', 'service',
+            # '/api/v1/service/([a-z]+)/instance/([0-9]+)/vhost(?:/([0-9]+))', 'service',
 
             # AUTH
-            '/api/v1/auth', 'Auth',
+            # '/api/v1/auth', 'Auth',
 
             # MANAGEMENT CLUSTER
             '/api/v1/administration/cluster/(?:[0-9a-zA-Z\_\-]+)', 'Cluster',
