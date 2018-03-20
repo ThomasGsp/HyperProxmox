@@ -192,7 +192,7 @@ class Analyse:
                     try:
                         node_status["status"] = value_nodes_list["status"]
                     except BaseException:
-                        node_status["status"] = "Online"
+                        node_status["status"] = "Unknown"
 
                     percent_cpu_alloc = (totalcpu / value_nodes_list["maxcpu"]) * 100
                     percent_ram_alloc = (totalram / value_nodes_list["mem"]) * 100
