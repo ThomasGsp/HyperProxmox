@@ -17,6 +17,7 @@ import operator
 import random
 import base64
 import re
+import random
 
 
 def add_token(tokens_in_slots, slot_distributions):
@@ -93,18 +94,20 @@ class Analyse:
             nodes_list = proxmox.get_nodes("{0}:{1}".format(cluster["url"], int(cluster["port"])))
             if nodes_list["result"] == "OK":
                 for value_nodes_list in nodes_list["value"]["data"]:
-                    # if value_nodes_list["node"] not in exclude_nodes:
+                    node_status = proxmox.get_status("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                     value_nodes_list["node"])["value"]["data"]
 
-                    node_status = proxmox.get_status("{0}:{1}".format(cluster["url"], int(cluster["port"])), value_nodes_list["node"])["value"]["data"]
-
-                    list_instances = { "data" : []}
+                    # pve-manager/5.1-42/724a6cb3
+                    list_instances = {"data": []}
                     """ TOTAL COUNT CPU and RAM allocate """
                     if (instancetype == "all"):
-                        types = ["lxc", "qemu"]  # vz...
+                        # Revoir cette partie - version proxmox !
+                        types = ["lxc", "qemu", "openvz"]
                         for type in types:
                             list_instances["data"] = list_instances["data"] + \
-                                                     proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                     value_nodes_list["node"], type)["value"]["data"]
+                                                         proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                         value_nodes_list["node"], type)["value"]["data"]
+
 
                     else:
                         list_instances = \
@@ -144,6 +147,24 @@ class Analyse:
                                     mac = re.search(r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})', value, re.I).group()
                                     maclist.append(mac)
                             instance["macaddr"] = maclist
+
+                            """ Following instance ID """
+                            uniqid = re.search('/^id=\"([a-z]+)\"$/', instance["description"])
+                            # Set unique id if not found
+                            if not uniqid:
+                                """ General description """
+                                randtext = ''.join(random.choice('AZERTYUIOPQSDFGHJKLMWXCVBN') for i in range(8))
+                                uniqid = "Please, do not change or delete this ID \n" \
+                                         "id={0}_{1}\n{2}".format(insert_time, randtext,
+                                                                  instance["description"])
+                                """ INSTANCE DEFINITION """
+                                datadesc = {
+                                    'description': uniqid,
+                                    'vmid':  instance["vmid"],
+                                    'node': value_nodes_list["node"]
+                                }
+                                resultsetdesc = proxmox.change_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                         value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)["value"]
 
                             self.mongo.insert_instances(instance)
 
