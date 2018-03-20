@@ -399,7 +399,7 @@ class Proxmox:
 
         return result
 
-    def resize_instances(self, url, nodename, category, instanceid, data):
+    def change_instances(self, url, nodename, category, instanceid, data):
         """
         :param url: 
         :param nodename: 
@@ -435,7 +435,7 @@ class Proxmox:
                     "result": "ERROR",
                     "target": "{0}".format(nodename),
                     "type": "PYTHON",
-                    "value": "Cannot resize this instance {2} on {0} : ({1})".format(url, e, instanceid)
+                    "value": "Cannot change settings for this instance {2} on {0} : ({1})".format(url, e, instanceid)
                 }
 
         return result
