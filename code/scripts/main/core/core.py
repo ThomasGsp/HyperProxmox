@@ -383,7 +383,7 @@ class Core:
                                proxmox_clusters_user,
                                proxmox_clusters_pwd)
 
-            result = proxmox.resize_instances("{0}:{1}".format(proxmox_clusters_url,
+            result = proxmox.change_instances("{0}:{1}".format(proxmox_clusters_url,
                                                               int(proxmox_clusters_port)),
                                              instances_informations['node'],
                                              instancetype,
