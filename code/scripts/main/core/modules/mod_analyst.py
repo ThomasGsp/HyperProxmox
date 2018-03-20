@@ -99,13 +99,13 @@ class Analyse:
 
                     # pve-manager/5.1-42/724a6cb3
                     # return something like: "5.1"
-                    pveversion = float(re.search('\/([\d]{1}\.[\d]{1})\-[\d]{1,4}+\/', value_nodes_list["pveversion"]).group(1))
+                    pveversion = re.search("([\d]{1}\.[\d]{1})\-[\d]{1,4}", node_status["pveversion"]).group(1)
 
                     list_instances = {"data": []}
                     """ TOTAL COUNT CPU and RAM allocate """
                     if (instancetype == "all"):
                         """ Select types // version dependant """
-                        if pveversion < 4:
+                        if float(pveversion) < float(4.0):
                             """ Proxmox versions before 4 """
                             types = ["qemu", "openvz"]
                         else:
@@ -134,7 +134,6 @@ class Analyse:
                     """
                     for key_list_instances, value_list_instances in list_instances.items():
                         for instance in value_list_instances:
-
                             """ Update cpu and ram for node """
                             totalcpu = totalcpu + instance["cpus"]
                             totalram = totalram + instance["maxmem"]
@@ -151,30 +150,33 @@ class Analyse:
 
 
                             maclist = []
+                            currentdesc = ""
                             for key, value in config_av['data'].items():
                                 if 'net' in key:
                                     mac = re.search(r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})', value, re.I).group()
                                     maclist.append(mac)
+
+                                if 'description' in key:
+                                    currentdesc = value
+
                             instance["macaddr"] = maclist
 
                             """ Following instance ID """
-                            uniqid = re.search('/^id=\"([a-z]+)\"$/', instance["description"]).group(1)
+                            getidfromdesc = re.search("id=\"([A-Z\.\d\_]+)\"", currentdesc)
                             # Set unique id if not found
-                            if not uniqid:
+                            if getidfromdesc is None:
                                 """ General description """
                                 randtext = ''.join(random.choice('AZERTYUIOPQSDFGHJKLMWXCVBN') for i in range(8))
-                                uniqid = "Please, do not change or delete this ID \n" \
-                                         "id={0}_{1}\n{2}".format(insert_time, randtext,
-                                                                  instance["description"])
+                                uniqid = "-- Please, do not change or delete this ID -- \n" \
+                                         "id=\"{0}_{1}\"\n------------------\n{2}".format(insert_time, randtext,
+                                                                  currentdesc)
+                                instance["description"] = uniqid
                                 """ INSTANCE DEFINITION """
-                                datadesc = {
-                                    'description': uniqid,
-                                    'vmid':  instance["vmid"],
-                                    'node': value_nodes_list["node"]
-                                }
+                                datadesc = {'description': uniqid}
                                 resultsetdesc = proxmox.change_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                         value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)["value"]
+                                                         value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)
 
+                                print(resultsetdesc)
                             self.mongo.insert_instances(instance)
 
                     """ 
