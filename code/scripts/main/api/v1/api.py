@@ -164,8 +164,8 @@ class Instance:
                 for nodeid, count in sorted_nodes.items():
                     """ GENERATE UNIQ COMMAND ID """
                     randtext = ''.join(random.choice('AZERTYUIOPQSDFGHJKLMWXCVBN') for i in range(8))
-                    command_id = "Please, do not change or delete this ID \n" \
-                                 "id={0}_{1}".format(time.time(), randtext)
+                    command_id = "-- Please, do not change or delete this ID -- \n" \
+                                 "id=\"{0}_{1}\"\n------------------\n".format(time.time(), randtext)
 
                     """ Find information by id mongodb"""
                     realnode = core.generalsearch('{ "_id": {id} }'.format(id=nodeid))
