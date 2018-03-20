@@ -98,11 +98,20 @@ class Analyse:
                                                      value_nodes_list["node"])["value"]["data"]
 
                     # pve-manager/5.1-42/724a6cb3
+                    # return something like: "5.1"
+                    pveversion = float(re.search('\/([\d]{1}\.[\d]{1})\-[\d]{1,4}+\/', value_nodes_list["pveversion"]).group(1))
+
                     list_instances = {"data": []}
                     """ TOTAL COUNT CPU and RAM allocate """
                     if (instancetype == "all"):
-                        # Revoir cette partie - version proxmox !
-                        types = ["lxc", "qemu", "openvz"]
+                        """ Select types // version dependant """
+                        if pveversion < 4:
+                            """ Proxmox versions before 4 """
+                            types = ["qemu", "openvz"]
+                        else:
+                            """ Proxmox versions after 4 """
+                            types = ["qemu", "lxc"]
+
                         for type in types:
                             list_instances["data"] = list_instances["data"] + \
                                                          proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
@@ -149,7 +158,7 @@ class Analyse:
                             instance["macaddr"] = maclist
 
                             """ Following instance ID """
-                            uniqid = re.search('/^id=\"([a-z]+)\"$/', instance["description"])
+                            uniqid = re.search('/^id=\"([a-z]+)\"$/', instance["description"]).group(1)
                             # Set unique id if not found
                             if not uniqid:
                                 """ General description """
