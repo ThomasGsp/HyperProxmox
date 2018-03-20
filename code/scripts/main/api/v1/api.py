@@ -156,16 +156,17 @@ class Instance:
                 """ CREATE NEWS INSTANCES"""
                 count = json.loads(web.data().decode('utf-8'))["count"]
 
-                """ GENERATE UNIQ COMMAND ID """
-                randtext = ''.join(random.choice('0123456789ABCDEF') for i in range(8))
-                command_id = "{0}_{1}_{2}".format(time.time(), count, randtext)
-
                 """ LOAD CLUSTER CONFIGURATIONS """
                 select = Analyse(core.clusters_conf, generalconf)
                 sorted_nodes = dict(select.set_attribution(count))
 
                 """ START ALL Thread """
                 for nodeid, count in sorted_nodes.items():
+                    """ GENERATE UNIQ COMMAND ID """
+                    randtext = ''.join(random.choice('AZERTYUIOPQSDFGHJKLMWXCVBN') for i in range(8))
+                    command_id = "Please, do not change or delete this ID \n" \
+                                 "id={0}_{1}".format(time.time(), randtext)
+
                     """ Find information by id mongodb"""
                     realnode = core.generalsearch('{ "_id": {id} }'.format(id=nodeid))
 
