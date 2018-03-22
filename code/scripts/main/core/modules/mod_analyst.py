@@ -11,6 +11,7 @@ to allocate news instances.
 from core.modules.mod_proxmox import *
 from core.modules.mod_database import *
 from core.libs.hcrypt import *
+from core.libs.logs import *
 from core.libs.locker import *
 import time
 import operator
@@ -54,9 +55,14 @@ class Analyse:
         self.mongo.db = self.mongo.client.db
 
     def run(self, instancetype="all"):
+        """ Active logger"""
+        logger = Logger2(generalconf["logger"])
+        logger.write({"result": "INFO", "type": "PYTHON", "value": "Start logger - Analyst Module"})
+
         insert_time = time.time()
 
         """ Create lock file """
+        logger.write({"result": "INFO", "type": "PYTHON", "value": "Create locker file"})
         locker = Locker()
         locker.createlock(self.generalconf["analyst"]["walker_lock"], "analyst", insert_time)
 
@@ -165,6 +171,7 @@ class Analyse:
                             getidfromdesc = re.search("id=\"([A-Z\.\d\_]+)\"", currentdesc)
                             # Set unique id if not found
                             if getidfromdesc is None:
+                                # ajouter un test de duplicateid
                                 """ General description """
                                 randtext = ''.join(random.choice('AZERTYUIOPQSDFGHJKLMWXCVBN') for i in range(8))
                                 uniqid = "-- Please, do not change or delete this ID -- \n" \
@@ -176,7 +183,6 @@ class Analyse:
                                 resultsetdesc = proxmox.change_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                                          value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)
 
-                                print(resultsetdesc)
                             self.mongo.insert_instances(instance)
 
                     """ 
