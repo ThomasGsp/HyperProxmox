@@ -46,7 +46,7 @@ class CryticalData:
             key_generation = {
                 "result": "ERROR",
                 "type": "PYTHON",
-                "Error": "Key generation fail: {0}".format(e)
+                "value": "Key generation fail: {0}".format(e)
             }
 
         return key_generation
@@ -58,13 +58,13 @@ class CryticalData:
             file_key_pub.close()
             result_public_key = {
                 "result": "OK",
-                "data": self.public_key
+                "value": self.public_key
             }
         except BaseException as e:
             result_public_key = {
                 "result": "ERROR",
                 "type": "PYTHON",
-                "error": "Your public key seem to invalid: {0}".format(e)
+                "value": "Your public key seem to invalid: {0}".format(e)
             }
         return result_public_key
 
@@ -75,14 +75,14 @@ class CryticalData:
             file_key_pvt.close()
             result_private_key = {
                 "result": "OK",
-                "data": self.private_key
+                "value": self.private_key
 
             }
         except BaseException as e:
             result_private_key = {
                 "result": "ERROR",
                 "type": "PYTHON",
-                "error": "Your private key seem to invalid: {0}".format(e)
+                "value": "Your private key seem to invalid: {0}".format(e)
             }
         return result_private_key
 
@@ -92,18 +92,18 @@ class CryticalData:
             if key:
                 result_encrypt = {
                     "result": "OK",
-                    "data":  encfrypt[0]
+                    "value":  encfrypt[0]
                 }
             else:
                 result_encrypt = {
                     "result": "OK",
-                    "data": self.public_key.encrypt(data.encode("utf-8"), 64)
+                    "value": self.public_key.encrypt(data.encode("utf-8"), 64)
                 }
         except BaseException as e:
             result_encrypt = {
                 "result": "ERROR",
                 "type": "PYTHON",
-                "error": "Data encryption failed: {0}".format(e)
+                "value": "Data encryption failed: {0}".format(e)
             }
         return result_encrypt
 
@@ -112,17 +112,20 @@ class CryticalData:
             if key:
                 result_decryption = {
                     "result": "OK",
-                    "data": key.decrypt(data)
+                    "type": "PYTHON",
+                    "value": key.decrypt(data)
                 }
             else:
                 result_decryption = {
                     "result": "OK",
-                    "data": self.private_key.decrypt(data)
+                    "type": "PYTHON",
+                    "value": self.private_key.decrypt(data)
                 }
         except BaseException as e:
             result_decryption = {
                 "result": "ERROR",
                 "type": "PYTHON",
-                "error": "Data decryption failed: {0}".format(e)
+                "value": "Data decryption failed: {0}".format(e)
             }
+        logger.write({"result": "INFO", "type": "PYTHON", "value": "Create locker file"})
         return result_decryption
