@@ -231,12 +231,12 @@ curl -H -XPOST -d '{    "name": "Cluster_B",
 
 ### Instance status management
 ``` bash
-'/api/v1/instance/id/([a-z0-9]+)/status/(start|stop|current|reset|shutdown)' | GET 
+'/api/v1/instance/id/<MongoID>/status/(start|stop|current|reset|shutdown)' | GET 
 ```
 
 ### Cluster management
 ``` bash
-'/api/v1/administration/cluster/(?:[0-9a-zA-Z\_\-]+)' | GET - Return the informations for an specific cluster
+'/api/v1/administration/cluster/<cluster>' | GET - Return the informations for an specific cluster
                                                       | PUT - Update the configurations for an specific cluster
                                                       | DELETE - Delete the configuration for an specific cluster
                                                       
@@ -249,36 +249,36 @@ This data are manage by the crawler, you can't insert or change data yourself
 ``` bash
 # date/cluster/node/vmid
 # Disks mapping
-'/api/v1/static/disks/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)' | GET - Return the informations for an specific disk
-'/api/v1/static/disks/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/'         | GET - Return all disks used in a node
-'/api/v1/static/disks/([0-9]+)/([0-9a-zA-Z\_\-]+)/'                            | GET - Return all disks used in a cluster
-'/api/v1/static/disks/([0-9]+)/'                                               | GET - Return all disks
+'/api/v1/static/disks/<date>/<cluster>/<node>/<vmid>' | GET - Return the informations for an specific disk
+'/api/v1/static/disks/<date>/<cluster>/<node>/'         | GET - Return all disks used in a node
+'/api/v1/static/disks/<date>/<cluster>/'                            | GET - Return all disks used in a cluster
+'/api/v1/static/disks/<date>/'                                               | GET - Return all disks
 
 # Storages mapping
-'/api/v1/static/storages/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/'    | GET - Return all storage used in a node
-'/api/v1/static/storages/([0-9]+)/([0-9a-zA-Z\_\-]+)/'                       | GET - Return all storages used in a cluster
-'/api/v1/static/storages/([0-9]+)/'                                          | GET - Return all storages
+'/api/v1/static/storages/<date>/<cluster>/<node>/'    | GET - Return all storage used in a node
+'/api/v1/static/storages/<date>/<cluster>/'                       | GET - Return all storages used in a cluster
+'/api/v1/static/storages/<date>/'                                          | GET - Return all storages
 
 # Instances mapping
-'/api/v1/static/instances/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)  | GET - Return the informations for an specific instance
-'/api/v1/static/instances/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/          | GET - Return all instances for a node
-'/api/v1/static/instances/([0-9]+)/([0-9a-zA-Z\_\-]+)/                             | GET - Return all instances for a cluster
-'/api/v1/static/instances/([0-9]+)                                                 | GET - Return all instances (the dump can be very big, in a large infrastructure)
+'/api/v1/static/instances/<date>/<cluster>/<node>/<vmid>' | GET - Return the informations for an specific instance
+'/api/v1/static/instances/<date>/<cluster>/<node>/'        | GET - Return all instances for a node
+'/api/v1/static/instances/<date>/<cluster>/'                            | GET - Return all instances for a cluster
+'/api/v1/static/instances/<date>/'                                                 | GET - Return all instances (the dump can be very big, in a large infrastructure)
 
 # Nodes mapping
-'/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)'            | GET - Return the informations for an specific node
-'/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z\_\-]+)/'                              | GET - Return all nodes for a cluster
-'/api/v1/static/(nodes)/([0-9]+)/'                                                 | GET - Return all nodes 
+'/api/v1/static/nodes/<date>/<cluster>/<node>'            | GET - Return the informations for an specific node
+'/api/v1/static/nodes/<date>/<cluster>/'                              | GET - Return all nodes for a cluster
+'/api/v1/static/nodes/<date>/'                                                 | GET - Return all nodes 
 
 # cluster mapping
-'/api/v1/static/(clusters)/([0-9]+)/(?:[0-9a-zA-Z\_\-]+)'                          | GET - Return the insformations for a specific cluster
-'/api/v1/static/(clusters)/([0-9]+)/'                                              | GET - Return all cluster informations
+'/api/v1/static/clusters/<date>/<cluster>'                          | GET - Return the insformations for a specific cluster
+'/api/v1/static/clusters/<date>/'                                              | GET - Return all cluster informations
 
 # date
 '/api/v1/static/dates/(all|last)'                                                  | GET - Return all or the last date available (generated by the crawler)
 
 # mongoid
-'/api/v1/static/(instances|nodes|clusters|storages|disks)/id/([a-z0-9]+)'          | GET - Return an information by mongoid
+'/api/v1/static/(instances|nodes|clusters|storages|disks)/id/<MongoID>'          | GET - Return an information by mongoid
 ```
 
 ### Typical use
