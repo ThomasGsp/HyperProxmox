@@ -11,24 +11,37 @@ import random
 import ast
 
 
-def cooktheticket(ticket, action, target):
-    if ticket == "aaa":
-        return True
-    else:
-        return False
 
-class Auth:
-    def POST(self):
-        # '{"username":"fff", "password":"azerty"}'
-        data = json.loads(web.data().decode('utf-8'))
-        print(data["username"])
-        # Test Login
+allowed = (
+    ('jon','pass1'),
+    ('tom','pass2')
+)
 
-        # If true generate an ticket
-        # use date and ip
-        i = web.input(ticket='aaa')
-        web.setcookie('ticket', i.ticket, 3600)
-        return
+
+class Index:
+    def GET(self):
+        if web.ctx.env.get('HTTP_AUTHORIZATION') is not None:
+            return 'This is the index page'
+        else:
+            raise web.seeother('/login')
+
+class Login:
+    def GET(self):
+        auth = web.ctx.env.get('HTTP_AUTHORIZATION')
+        authreq = False
+        if auth is None:
+            authreq = True
+        else:
+            auth = re.sub('^Basic ','',auth)
+            username,password = base64.decodestring(auth).split(':')
+            if (username,password) in allowed:
+                raise web.seeother('/')
+            else:
+                authreq = True
+        if authreq:
+            web.header('WWW-Authenticate','Basic realm="Auth HyperProxmox API"')
+            web.ctx.status = '401 Unauthorized'
+            return
 
 """ CLASS MONGO CACHE """
 class General_Search:
