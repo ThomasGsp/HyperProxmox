@@ -127,5 +127,4 @@ class CryticalData:
                 "type": "PYTHON",
                 "value": "Data decryption failed: {0}".format(e)
             }
-        logger.write({"result": "INFO", "type": "PYTHON", "value": "Create locker file"})
         return result_decryption
