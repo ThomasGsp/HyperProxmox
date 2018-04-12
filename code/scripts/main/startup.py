@@ -27,11 +27,17 @@ if __name__ == "__main__":
 
     generalconf = {
         "logger": {"debug": localconf['logger']['debug'], "logs_level": localconf['logger']['logs_level'],
-                   "logs_dir": localconf['logger']['logs_dir']},
+                   "logs_dir": localconf['logger']['logs_dir'], "bulk_write": localconf['logger']['bulk_write'],
+                   "bulk_size": localconf['logger']['bulk_size']},
+
         "analyst": {"walker": localconf['walker']['walker'], "walker_lock": localconf['walker']['walker_lock']},
+
         "mongodb": {"ip": localconf['databases']['mongodb_ip'], 'port': localconf['databases']['mongodb_port']},
+
         "redis": {"ip": localconf['databases']['redis_ip'], 'port': localconf['databases']['redis_port']},
-        "deploy": {'concurrencydeploy': localconf['deploy']['concurrencydeploy'], 'delayrounddeploy': localconf['deploy']['delayrounddeploy']}
+
+        "deploy": {'concurrencydeploy': localconf['deploy']['concurrencydeploy'],
+                   'delayrounddeploy': localconf['deploy']['delayrounddeploy']}
     }
 
     """ Active logger"""

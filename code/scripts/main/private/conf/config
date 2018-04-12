@@ -6,6 +6,9 @@ user: hyperproxmox
 key_pvt: private/keys/Ragnarok.pvt.key
 key_pub: private/keys/Ragnarok.pub.key
 
+admin_mail: tlams@localhost
+
+
 [web]
 user: www-data
 
@@ -49,8 +52,10 @@ debug = False
 ; debug level    1: "INFO",  2: "WARNING", 3: "ERROR", 4: "CRITICAL",  5: "DEBUG"
 logs_level = 1
 
-; Limit IO writte, if debug level is active, this value is overwrite to 0
+; Limit IO write, if debug level is active, this value is overwrite to 0
 bulk_write = 1
+; Buffer size
+bulk_size = 1000
 
 ; log output
 logs_dir = /var/log/hyperproxmox/

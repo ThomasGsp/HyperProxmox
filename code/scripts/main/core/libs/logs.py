@@ -5,6 +5,7 @@ import http.client as http_client
 import datetime
 import re
 import json
+from sys import getsizeof
 
 class StreamToLogger(object):
     def __init__(self, logger, log_level=logging.INFO):
@@ -89,6 +90,9 @@ class Logger2:
     def __init__(self, loggerconf):
         self.logs_dir = loggerconf['logs_dir']
         self.log_level = int(loggerconf['logs_level'])
+        self.bulk = loggerconf['bulk_write']
+        self.bulk_size = loggerconf['bulk_size']
+        self.currenttext = ""
 
     def write(self, json_text):
         switcher = {
@@ -104,30 +108,32 @@ class Logger2:
         if lKeyC >= self.log_level and lKeyC <= 4:
             now = datetime.datetime.now()
             date = now.strftime("%Y-%m-%d %H:%M")
-            text = re.sub(r"ticket\?(.*?) ", "ticket?username=***YOUR_USER***&password=***PWD***", json_text["value"])
+            newtext = re.sub(r"ticket\?(.*?) ", "ticket?username=***YOUR_USER***&password=***PWD***", json_text["value"])
 
             try:
                 info = "[{0}] [{1}] [{2}]".format(json_text["result"], json_text["type"], json_text["target"])
             except BaseException:
                 info = "[{0}] [{1}]".format(json_text["result"], json_text["type"])
 
-            text = "[{date}] {info} : {text} \n".format(date=date, info=info, text=text)
+            newtext = "[{date}] {info} : {text} \n".format(date=date, info=info, text=newtext)
+            self.currenttext = self.currenttext + newtext
 
-            try:
-                if json_text["type"] == "PROXMOX":
-                    errorlog = open("{0}/proxmox.log".format(self.logs_dir), "ab")
-                    errorlog.write(text.encode('utf-8'))
-                elif json_text["type"] == "HYPERPROXMOX":
-                    errorlog = open("{0}/hyperproxmox.log".format(self.logs_dir), "ab")
-                    errorlog.write(text.encode('utf-8'))
-                elif json_text["type"] == "PYTHON":
-                    errorlog = open("{0}/python.log".format(self.logs_dir), "ab")
-                    errorlog.write(text.encode('utf-8'))
-                else:
-                    errorlog = open("{0}/others.log".format(self.logs_dir), "ab")
-                    errorlog.write(text.encode('utf-8'))
-                errorlog.close()
-            except BaseException:
-                print("Cannot write on {0}, please check permissions.".format(self.logs_dir))
-                exit(1)
-
+            if getsizeof(self.currenttext) > 800 or self.bulk == 0 or self.log_level == 6:
+                try:
+                    if json_text["type"] == "PROXMOX":
+                        errorlog = open("{0}/proxmox.log".format(self.logs_dir), "ab")
+                        errorlog.write(self.currenttext.encode('utf-8'))
+                    elif json_text["type"] == "HYPERPROXMOX":
+                        errorlog = open("{0}/hyperproxmox.log".format(self.logs_dir), "ab")
+                        errorlog.write(self.currenttext.encode('utf-8'))
+                    elif json_text["type"] == "PYTHON":
+                        errorlog = open("{0}/python.log".format(self.logs_dir), "ab")
+                        errorlog.write(self.currenttext.encode('utf-8'))
+                    else:
+                        errorlog = open("{0}/others.log".format(self.logs_dir), "ab")
+                        errorlog.write(self.currenttext.encode('utf-8'))
+                    errorlog.close()
+                    self.currenttext = ""
+                except BaseException:
+                    print("Cannot write on {0}, please check permissions.".format(self.logs_dir))
+                    exit(1)
