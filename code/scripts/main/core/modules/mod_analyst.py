@@ -57,12 +57,12 @@ class Analyse:
     def run(self, instancetype="all"):
         """ Active logger"""
         logger = Logger2(self.generalconf["logger"])
-        logger.write({"result": "INFO", "type": "PYTHON", "value": "Start logger - Analyst Module"})
+        logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger - Analyst Module"})
 
         insert_time = time.time()
 
         """ Create lock file """
-        logger.write({"result": "INFO", "type": "PYTHON", "value": "Create locker file"})
+        logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Create locker file"})
         locker = Locker()
         locker.createlock(self.generalconf["analyst"]["walker_lock"], "analyst", insert_time)
 
@@ -192,9 +192,9 @@ class Analyse:
                                 instance["uniqid"] = getidfromdesc.group(1)
                                 if getidfromdesc.group(1) in idlist:
                                     logger.write(
-                                        {"result": "WARNING", "type": "PYTHON", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
-                                    logger.write({"result": "WARNING", "type": "PYTHON", "value": json.dumps(instance)})
-                                    logger.write({"result": "WARNING", "type": "PYTHON", "value": "-------------------"})
+                                        {"result": "WARNING", "type": "HYPERPROXMOX", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
+                                    logger.write({"result": "WARNING", "type": "HYPERPROXMOX", "value": json.dumps(instance)})
+                                    logger.write({"result": "WARNING", "type": "HYPERPROXMOX", "value": "-------------------"})
                                 else:
                                     idlist.append(getidfromdesc.group(1))
 

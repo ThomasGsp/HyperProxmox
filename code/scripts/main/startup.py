@@ -42,8 +42,8 @@ if __name__ == "__main__":
 
     """ Active logger"""
     logger = Logger2(generalconf["logger"])
-    logger.write({"result": "INFO", "type": "PYTHON", "value": "Start logger"})
-    logger.write({"result": "INFO", "type": "PYTHON", "value": ">>>>>>> -- NEW STARTUP -- <<<<<<<"})
+    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger"})
+    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": ">>>>>>> -- NEW STARTUP -- <<<<<<<"})
 
     CritConf = CryticalData()
     """ Step One: test private key or create it """
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         print("This action can take some minutes, please wait.")
         gen = CritConf.generate_key(localconf['system']['key_pvt'], localconf['system']['key_pub'], passhash)
         if gen['result'] == "OK":
-            logger.write({"result": "INFO", "type": "PYTHON", "value": "Key generated in {0}".format(localconf['system']['key_pvt'])})
+            logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Key generated in {0}".format(localconf['system']['key_pvt'])})
             print("Your new key has been generate ! "
                   "\n - Private Key: {0} "
                   "\n - Public Key: {1}"
@@ -66,7 +66,7 @@ if __name__ == "__main__":
             key_pvt = CritConf.read_private_key(localconf['system']['key_pvt'], passhash)
         else:
             print(gen['Error'])
-            logger.write({"result": "ERROR", "type": "PYTHON", "value": "Your key is not create due to an error: {0}".format(gen['value'])})
+            logger.write({"result": "ERROR", "type": "HYPERPROXMOX", "value": "Your key is not create due to an error: {0}".format(gen['value'])})
             exit(1)
 
     """ Test valid right for your private Key """
@@ -76,7 +76,7 @@ if __name__ == "__main__":
               format(oct(stat.S_IMODE(os.stat(localconf['system']['key_pvt']).st_mode))))
         os.chmod(localconf['system']['key_pvt'], 0o600)
         print("Auto correction... done !")
-        logger.write({"result": "INFO", "type": "PYTHON",  "value": "Setting chmod on your key.."})
+        logger.write({"result": "INFO", "type": "HYPERPROXMOX",  "value": "Setting chmod on your key.."})
 
     """ Step two"""
     if 'passhash' not in vars():
@@ -85,10 +85,10 @@ if __name__ == "__main__":
         if key_pvt['result'] != "OK":
             print("{0}: {1}"
                   "\n Please verify your passphrase".format(key_pvt['type'], key_pvt['error']))
-            logger.write({"result": "WARNING", "type": "PYTHON", "value": "Bad passphrase, try again."})
+            logger.write({"result": "WARNING", "type": "HYPERPROXMOX", "value": "Bad passphrase, try again."})
             exit(1)
 
-    logger.write({"result": "INFO", "type": "PYTHON", "value": "Loading keys in memory"})
+    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Loading keys in memory"})
     key_pub = CritConf.read_public_key(localconf['system']['key_pub'])
     generalconf["keys"] = {"key_pvt": key_pvt["value"], "key_pub": key_pub["value"]}
 
@@ -147,10 +147,10 @@ if __name__ == "__main__":
         )
 
     """ Init Core thread """
-    logger.write({"result": "INFO", "type": "PYTHON", "value": "Init Core thread"})
+    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Init Core thread"})
     core = Core(generalconf)
 
     """ Init API thread """
-    logger.write({"result": "INFO", "type": "PYTHON", "value": "Init API thread"})
+    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Init API thread"})
     api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf)
     api_th.start()
