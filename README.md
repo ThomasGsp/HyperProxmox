@@ -234,9 +234,9 @@ curl -H -XPOST -d '{    "name": "Cluster_B",
 '/api/v1/administration/cluster/<cluster>'            | GET - Return the informations for an specific cluster
                                                       | PUT - Update the configurations for an specific cluster
                                                       | DELETE - Delete the configuration for an specific cluster
+                                                      | POST - Inster a new cluster
                                                       
 '/api/v1/administration/cluster/'                     | GET - Return all clusters information
-'/api/v1/administration/cluster/new'                  | POST - Inster a new cluster
 ```
 
 ### Cache Data - MongoDB
