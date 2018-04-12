@@ -22,7 +22,7 @@ You shouldn't use in production mode, use at your risks !
     - Group & cluster viewing in web interface
 
 * Not provide:
-    - Advanced security **(Not API authentication - DO NOT EXPOSE API ON "0.0.0.0")**
+    - Advanced security **(Not API authentication - DO NOT EXPOSE API WITHOUT AN AUTHENTICATION PROXY)**
     - Instance deployment
     - Advanced logs system
     - Purge data system
