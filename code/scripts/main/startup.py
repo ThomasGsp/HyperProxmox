@@ -41,7 +41,7 @@ if __name__ == "__main__":
     }
 
     """ Active logger"""
-    logger = Logger2(generalconf["logger"])
+    logger = Logger(generalconf["logger"])
     logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger"})
     logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": ">>>>>>> -- NEW STARTUP -- <<<<<<<"})
 

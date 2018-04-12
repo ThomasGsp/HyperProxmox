@@ -56,7 +56,7 @@ class Analyse:
 
     def run(self, instancetype="all"):
         """ Active logger"""
-        logger = Logger2(self.generalconf["logger"])
+        logger = Logger(self.generalconf["logger"])
         logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger - Analyst Module"})
 
         insert_time = time.time()
