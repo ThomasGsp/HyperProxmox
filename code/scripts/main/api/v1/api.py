@@ -11,6 +11,7 @@ import random
 import ast
 
 
+""" --------- TMP PART --------- """
 
 allowed = (
     ('jon','pass1'),
@@ -39,9 +40,11 @@ class Login:
             else:
                 authreq = True
         if authreq:
-            web.header('WWW-Authenticate','Basic realm="Auth HyperProxmox API"')
+            web.header('WWW-Authenticate', 'Basic realm="Auth HyperProxmox API"')
             web.ctx.status = '401 Unauthorized'
             return
+
+""" ------------------- """
 
 """ CLASS MONGO CACHE """
 class General_Search:
@@ -107,9 +110,10 @@ class Cluster:
 
         return json.dumps(result)
 
-    def POST(self):
+    def POST(self, cluster):
         try:
             data = json.loads(web.data().decode('utf-8'))
+            data["name"] = cluster
             result = core.insert_clusters_conf(data)
         except BaseException as e:
             result = {
