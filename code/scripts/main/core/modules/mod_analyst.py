@@ -56,7 +56,7 @@ class Analyse:
 
     def run(self, instancetype="all"):
         """ Active logger"""
-        logger = Logger2(generalconf["logger"])
+        logger = Logger2(self.generalconf["logger"])
         logger.write({"result": "INFO", "type": "PYTHON", "value": "Start logger - Analyst Module"})
 
         insert_time = time.time()
@@ -68,14 +68,16 @@ class Analyse:
 
         self.mongo.insert_datekey(insert_time, 'running')
 
+        """ Init the ID list to detect the duplicates """
+        idlist = []
         for cluster in self.clusters_conf:
             """ Decode data """
 
             proxmox_clusters_user = pdecrypt(base64.b64decode(cluster["user"]),
-                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                            self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
             proxmox_clusters_pwd = pdecrypt(base64.b64decode(cluster["password"]),
-                                self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
             """ AUTH """
             proxmox = Proxmox("Analyse")
@@ -178,10 +180,23 @@ class Analyse:
                                          "id=\"{0}_{1}\"\n------------------\n{2}".format(insert_time, randtext,
                                                                   currentdesc)
                                 instance["description"] = uniqid
+
+                                idlist.append(uniqid)
                                 """ INSTANCE DEFINITION """
                                 datadesc = {'description': uniqid}
                                 resultsetdesc = proxmox.change_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                                          value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)
+                                instance["uniqid"] = "{0}_{1}".format(insert_time, randtext)
+
+                            else:
+                                instance["uniqid"] = getidfromdesc.group(1)
+                                if getidfromdesc.group(1) in idlist:
+                                    logger.write(
+                                        {"result": "WARNING", "type": "PYTHON", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
+                                    logger.write({"result": "WARNING", "type": "PYTHON", "value": json.dumps(instance)})
+                                    logger.write({"result": "WARNING", "type": "PYTHON", "value": "-------------------"})
+                                else:
+                                    idlist.append(getidfromdesc.group(1))
 
                             self.mongo.insert_instances(instance)
 
