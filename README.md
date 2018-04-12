@@ -1,6 +1,6 @@
 # HyperProxmox
 
-* Author : Tlams
+* Author :  ([ThomasGSP](https://www.thomasgsp.fr))
 * Date : 2017/2018
 * Version : Alpha 1.0
 * Status: Dev
