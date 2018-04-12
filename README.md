@@ -223,11 +223,6 @@ curl -H -XPOST -d '{    "name": "Cluster_B",
 
 ### General informations
 ``` bash
-([a-z0-9]+) = MongoID
-([0-9]+) = Timestamp/vmid
-([0-9a-zA-Z\_\-]+) = Cluster/node name
-```
-
 
 ### Instance status management
 ``` bash
