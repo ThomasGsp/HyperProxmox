@@ -102,7 +102,7 @@ if __name__ == "__main__":
             # MANAGEMENT CLUSTER
             '/api/v1/administration/cluster/(?:[0-9a-zA-Z\_\-]+)', 'Cluster',
             '/api/v1/administration/cluster/', 'Cluster',
-            '/api/v1/administration/cluster/new', 'Cluster',
+            # '/api/v1/administration/cluster/new', 'Cluster',
 
             # CACHE DATA (MONGO)
             # date/cluster/node/vmid
