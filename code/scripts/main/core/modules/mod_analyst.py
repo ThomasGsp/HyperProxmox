@@ -71,8 +71,10 @@ class Analyse:
         """ Init the ID list to detect the duplicates """
         idlist = []
         for cluster in self.clusters_conf:
-            """ Decode data """
+            logger.write({"result": "DEBUG", "type": "HYPERPROXMOX", "value": "Start crawl on:"})
+            logger.write({"result": "DEBUG", "type": "HYPERPROXMOX", "value": cluster})
 
+            """ Decode data """
             proxmox_clusters_user = pdecrypt(base64.b64decode(cluster["user"]),
                             self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
@@ -91,6 +93,8 @@ class Analyse:
 
             """ Get excluded nodes """
             exclude_nodes = cluster["exclude_nodes"]
+            logger.write({"result": "DEBUG", "type": "HYPERPROXMOX", "value": "List nodes excludes:"})
+            logger.write({"result": "DEBUG", "type": "HYPERPROXMOX", "value": exclude_nodes})
 
             """ UPDATE CLUSTER STATUS """
             clusters_status = proxmox.get_clusters("{0}:{1}".format(cluster["url"], int(cluster["port"])))
