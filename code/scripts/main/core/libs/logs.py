@@ -113,17 +113,21 @@ class Logger2:
 
             text = "[{date}] {info} : {text} \n".format(date=date, info=info, text=text)
 
-            if json_text["type"] == "PROXMOX":
-                errorlog = open("{0}/proxmox.log".format(self.logs_dir), "ab")
-                errorlog.write(text.encode('utf-8'))
-            elif json_text["type"] == "HYPERPROXMOX":
-                errorlog = open("{0}/hyperproxmox.log".format(self.logs_dir), "ab")
-                errorlog.write(text.encode('utf-8'))
-            elif json_text["type"] == "PYTHON":
-                errorlog = open("{0}/python.log".format(self.logs_dir), "ab")
-                errorlog.write(text.encode('utf-8'))
-            else:
-                errorlog = open("{0}/others.log".format(self.logs_dir), "ab")
-                errorlog.write(text.encode('utf-8'))
+            try:
+                if json_text["type"] == "PROXMOX":
+                    errorlog = open("{0}/proxmox.log".format(self.logs_dir), "ab")
+                    errorlog.write(text.encode('utf-8'))
+                elif json_text["type"] == "HYPERPROXMOX":
+                    errorlog = open("{0}/hyperproxmox.log".format(self.logs_dir), "ab")
+                    errorlog.write(text.encode('utf-8'))
+                elif json_text["type"] == "PYTHON":
+                    errorlog = open("{0}/python.log".format(self.logs_dir), "ab")
+                    errorlog.write(text.encode('utf-8'))
+                else:
+                    errorlog = open("{0}/others.log".format(self.logs_dir), "ab")
+                    errorlog.write(text.encode('utf-8'))
+                errorlog.close()
+            except BaseException:
+                print("Cannot write on {0}, please check permissions.".format(self.logs_dir))
+                exit(1)
 
-            errorlog.close()
