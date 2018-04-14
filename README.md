@@ -1,6 +1,6 @@
 # HyperProxmox
 
-* Author :  ([ThomasGSP](https://www.thomasgsp.fr))
+* Author :  [ThomasGSP](https://www.thomasgsp.fr)
 * Date : 2017/2018
 * Version : Alpha 1.0
 * Status: Dev
@@ -9,7 +9,7 @@
 This project is currently in active development. 
 You shouldn't use in production mode, use at your risks !
 
-* Proxmox version supported: 4.x/5/x (not tested on 3.x)
+* Proxmox version supported: 3.x/4.x/5/x
 
 ## Version informations:
 * Provide:
@@ -31,7 +31,6 @@ You shouldn't use in production mode, use at your risks !
 ## Requirement:
 * Proxmox infrastructure (standalone, clusters...)
     * Administrative pve user (full access)
-    * Vztemplate uploaded
 
 * MongoDB server
     * Version 3.6
@@ -45,7 +44,7 @@ You shouldn't use in production mode, use at your risks !
         * php-curl, php-mysql, php7.0-json
 
 * Python softwares
-    * Version 3.5 min
+    * Version 3.5+
     * python-redis
     * pymongo
     * web.py
@@ -175,7 +174,7 @@ If you loose it, you must delete the keys, delete the different entries in the c
 ### Insert your first cluster (from host)
 ``` bash
 # Minimum:
-curl -H -XPOST -d '{    "name": "Cluster_A",
+curl -H -XPOST -d '{
                         "url":"proxmox.cluster.net",
                         "port": "8006",
                         "user": "user@pve",
@@ -185,10 +184,10 @@ curl -H -XPOST -d '{    "name": "Cluster_A",
                         "exclude_nodes": [""],
                         "groups" : [""],
                         "weight": 1 
-                    }'  localhost:8080/api/v1/administration/cluster/new
+                    }'  localhost:8080/api/v1/administration/cluster/Cluster_A
 
 # Other example:
-curl -H -XPOST -d '{    "name": "Cluster_B",
+curl -H -XPOST -d '{
                         "url":"proxmox.cluster.net",
                         "port": "8006",
                         "user": "user@pve",
@@ -198,7 +197,7 @@ curl -H -XPOST -d '{    "name": "Cluster_B",
                         "exclude_nodes": ["node_shit1"],
                         "groups" : ["group1", "group2..."],
                         "weight": 1 
-                    }'  localhost:8080/api/v1/administration/cluster/new
+                    }'  localhost:8080/api/v1/administration/cluster/Cluster_B
 ```
 
 * "name": Symbolic cluster name. Should be uniq (string)  [VALUE NOT EMPTY REQUIRED]
