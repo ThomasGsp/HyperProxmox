@@ -194,6 +194,7 @@ class API_Gen_HTML
             $macs = "";
             $volids = "";
             $volsize = 0;
+            $volused = 0;
 
             if($last_clust != $qemu->cluster)
             {
@@ -218,8 +219,9 @@ class API_Gen_HTML
                 {
                     if ($vol->vmid == $qemu->vmid)
                     {
-                        $volids =  $vol->volid.",".$volids ; 
-                        $volsize =  $volsize + $vol->size ; 
+                        $volsize =  $volsize + $vol->size ;
+                        $volused =  $volused + $vol->used ;
+                        $volids =  $vol->volid."(".formatBytes($vol->used)."/".formatBytes($vol->size)."),".$volids ;
                     }
                 } 
             }
@@ -244,7 +246,7 @@ class API_Gen_HTML
                     <td>'.$qemu->vmid.'</td>
                     <td  data-order="'.$qemu->maxmem.'">'.formatBytes(round($qemu->maxmem)).'</td>
                     <td>'.$qemu->cpus.'</td>
-                    <td data-order="'.$volsize.'" id="wrapper-mac"> <a data-toggle="tooltip" data-html="true" title="'.str_replace(",", "<br/>", $volids).'">'.formatBytes($volsize).'</a></td>
+                    <td data-order="'.$volsize.'" id="wrapper-mac"> <a data-toggle="tooltip" data-html="true" title="'.str_replace(",", "<br/>", $volids).'">'.formatBytes($volused).'/'.formatBytes($volsize).'</a></td>
                     <td id="wrapper-mac"> <a data-toggle="tooltip" data-html="true" title="'.str_replace(",", "<br/>", $macs).'">'.$macs.'</a></td>
                     <td>'.secondsToDays($qemu->uptime).'</td>
                     <td>'.$qemu->status.'</td>
