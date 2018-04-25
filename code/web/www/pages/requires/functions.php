@@ -406,6 +406,7 @@ class API_Gen_HTML
                                 <th>type</th>
                                 <th>vol.id</th>
                                 <th>size</th>
+                                <th>used</th>
                                 <th>format</th>  
                             </tr>
                         </thead>';
@@ -425,6 +426,7 @@ class API_Gen_HTML
                                                 <td>'.$disklist->content.'</td>  
                                                 <td>'.$disklist->volid.'</td>  
                                                 <td>'.formatBytes($disklist->size).'</td>
+                                                <td>'.formatBytes($disklist->used).'</td>
                                                 <td>'.$disklist->format.'</td>
                                             </tr>';
             }
