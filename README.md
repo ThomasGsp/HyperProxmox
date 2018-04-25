@@ -7,25 +7,27 @@
 * Object :   Massive LXC CT / KVM deployment and management system for Proxmox clusters.
 * Information : 
 This project is currently in active development. 
-You shouldn't use in production mode, use at your risks !
+You shouldn't use in production mode or... use at your risks !
 
 * Proxmox version supported: 3.x/4.x/5/x
 
 ## Version informations:
 * Provide:
-    - Basic web interface to list instances, nodes and clusters (with details)
-    - Basic instance management by the web interface(stop/start/restart...)
-    - Proxmox data crawler 
-    - API for the system management and data
+    - Basic web interface to list instances, nodes and clusters
+    - Basic instance management (stop/start/restart...)
+    - Data crawler 
+    - API
     - Encipher the critical data (cluster access)
     - LDAP authentication for web interface
     - Group & cluster viewing in web interface
 
+* In progress:
+    - Advanced logs system
+    - Purge old data
+    
 * Not provide:
     - Advanced security **(Not API authentication - DO NOT EXPOSE API WITHOUT AN AUTHENTICATION PROXY)**
     - Instance deployment
-    - Advanced logs system
-    - Purge data system
     - Lot of others things
 
 ## Requirement:
@@ -41,7 +43,7 @@ You shouldn't use in production mode, use at your risks !
 * Web stack
     * Nginx
     * PHP7
-        * php-curl, php-mysql, php7.0-json
+        * php-curl, php7.0-json
 
 * Python softwares
     * Version 3.5+
@@ -139,8 +141,6 @@ chown hyperproxmox: /var/log/hyperproxmox/
 rm /opt/HyperProxmox/code/scripts/main/private/keys/Ragnarok.p*
 ```
 
-```
-
 ``` bash
 # Configurations
 vi /opt/HyperProxmox/code/scripts/main/private/conf/config
@@ -197,7 +197,8 @@ curl -H -XPOST -d '{
                         "exclude_nodes": ["node_shit1"],
                         "groups" : ["group1", "group2..."],
                         "weight": 1 
-                    }'  localhost:8080/api/v1/administration/cluster/Cluster_B
+                    }'  localhost:8080/api/v1/administration/cluster/Cluster_B*
+                    
 ```
 
 * "name": Symbolic cluster name. Should be uniq (string)  [VALUE NOT EMPTY REQUIRED]
@@ -221,7 +222,6 @@ curl -H -XPOST -d '{
 ## API Information
 
 ### General informations
-``` bash
 
 ### Instance status management
 ``` bash
