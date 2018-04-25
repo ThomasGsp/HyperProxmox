@@ -32,7 +32,7 @@ else
     $lastdate = intval(json_decode($q->GET_Dates("last"), true)['value']);
 }
 
-//$html_groups = $html->List_Groups($lastdate);
+$html_groups = $html->List_Groups($lastdate);
 ?>
 
 
@@ -157,11 +157,11 @@ else
                     <li><a href="vms.php?date=<?php echo $lastdate; ?>"><i class="fa fa-table fa-fw"></i>Instances</a></li>
                     <li><a href="nodes.php?date=<?php echo $lastdate; ?>"><i class="fa fa-table fa-fw"></i>Nodes</a></li>
                     <li><a href="storages.php?date=<?php echo $lastdate; ?>"><i class="fa fa-table fa-fw"></i>Storages</a></li>
-                    <!--
+                   
                     <li>
                         <a href="#"><i class="fa fa-sitemap fa-fw"></i> Groups <span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
-                            <?php // echo $html_groups;  ?>
+                            <?php echo $html_groups;  ?>
                         </ul>
                     </li>
                 </ul>
