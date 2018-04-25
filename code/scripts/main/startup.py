@@ -83,8 +83,8 @@ if __name__ == "__main__":
         passhash = getpass.getpass("This system need a passphrase to start:")
         key_pvt = CritConf.read_private_key(localconf['system']['key_pvt'], passhash)
         if key_pvt['result'] != "OK":
-            print("{0}: {1}"
-                  "\n Please verify your passphrase".format(key_pvt['type'], key_pvt['error']))
+            print("{0}: {1} "
+                  "\nPlease verify your passphrase".format(key_pvt['type'], key_pvt['value']))
             logger.write({"result": "WARNING", "type": "HYPERPROXMOX", "value": "Bad passphrase, try again."})
             exit(1)
 
