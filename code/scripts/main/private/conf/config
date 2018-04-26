@@ -2,7 +2,7 @@
 ; System configurations
 user: hyperproxmox
 
-; If not exist on start, the key will be auto-generate.
+; If not exist at startup, the key will be auto-generate.
 key_pvt: private/keys/Ragnarok.pvt.key
 key_pub: private/keys/Ragnarok.pub.key
 
@@ -29,24 +29,24 @@ redis_ip: 127.0.0.1
 redis_port: 6379
 
 [deploy]
-; Maximum deploy instance in same time
-; A hight value my do overcharge on your physicals servers
+; Maximum concurrent deployment
+; A high value can overcharge your physicals servers
 concurrencydeploy: 2
 
-; Delay between two deploy round
+; Delay between two deployment round
 ; If your infrastructure isn't very large, you should'nt reduce this delay.
-; A low delay my do overcharge on your physicals servers
+; A low delay can overcharge your physicals servers
 delayrounddeploy: 15
 
 [walker]
-; Delay in secondes between to data crawl
+; Delay in seconds between to crawl (update)
 walker: 300
 
-; walker lock file
+; Lock file -- prevent concurrent crawling
 walker_lock: /tmp/hyperproxmoxwalker.lock
 
 [logger]
-; Active or not(True/False - Case !)
+; Active or not(True/False - Case sensitive !)
 debug = False
 
 ; debug level    1: "INFO",  2: "WARNING", 3: "ERROR", 4: "CRITICAL",  5: "DEBUG"
@@ -54,6 +54,7 @@ logs_level = 1
 
 ; Limit IO write, if debug level is active, this value is overwrite to 0
 bulk_write = 1
+
 ; Buffer size
 bulk_size = 1000
 
