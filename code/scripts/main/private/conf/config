@@ -46,11 +46,8 @@ walker: 300
 walker_lock: /tmp/hyperproxmoxwalker.lock
 
 [logger]
-; Active or not(True/False - Case sensitive !)
-debug = False
-
-; debug level    1: "INFO",  2: "WARNING", 3: "ERROR", 4: "CRITICAL",  5: "DEBUG"
-logs_level = 1
+; logs level    1: "INFO",  2: "WARNING", 3: "ERROR", 4: "CRITICAL",  5: "DEBUG"
+logs_level = 5
 
 ; Limit IO write, if debug level is active, this value is overwrite to 0
 bulk_write = 1

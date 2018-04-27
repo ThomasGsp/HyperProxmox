@@ -217,7 +217,7 @@ class Instance:
 
 class ThreadAPI(threading.Thread):
     #def __init__(self, threadid, name, urls, c, g, r):
-    def __init__(self, threadid, name, urls, c, g):
+    def __init__(self, threadid, name, urls, c, g, logger):
         """ Pass Global var in this theard."""
         global core, generalconf, redis_msg
         core = c

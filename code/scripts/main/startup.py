@@ -16,17 +16,24 @@ import getpass
 import os
 import stat
 import urllib3
-global passhash
+import argparse
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 if __name__ == "__main__":
+
+    """ Arg parse"""
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-a", "--api", action="store_true",  help="Start only")
+    args = parser.parse_args()
 
     """ Read conf """
     localconf = configparser.ConfigParser()
     localconf.read('private/conf/config')
 
     generalconf = {
-        "logger": {"debug": localconf['logger']['debug'], "logs_level": localconf['logger']['logs_level'],
+        "logger": {"logs_level": localconf['logger']['logs_level'],
                    "logs_dir": localconf['logger']['logs_dir'], "bulk_write": localconf['logger']['bulk_write'],
                    "bulk_size": localconf['logger']['bulk_size']},
 
@@ -42,8 +49,8 @@ if __name__ == "__main__":
 
     """ Active logger"""
     logger = Logger(generalconf["logger"])
-    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger"})
-    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": ">>>>>>> -- NEW STARTUP -- <<<<<<<"})
+    logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger"})
+    logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": ">>>>>>> -- NEW STARTUP -- <<<<<<<"})
 
     CritConf = CryticalData()
     """ Step One: test private key or create it """
@@ -56,7 +63,7 @@ if __name__ == "__main__":
         print("This action can take some minutes, please wait.")
         gen = CritConf.generate_key(localconf['system']['key_pvt'], localconf['system']['key_pub'], passhash)
         if gen['result'] == "OK":
-            logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Key generated in {0}".format(localconf['system']['key_pvt'])})
+            logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": "Key generated in {0}".format(localconf['system']['key_pvt'])})
             print("Your new key has been generate ! "
                   "\n - Private Key: {0} "
                   "\n - Public Key: {1}"
@@ -66,7 +73,7 @@ if __name__ == "__main__":
             key_pvt = CritConf.read_private_key(localconf['system']['key_pvt'], passhash)
         else:
             print(gen['Error'])
-            logger.write({"result": "ERROR", "type": "HYPERPROXMOX", "value": "Your key is not create due to an error: {0}".format(gen['value'])})
+            logger.write({"thread":threading.get_ident(), "result": "ERROR", "type": "HYPERPROXMOX", "value": "Your key is not create due to an error: {0}".format(gen['value'])})
             exit(1)
 
     """ Test valid right for your private Key """
@@ -76,7 +83,7 @@ if __name__ == "__main__":
               format(oct(stat.S_IMODE(os.stat(localconf['system']['key_pvt']).st_mode))))
         os.chmod(localconf['system']['key_pvt'], 0o600)
         print("Auto correction... done !")
-        logger.write({"result": "INFO", "type": "HYPERPROXMOX",  "value": "Setting chmod on your key.."})
+        logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX",  "value": "Setting chmod on your key.."})
 
     """ Step two"""
     if 'passhash' not in vars():
@@ -85,10 +92,10 @@ if __name__ == "__main__":
         if key_pvt['result'] != "OK":
             print("{0}: {1} "
                   "\nPlease verify your passphrase".format(key_pvt['type'], key_pvt['value']))
-            logger.write({"result": "WARNING", "type": "HYPERPROXMOX", "value": "Bad passphrase, try again."})
+            logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "Bad passphrase, try again."})
             exit(1)
 
-    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Loading keys in memory"})
+    logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": "Loading keys in memory"})
     key_pub = CritConf.read_public_key(localconf['system']['key_pub'])
     generalconf["keys"] = {"key_pvt": key_pvt["value"], "key_pub": key_pub["value"]}
 
@@ -103,12 +110,15 @@ if __name__ == "__main__":
             '/api/v1/instance/id/([a-z0-9]+)/status/(start|stop|current|reset|shutdown)', 'Instance',
 
             # AUTH
-            '/api/v1/login', 'Login'
+            # '/api/v1/login', 'Login'
 
             # MANAGEMENT CLUSTER
             '/api/v1/administration/cluster/(?:[0-9a-zA-Z\_\-]+)', 'Cluster',
             '/api/v1/administration/cluster/', 'Cluster',
             # '/api/v1/administration/cluster/new', 'Cluster',
+
+            # PURGE SYSTEM
+            '/api/v1/administration/purge/([a-z0-9]+)', 'Purge',
 
             # CACHE DATA (MONGO)
             # date/cluster/node/vmid
@@ -147,10 +157,10 @@ if __name__ == "__main__":
         )
 
     """ Init Core thread """
-    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Init Core thread"})
-    core = Core(generalconf)
+    logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": "Init Core thread"})
+    core = Core(generalconf, logger)
 
     """ Init API thread """
-    logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Init API thread"})
-    api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf)
+    logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": "Init API thread"})
+    api_th = ThreadAPI(1, "ThreadAPI", urls, core, generalconf, logger)
     api_th.start()

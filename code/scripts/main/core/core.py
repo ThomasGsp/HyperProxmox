@@ -18,28 +18,32 @@ import time
 import base64
 import hashlib
 
-
-def RunAnalyse(clusters_conf, generalconf, delay=300):
-    play = Analyse(clusters_conf, generalconf)
-
+def RunAnalyse(clusters_conf, generalconf, logger):
+    play = Analyse(clusters_conf, generalconf, logger)
 
     while True:
         """ Instances types availables: lxc/qemu/all"""
         play.run("all")
-        time.sleep(int(delay))
+        time.sleep(int(generalconf["analyst"]["walker"]))
 
 class Core:
-
     # def __init__(self, generalconf, Lredis):
-    def __init__(self, generalconf):
+    def __init__(self, generalconf, logger):
 
         self.generalconf = generalconf
+        self.logger = logger
+        self.logger.write({"thread":threading.get_ident() ,"result": "INFO", "type": "HYPERPROXMOX",
+                           "value": "Start Core process"})
 
         """ LOAD MONGODB """
+        self.logger.write({"thread": threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX",
+                           "value": "MongoDB connection"})
         self.mongo = MongoDB(generalconf["mongodb"]["ip"])
         self.mongo.client = self.mongo.connect()
 
         """ LOAD REDIS """
+        self.logger.write({"thread": threading.get_ident(),"result": "INFO", "type": "HYPERPROXMOX",
+                           "value": "Redis connection"})
         self.redis_msg = Redis_wrapper(generalconf["redis"]["ip"],
                                        generalconf["redis"]["port"], 0)
 
@@ -62,13 +66,14 @@ class Core:
             self.clusters_conf = self.mongo.get_clusters_conf()["value"]
 
             """ Clean previous lockers """
+            self.logger.write({"thread": threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX",
+                               "value": "Clean Locker"})
             locker = Locker()
             locker.unlock(generalconf["analyst"]["walker_lock"], "startup")
 
             thc = threading.Thread(name="Update statistics",
                                    target=RunAnalyse,
-                                   args=(self.clusters_conf, self.generalconf,
-                                         generalconf["analyst"]["walker"]))
+                                   args=(self.clusters_conf, self.generalconf, self.logger))
             thc.start()
         else:
             exit(1)
@@ -454,6 +459,48 @@ class Core:
         clusters_delete = self.mongo.delete_clusters_conf(cluster)
         return clusters_delete
 
+    """ 
+    #######################
+    #   DATA MANAGEMENT   #
+    #######################
+    """
+
+    def managedata(self, json):
+        if json["action"] == "purge":
+            if json["type"] == "strict":
+                listdate = self.mongo.get_all_datekey()
+                if json["date"] in listdate:
+                    for date in listdate:
+                        if date <= json["date"]:
+                            for instance in  self.mongo.get_instances(date):
+                                self.mongo.deletedata("instances", instance["_id"])
+                            for node in  self.mongo.get_nodes(date):
+                                self.mongo.deletedata("nodes", node["_id"])
+                            for storage in  self.mongo.get_storages(date):
+                                self.mongo.deletedata("storages", storage["_id"])
+                            for disk in  self.mongo.get_disks(date):
+                                self.mongo.deletedata("disks", disk["_id"])
+
+                else:
+                    purge = {
+                        "value": "This date is not available",
+                        "result": "WARNING",
+                        "type": "HYPERPROXMOX"
+                    }
+
+            elif json["type"] == "sequencial":
+                purge = {
+                    "value": "Not implemented",
+                    "result": "WARNING",
+                    "type": "HYPERPROXMOX"
+                }
+            else:
+                purge = {
+                    "value": "Unknown purging type",
+                    "result": "WARNING",
+                    "type": "HYPERPROXMOX"
+                }
+        return purge
 
     """ 
     #######################
