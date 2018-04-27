@@ -19,7 +19,7 @@ import random
 import base64
 import re
 import random
-
+import threading
 
 def add_token(tokens_in_slots, slot_distributions):
     num_tokens = sum(tokens_in_slots)
@@ -41,13 +41,14 @@ def distribution(n, tokens_in_slots, slot_distributions):
 
 
 class Analyse:
-    def __init__(self, clusters_conf, generalconf):
+    def __init__(self, clusters_conf, generalconf, logger):
         """
         :param clusters_conf: Proxmox configurations
         :param generalconf : General configuration
         """
         self.generalconf = generalconf
         self.clusters_conf = clusters_conf
+        self.logger = logger
 
         """ LOAD MONGODB """
         self.mongo = MongoDB(generalconf["mongodb"]["ip"])
@@ -56,13 +57,12 @@ class Analyse:
 
     def run(self, instancetype="all"):
         """ Active logger"""
-        logger = Logger(self.generalconf["logger"])
-        logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger - Analyst Module"})
+        self.logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger - Analyst Module"})
 
         insert_time = time.time()
 
         """ Create lock file """
-        logger.write({"result": "INFO", "type": "HYPERPROXMOX", "value": "Create locker file"})
+        self.logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": "Create locker file"})
         locker = Locker()
         locker.createlock(self.generalconf["analyst"]["walker_lock"], "analyst", insert_time)
 
@@ -71,8 +71,8 @@ class Analyse:
         """ Init the ID list to detect the duplicates """
         idlist = []
         for cluster in self.clusters_conf:
-            logger.write({"result": "DEBUG", "type": "HYPERPROXMOX", "value": "Start crawl on:"})
-            logger.write({"result": "DEBUG", "type": "HYPERPROXMOX", "value": cluster})
+            self.logger.write({"thread":threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": "Start crawl on:"})
+            self.logger.write({"thread":threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": cluster})
 
             """ Decode data """
             proxmox_clusters_user = pdecrypt(base64.b64decode(cluster["user"]),
@@ -93,8 +93,8 @@ class Analyse:
 
             """ Get excluded nodes """
             exclude_nodes = cluster["exclude_nodes"]
-            logger.write({"result": "DEBUG", "type": "HYPERPROXMOX", "value": "List nodes excludes:"})
-            logger.write({"result": "DEBUG", "type": "HYPERPROXMOX", "value": exclude_nodes})
+            self.logger.write({"thread":threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": "List nodes excludes:"})
+            self.logger.write({"thread":threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": exclude_nodes})
 
             """ UPDATE CLUSTER STATUS """
             clusters_status = proxmox.get_clusters("{0}:{1}".format(cluster["url"], int(cluster["port"])))
@@ -195,10 +195,10 @@ class Analyse:
                             else:
                                 instance["uniqid"] = getidfromdesc.group(1)
                                 if getidfromdesc.group(1) in idlist:
-                                    logger.write(
+                                    self.logger.write(
                                         {"result": "WARNING", "type": "HYPERPROXMOX", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
-                                    logger.write({"result": "WARNING", "type": "HYPERPROXMOX", "value": json.dumps(instance)})
-                                    logger.write({"result": "WARNING", "type": "HYPERPROXMOX", "value": "-------------------"})
+                                    self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": json.dumps(instance)})
+                                    self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "-------------------"})
                                 else:
                                     idlist.append(getidfromdesc.group(1))
 
