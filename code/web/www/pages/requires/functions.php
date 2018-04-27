@@ -143,13 +143,16 @@ class API_Gen_HTML
         
         foreach ($group_arr as $keygroup => $group)
         {
-            $html = $html.'<li><a href="#">'.$keygroup.'<span class="fa arrow"></span></a>';
-            $html = $html.'<ul class="nav nav-third-level">';
-            foreach ($group as $cluster)
-            {;
-                $html = $html.'<li><a href="cluster.php?date='.$date.'&cluster='.$cluster.'">'.$cluster.'</a></li>';
+            if(!empty($keygroup))
+            {
+                $html = $html.'<li><a href="#">'.$keygroup.'<span class="fa arrow"></span></a>';
+                $html = $html.'<ul class="nav nav-third-level">';
+                foreach ($group as $cluster)
+                {
+                    $html = $html.'<li><a href="cluster.php?date='.$date.'&cluster='.$cluster.'">'.$cluster.'</a></li>';
+                }
+                $html = $html.'</ul></li>';
             }
-            $html = $html.'</ul></li>';
         }
         
         $html = $html.'';
