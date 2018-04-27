@@ -11,42 +11,19 @@ import random
 import ast
 
 
-""" --------- TMP PART --------- """
-
-allowed = (
-    ('jon','pass1'),
-    ('tom','pass2')
-)
-
-
-class Index:
-    def GET(self):
-        if web.ctx.env.get('HTTP_AUTHORIZATION') is not None:
-            return 'This is the index page'
-        else:
-            raise web.seeother('/login')
-
-class Login:
-    def GET(self):
-        auth = web.ctx.env.get('HTTP_AUTHORIZATION')
-        authreq = False
-        if auth is None:
-            authreq = True
-        else:
-            auth = re.sub('^Basic ','',auth)
-            username,password = base64.decodestring(auth).split(':')
-            if (username,password) in allowed:
-                raise web.seeother('/')
-            else:
-                authreq = True
-        if authreq:
-            web.header('WWW-Authenticate', 'Basic realm="Auth HyperProxmox API"')
-            web.ctx.status = '401 Unauthorized'
-            return
-
-""" ------------------- """
-
 """ CLASS MONGO CACHE """
+class Purge:
+    def POST(self):
+        try:
+            result = core.managedata(json.loads(web.data().decode('utf-8')))
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "PYTHON - API",
+                "value": "Invalid request: {0}".format(e)
+            }
+        return json.dumps(result)
+
 class General_Search:
     def GET(self, query, id):
         try:
