@@ -216,7 +216,7 @@ class MongoDB:
 
     def update_clusters_conf(self, cluster, data):
         try:
-            self.db[self.collection_clusters_conf].update({"vmid": str(cluster)}, {'$set': data}, upsert=False)
+            self.db[self.collection_clusters_conf].update({"name": str(cluster)}, {'$set': data}, upsert=False)
             result = {
                 "result": "OK",
                 "value": "{0} has been updated".format(data["name"])

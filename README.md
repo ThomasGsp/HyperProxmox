@@ -187,6 +187,7 @@ If you loose it, you must delete the keys, delete the different entries in the c
 ``` bash
 # Minimum:
 curl -H -XPOST -d '{
+                        "name": "Cluster_name",
                         "url":"proxmox.cluster.net",
                         "port": "8006",
                         "user": "user@pve",
@@ -196,10 +197,11 @@ curl -H -XPOST -d '{
                         "exclude_nodes": [""],
                         "groups" : [""],
                         "weight": 1 
-                    }'  localhost:8080/api/v1/administration/cluster/Cluster_A
+                    }'  localhost:8080/api/v1/administration/cluster
 
 # Other example:
 curl -H -XPOST -d '{
+                        "name": "Cluster_name",
                         "url":"proxmox.cluster.net",
                         "port": "8006",
                         "user": "user@pve",
@@ -209,7 +211,7 @@ curl -H -XPOST -d '{
                         "exclude_nodes": ["node_shit1"],
                         "groups" : ["group1", "group2..."],
                         "weight": 1 
-                    }'  localhost:8080/api/v1/administration/cluster/Cluster_B*
+                    }'  localhost:8080/api/v1/administration/cluster
                     
 ```
 
@@ -245,9 +247,10 @@ curl -H -XPOST -d '{
 '/api/v1/administration/cluster/<cluster>'            | GET - Return the informations for an specific cluster
                                                       | PUT - Update the configurations for an specific cluster
                                                       | DELETE - Delete the configuration for an specific cluster
-                                                      | POST - Insert a new cluster
                                                       
-'/api/v1/administration/cluster/'                     | GET - Return all clusters information
+                                                      
+'/api/v1/administration/cluster'                     | GET - Return all clusters information
+                                                     | POST - Insert a new cluster
 ```
 
 ### Data

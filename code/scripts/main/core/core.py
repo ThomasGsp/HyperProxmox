@@ -418,7 +418,7 @@ class Core:
 
         cache = self.redis_cache.get_message(hash_hex)
 
-        if cache is None or self.generalconf["logger"]["debug"] == True:
+        if cache is None or self.generalconf["logger"]["logs_level"] == 5:
             clusters_informations = self.mongo.get_clusters_conf(cluster)
             self.redis_cache.insert_message(hash_hex, clusters_informations, 500)
             return clusters_informations
@@ -441,7 +441,7 @@ class Core:
                 }
         else:
             new_cluster = {
-                "value": "{1} {0}".format(testdata, "Invalid or miss parametrer"),
+                "value": "{1} {0}".format(testdata, "Invalid or missing parameter"),
                 "result": "ERROR",
                 "type": "PROXMOX - VALUES"
             }

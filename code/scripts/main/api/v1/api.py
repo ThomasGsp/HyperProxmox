@@ -87,16 +87,15 @@ class Cluster:
 
         return json.dumps(result)
 
-    def POST(self, cluster):
+    def POST(self):
         try:
             data = json.loads(web.data().decode('utf-8'))
-            data["name"] = cluster
             result = core.insert_clusters_conf(data)
         except BaseException as e:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "Invalid request: {0}".format(e)
+                "value": "Invalid insert request: {0}".format(e)
             }
         return result
 
@@ -108,7 +107,7 @@ class Cluster:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "Invalid request: {0}".format(e)
+                "value": "Invalid update request: {0}".format(e)
             }
         return result
 
@@ -119,7 +118,7 @@ class Cluster:
             result = {
                 "result": "ERROR",
                 "type": "PYTHON - API",
-                "value": "Invalid request: {0}".format(e)
+                "value": "Invalid delete request: {0}".format(e)
             }
         return result
 

@@ -27,7 +27,7 @@ class API_GET_INFO
         if (!empty($cluster))
             $cluster_conf = curl("api/v1/administration/cluster/".$cluster);
         else
-            $cluster_conf = curl("api/v1/administration/cluster/");
+            $cluster_conf = curl("api/v1/administration/cluster");
         return $cluster_conf;
     }
     
@@ -72,7 +72,7 @@ class API_GET_INFO
 
     public function GET_Groups()
     {
-        $groups = curl("api/v1/administration/cluster/");
+        $groups = curl("api/v1/administration/cluster");
         return $groups;
     }
 

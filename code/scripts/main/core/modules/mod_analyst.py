@@ -196,7 +196,7 @@ class Analyse:
                                 instance["uniqid"] = getidfromdesc.group(1)
                                 if getidfromdesc.group(1) in idlist:
                                     self.logger.write(
-                                        {"result": "WARNING", "type": "HYPERPROXMOX", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
+                                        {"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
                                     self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": json.dumps(instance)})
                                     self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "-------------------"})
                                 else:
