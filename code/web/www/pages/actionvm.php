@@ -36,7 +36,7 @@ $status = (object) $status;
                             <option value="reset">Reset</option>
                         </optgroup>
                     </select>
-		             <button id="bbaction" value="<?php echo  $instanceinfo->_id["\$oid"]; ?>">Click me</button> 
+		             <button id="bbaction" value="<?php echo  $instanceinfo->_id["\$oid"]; ?>">Send</button>
                 </div>
  				<div class="result"></div>
             </div>
