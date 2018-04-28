@@ -69,6 +69,24 @@ class MongoDB:
         self.db = None
         self.client = None
 
+
+    def __mappingcol(self, col):
+        if col == "instances":
+            collection = self.collection_instances
+        elif col == "nodes":
+            collection = self.collection_nodes
+        elif col == "disks":
+            collection = self.collection_disks
+        elif col == "storages":
+            collection = self.collection_storages
+        elif col == "dates":
+            collection = self.collection_datekey
+        elif col == "clusters":
+            collection = self.collection_clusters
+        else:
+            collection = ""
+        return collection
+
     def connect(self):
         try:
             conn = MongoClient(self.server + ':' + str(self.port))
@@ -93,6 +111,30 @@ class MongoDB:
             result = {
                 "result": "ERROR",
                 "type": "MongoDB - Request on generalmongosearch",
+                "value": "Invalid request: {0}".format(e)
+            }
+        return result
+
+    def generalmongodelete(self, col, id):
+        try:
+            # mapping
+            collection = self.__mappingcol(col)
+            if collection:
+                print(col, id)
+                self.db[collection].remove({"_id": ObjectId(id)})
+                result = {
+                    "result": "OK",
+                    "value": "{0} has been deleted".format(id)
+                }
+            else:
+                result = {
+                    "result": "ERROR",
+                    "value": "{0} collection not found".format(collection)
+                }
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "MongoDB - Request delete failed",
                 "value": "Invalid request: {0}".format(e)
             }
         return result
@@ -228,12 +270,12 @@ class MongoDB:
         self.db[self.collection_datekey].update({'date': int(date)}, {'$set': {'status': status}}, upsert=False)
 
     def get_last_datekey(self):
-        last_id = self.db[self.collection_datekey].find({'status': 'OK'}, {"date": 1, "_id": 0}).sort("date", -1)
+        last_id = self.db[self.collection_datekey].find({'status': 'OK'}, {"date": 1, "_id": 1}).sort("date", -1)
         return {"value": int(json.loads(dumps(last_id))[0]['date'])}
 
     def get_all_datekey(self):
         keylist = self.db[self.collection_datekey].find({'status': 'OK'},
-                                                        {"date": 1, "_id": 0}).sort("date", -1)
+                                                        {"date": 1, "_id": 1}).sort("date", -1)
         return {"value": json.loads(dumps(keylist))}
 
     """ NODES MANAGEMENT"""

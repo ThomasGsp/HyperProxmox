@@ -29,7 +29,7 @@ def RunAnalyse(clusters_conf, generalconf, logger):
 class Core:
     # def __init__(self, generalconf, Lredis):
     def __init__(self, generalconf, logger):
-
+        self.purge = False
         self.generalconf = generalconf
         self.logger = logger
         self.logger.write({"thread":threading.get_ident() ,"result": "INFO", "type": "HYPERPROXMOX",
@@ -113,7 +113,7 @@ class Core:
 
         cache = self.redis_cache.get_message(hash_hex)
 
-        if cache is None or self.generalconf["logger"]["debug"] == True:
+        if cache is None or self.generalconf["logger"]["logs_level"] == 5 or self.purge:
             if dest == "instances":
                 resultmbrequest = self.mongo.get_instances(date, cluster, node, vmid)
             elif dest == "nodes":
@@ -130,7 +130,6 @@ class Core:
             self.redis_cache.insert_message(hash_hex, resultmbrequest, 3600)
             return resultmbrequest
         else:
-
             return json.loads(cache.replace("'", "\"").replace("None", "\"\""))
 
 
@@ -467,40 +466,66 @@ class Core:
 
     def managedata(self, json):
         if json["action"] == "purge":
+            purgedata = {}
             if json["type"] == "strict":
-                listdate = self.mongo.get_all_datekey()
-                if json["date"] in listdate:
-                    for date in listdate:
-                        if date <= json["date"]:
-                            for instance in  self.mongo.get_instances(date):
-                                self.mongo.deletedata("instances", instance["_id"])
-                            for node in  self.mongo.get_nodes(date):
-                                self.mongo.deletedata("nodes", node["_id"])
-                            for storage in  self.mongo.get_storages(date):
-                                self.mongo.deletedata("storages", storage["_id"])
-                            for disk in  self.mongo.get_disks(date):
-                                self.mongo.deletedata("disks", disk["_id"])
+                listdate = self.mongo.get_all_datekey()["value"]
+                self.logger.write({"thread": threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX",
+                                   "value": "Starting purge process"})
+                self.purge = True # Purge Lock
+                totalinstances, totalnodes, totaldisks, totalstorares, totalclusters, totaldates = 0, 0, 0, 0, 0, 0
+                for date in listdate:
+                    if int(date['date']) <= int(json["date"]):
+                        for instance in self.generalquerycacheinfra("instances", date['date'])["value"]:
+                            purgedata[instance["_id"]["$oid"]] = self.mongo.generalmongodelete("instances", instance["_id"]["$oid"])
+                            totalinstances += 1
 
-                else:
-                    purge = {
-                        "value": "This date is not available",
-                        "result": "WARNING",
-                        "type": "HYPERPROXMOX"
-                    }
+                        for node in self.generalquerycacheinfra("nodes", date['date'])["value"]:
+                            purgedata[node["_id"]["$oid"]] = self.mongo.generalmongodelete("nodes", node["_id"]["$oid"])
+                            totalnodes += 1
 
-            elif json["type"] == "sequencial":
-                purge = {
-                    "value": "Not implemented",
-                    "result": "WARNING",
+                        for storage in self.generalquerycacheinfra("storages", date['date'])["value"]:
+                            purgedata[storage["_id"]["$oid"]] = self.mongo.generalmongodelete("storages", storage["_id"]["$oid"])
+                            totalstorares += 1
+
+                        for disk in self.generalquerycacheinfra("disks", date['date'])["value"]:
+                            purgedata[disk["_id"]["$oid"]] = self.mongo.generalmongodelete("disks", disk["_id"]["$oid"])
+                            totaldisks += 1
+
+                        for cluster in self.generalquerycacheinfra("clusters", date['date'])["value"]:
+                            purgedata[cluster["_id"]["$oid"]] = self.mongo.generalmongodelete("clusters", cluster["_id"]["$oid"])
+                            totalclusters += 1
+
+                        purgedata[date["_id"]["$oid"]] = self.mongo.generalmongodelete("dates", date["_id"]["$oid"])
+                        totaldates += 1
+
+                self.purge = False  # Purge UnLock
+                valuedelete = {
+                    "Instances": totalinstances, "Disks": totaldisks, "Nodes": totalnodes,
+                                "Storages": totalstorares, "Dates": totaldates, "Clusters": totalclusters
+                }
+                self.logger.write({"thread": threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX",
+                                   "value": "{0} entries in your database deleted".format(valuedelete)})
+                self.logger.write({"thread": threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX",
+                               "value": "Purge process terminated"})
+                data = {
+                    "value": "{0} entries in your database deleted".format(valuedelete),
+                    "result": "OK",
                     "type": "HYPERPROXMOX"
                 }
             else:
-                purge = {
-                    "value": "Unknown purging type",
-                    "result": "WARNING",
+                data = {
+                    "value": "Bad request",
+                    "result": "ERROR",
                     "type": "HYPERPROXMOX"
                 }
-        return purge
+        else:
+            data = {
+                "value": "Bad request",
+                "result": "ERROR",
+                "type": "HYPERPROXMOX"
+            }
+
+        return data
 
     """ 
     #######################
