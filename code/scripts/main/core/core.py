@@ -148,10 +148,10 @@ class Core:
         proxmox_clusters_url = clusters_informations["url"]
         proxmox_clusters_port = clusters_informations["port"]
         proxmox_clusters_user = pdecrypt(base64.b64decode(clusters_informations["user"]),
-                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                            self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
         proxmox_clusters_pwd = pdecrypt(base64.b64decode(clusters_informations["password"]),
-                                self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
         proxmox_template = clusters_informations["template"]
         proxmox_storages_disk = clusters_informations["storages_disk"]
@@ -261,10 +261,10 @@ class Core:
             proxmox_clusters_url = clusters_informations["url"]
             proxmox_clusters_port = clusters_informations["port"]
             proxmox_clusters_user = pdecrypt(base64.b64decode(clusters_informations["user"]),
-                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                            self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
             proxmox_clusters_pwd = pdecrypt(base64.b64decode(clusters_informations["password"]),
-                                           self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                           self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
             """ LOAD PROXMOX """
             proxmox = Proxmox(instances_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_clusters_url,
@@ -301,10 +301,10 @@ class Core:
             proxmox_clusters_url = clusters_informations["url"]
             proxmox_clusters_port = clusters_informations["port"]
             proxmox_clusters_user = pdecrypt(base64.b64decode(clusters_informations["user"]),
-                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                            self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
             proxmox_clusters_pwd = pdecrypt(base64.b64decode(clusters_informations["password"]),
-                                           self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                           self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
             """ LOAD PROXMOX """
             proxmox = Proxmox(instances_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_clusters_url,
@@ -338,10 +338,10 @@ class Core:
             proxmox_clusters_url = clusters_informations["url"]
             proxmox_clusters_port = clusters_informations["port"]
             proxmox_clusters_user = pdecrypt(base64.b64decode(clusters_informations["user"]),
-                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                            self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
             proxmox_clusters_pwd = pdecrypt(base64.b64decode(clusters_informations["password"]),
-                                           self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                           self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
             """ LOAD PROXMOX """
             proxmox = Proxmox(instances_informations['node'])
             proxmox.get_ticket("{0}:{1}".format(proxmox_clusters_url,
@@ -375,10 +375,10 @@ class Core:
             proxmox_clusters_url = clusters_informations["url"]
             proxmox_clusters_port = clusters_informations["port"]
             proxmox_clusters_user = pdecrypt(base64.b64decode(clusters_informations["user"]),
-                                            self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                            self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
             proxmox_clusters_pwd = pdecrypt(base64.b64decode(clusters_informations["password"]),
-                                           self.generalconf["keys"]["key_pvt"])["data"].decode('utf-8')
+                                           self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
 
             """ LOAD PROXMOX """
             proxmox = Proxmox(instances_informations['node'])
@@ -430,8 +430,8 @@ class Core:
         testdata = valid_clusters_data(data)
         if not testdata:
             if not self.mongo.get_clusters_conf(data["name"])["value"]:
-                data["user"] = base64.b64encode(pcrypt(data["user"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
-                data["password"] = base64.b64encode(pcrypt(data["password"], self.generalconf["keys"]["key_pvt"])["data"]).decode('utf-8')
+                data["user"] = base64.b64encode(pcrypt(data["user"], self.generalconf["keys"]["key_pvt"])["value"]).decode('utf-8')
+                data["password"] = base64.b64encode(pcrypt(data["password"], self.generalconf["keys"]["key_pvt"])["value"]).decode('utf-8')
                 new_cluster = self.mongo.insert_clusters_conf(data)
             else:
                 new_cluster = {
