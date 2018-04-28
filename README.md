@@ -147,6 +147,18 @@ vi /opt/HyperProxmox/code/scripts/main/private/conf/config
 < set your values >
 ```
 
+#### Purge system
+You should setup an cron to purge old data.
+``` bash
+RET=4 # older than the current date less this delay in days
+DATETIMESTAMP=$(($(date +%s)-$((86400*$RET))))
+curl -H -XPOST -d '{ "action": "purge", "type":"strict", "date": $DATETIMESTAMP }'  localhost:8080/api/v1/administration/purge
+```
+* action: actiontype (only purge currently available)
+* type: purge type (strict = all data before a date)
+* date: delete data before this date - in seconds(timestamp)
+
+
 ### Init:
 ``` bash
 # Start & generate your key (root user/sudo)
@@ -238,6 +250,11 @@ curl -H -XPOST -d '{
 '/api/v1/administration/cluster/'                     | GET - Return all clusters information
 ```
 
+### Data
+``` bash
+'/api/v1/administration/purge'  | POST - Delete old data
+```
+
 ### Cache Data - MongoDB
 This data are manage by the crawler, you can't insert or change data yourself
 ``` bash
@@ -273,6 +290,7 @@ This data are manage by the crawler, you can't insert or change data yourself
 
 # mongoid
 '/api/v1/static/(instances|nodes|clusters|storages|disks)/id/<MongoID>'          | GET - Return an information by mongoid
+
 ```
 
 ### Typical use
