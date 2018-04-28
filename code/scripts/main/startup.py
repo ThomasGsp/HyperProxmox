@@ -113,7 +113,7 @@ if __name__ == "__main__":
             # '/api/v1/login', 'Login'
 
             # MANAGEMENT CLUSTER
-            '/api/v1/administration/cluster/(?:[0-9a-zA-Z\_\-]+)', 'Cluster',
+            '/api/v1/administration/cluster/([0-9a-zA-Z\_\-]+)', 'Cluster',
             '/api/v1/administration/cluster/', 'Cluster',
             '/api/v1/administration/cluster', 'Cluster',
 

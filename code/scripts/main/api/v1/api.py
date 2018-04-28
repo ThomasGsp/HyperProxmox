@@ -10,7 +10,6 @@ import time
 import random
 import ast
 
-
 """ CLASS MONGO CACHE """
 class Purge:
     def POST(self):
@@ -87,9 +86,12 @@ class Cluster:
 
         return json.dumps(result)
 
-    def POST(self):
+    def POST(self, cluster=None):
         try:
             data = json.loads(web.data().decode('utf-8'))
+            """ Overwrite name """
+            if cluster:
+                data["name"] = cluster
             result = core.insert_clusters_conf(data)
         except BaseException as e:
             result = {
