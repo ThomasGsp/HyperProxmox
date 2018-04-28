@@ -147,7 +147,7 @@ vi /opt/HyperProxmox/code/scripts/main/private/conf/config
 < set your values >
 ```
 
-#### Purge system
+#### Purge system
 You should setup an cron to purge old data.
 ``` bash
 RET=4 # older than the current date less this delay in days
@@ -250,7 +250,7 @@ curl -H -XPOST -d '{
 '/api/v1/administration/cluster/'                     | GET - Return all clusters information
 ```
 
-### Data
+### Data
 ``` bash
 '/api/v1/administration/purge'  | POST - Delete old data
 ```
