@@ -25,7 +25,7 @@ if __name__ == "__main__":
     """ Arg parse"""
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-a", "--api", action="store_true",  help="Start only")
+    #group.add_argument("-a", "--api", action="store_true",  help="Start only")
     args = parser.parse_args()
 
     """ Read conf """
@@ -118,7 +118,7 @@ if __name__ == "__main__":
             # '/api/v1/administration/cluster/new', 'Cluster',
 
             # PURGE SYSTEM
-            '/api/v1/administration/purge/([a-z0-9]+)', 'Purge',
+            '/api/v1/administration/purge', 'Purge',
 
             # CACHE DATA (MONGO)
             # date/cluster/node/vmid
