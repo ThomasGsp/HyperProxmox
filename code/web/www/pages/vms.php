@@ -5,7 +5,7 @@ $html_VMs = $html->List_VMs($lastdate);
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Instances (KVM/LXC)</h1>
+            <h1 class="page-header">Instances - kvm/lxc/vz</h1>
         </div>
     </div>
     <div class="row">
