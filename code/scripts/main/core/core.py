@@ -18,8 +18,8 @@ import time
 import base64
 import hashlib
 
-def RunAnalyse(clusters_conf, generalconf, logger):
-    play = Analyse(clusters_conf, generalconf, logger)
+def RunAnalyse(generalconf, logger):
+    play = Analyse(generalconf, logger)
 
     while True:
         """ Instances types availables: lxc/qemu/all"""
@@ -63,8 +63,6 @@ class Core:
             self.delayrounddeploy = generalconf["deploy"]["delayrounddeploy"]
 
             """ RUN THE ANALYZER IN DEDICATED THEARD"""
-            self.clusters_conf = self.mongo.get_clusters_conf()["value"]
-
             """ Clean previous lockers """
             self.logger.write({"thread": threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX",
                                "value": "Clean Locker"})
@@ -73,7 +71,7 @@ class Core:
 
             thc = threading.Thread(name="Update statistics",
                                    target=RunAnalyse,
-                                   args=(self.clusters_conf, self.generalconf, self.logger))
+                                   args=(self.generalconf, self.logger))
             thc.start()
         else:
             exit(1)
@@ -448,10 +446,13 @@ class Core:
 
         return new_cluster
 
-    def change_clusters_conf(self, cluster, data):
-        clusters_update = self.mongo.update_clusters_conf(cluster, data)
-        return clusters_update
 
+    def change_clusters_conf(self, cluster, data):
+        if data["user"]:
+            data["user"] = base64.b64encode(pcrypt(data["user"], self.generalconf["keys"]["key_pvt"])["value"]).decode('utf-8')
+        if data["password"]:
+            data["password"] = base64.b64encode(pcrypt(data["password"], self.generalconf["keys"]["key_pvt"])["value"]).decode('utf-8')
+        return self.mongo.update_clusters_conf(cluster, data)
 
     def delete_clusters_conf(self, cluster):
         """ Find cluster informations from node """

@@ -41,19 +41,20 @@ def distribution(n, tokens_in_slots, slot_distributions):
 
 
 class Analyse:
-    def __init__(self, clusters_conf, generalconf, logger):
+    def __init__(self, generalconf, logger):
         """
         :param clusters_conf: Proxmox configurations
         :param generalconf : General configuration
         """
         self.generalconf = generalconf
-        self.clusters_conf = clusters_conf
         self.logger = logger
 
         """ LOAD MONGODB """
         self.mongo = MongoDB(generalconf["mongodb"]["ip"])
         self.mongo.client = self.mongo.connect()
         self.mongo.db = self.mongo.client.db
+
+        self.clusters_conf = self.mongo.get_clusters_conf()["value"]
 
     def run(self, instancetype="all"):
         """ Active logger"""
@@ -83,7 +84,12 @@ class Analyse:
 
             """ AUTH """
             proxmox = Proxmox("Analyse")
-            proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), proxmox_clusters_user, proxmox_clusters_pwd)
+            connection = proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), proxmox_clusters_user, proxmox_clusters_pwd)
+
+            """ ByPass and log if connection has failed """
+            if connection["result"] != "OK":
+                self.logger.write({"thread": threading.get_ident(), "result": "ERROR", "type": "HYPERPROXMOX", "value": connection})
+                continue
 
             """ 
             ##############

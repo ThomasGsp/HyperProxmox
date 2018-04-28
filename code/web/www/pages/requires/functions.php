@@ -202,7 +202,7 @@ class API_Gen_HTML
             if($last_clust != $qemu->cluster)
             {
                 $last_clust = $qemu->cluster;
-                $clusters_info = json_decode($d->GET_clusters_conf($qemu->cluster), true)['value'][0];
+                $clusters_info = json_decode($d->GET_clusters_conf($qemu->cluster), true)['value'];
                 $clusters_info = (object) $clusters_info;
             }
  
@@ -318,7 +318,7 @@ class API_Gen_HTML
             if($last_clust != $node->cluster)
             {
                 $last_clust = $node->cluster;
-                $clusters_info = json_decode($q->GET_clusters_conf($node->cluster), true)['value'][0];
+                $clusters_info = json_decode($q->GET_clusters_conf($node->cluster), true)['value'];
                 $clusters_info = (object) $clusters_info;
             }
             
@@ -391,7 +391,7 @@ class API_Gen_HTML
             if($last_clust != $sto->cluster)
             {
                 $last_clust = $sto->cluster;
-                $clusters_info = json_decode($q->GET_clusters_conf($sto->cluster), true)['value'][0];
+                $clusters_info = json_decode($q->GET_clusters_conf($sto->cluster), true)['value'];
                 $clusters_info = (object) $clusters_info;
             }
 
