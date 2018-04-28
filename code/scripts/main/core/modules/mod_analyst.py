@@ -271,6 +271,9 @@ class Analyse:
                             disk["node"] = value_nodes_list["node"]
                             disk["date"] = int(insert_time)
                             disk["cluster"] = cluster["name"]
+                            if not "used" in disk:
+                                disk["used"] = 0
+
                             totalsize += disk["size"]
                             self.mongo.insert_disks(disk)
 

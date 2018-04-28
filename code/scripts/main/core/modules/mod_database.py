@@ -120,7 +120,6 @@ class MongoDB:
             # mapping
             collection = self.__mappingcol(col)
             if collection:
-                print(col, id)
                 self.db[collection].remove({"_id": ObjectId(id)})
                 result = {
                     "result": "OK",
