@@ -9,7 +9,7 @@ You have to the possibility to access on the Proxmox API with an Administrative 
 Setting up Proxmox policies is out of scope for this tutorial.  
 Report you to the official Proxmox documentation.  
 
-## Recent environment for installing this project
+## Recent environment for installing this project
 This project need an recent environment to work correctly.  
 Typically, in this documentation, we'll use an Debian 9 environment.  
 You can use an other distribution, but just check if theses software are available:
@@ -26,7 +26,7 @@ but du performance you should use the same (low network latency).
 In more, the API authentication system is currently not implemented and this architecture can expose you
 to security issues.
 
-## Hardware
+## Hardware
 To run smoothly, the hardware requirement will depend to your goal and infrastructure.  
 For a basic test, you can run this project on a very small machine (1cpu/2gb ram/10G disk) without problem.  
 But on a large production system, it can need more resources, especially for the crawler and the databases.
@@ -35,4 +35,4 @@ and cause a slowly working if your hardware is too low.
 
 In some case, it can be necessary to use an independent MongoDB machine or cluster.
 
-[Readme](README.md) <-- Previous | Next --> [Setup - Backend](doc/md/02-backend.md)
+[Readme](../../README2.md) <-- Previous | Next --> [Setup - Backend](doc/md/02-backend.md)
