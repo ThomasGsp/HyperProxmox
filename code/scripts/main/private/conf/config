@@ -8,7 +8,6 @@ key_pub: private/keys/Ragnarok.pub.key
 
 admin_mail: tlams@localhost
 
-
 [web]
 user: www-data
 
@@ -44,6 +43,9 @@ walker: 300
 
 ; Lock file -- prevent concurrent crawling
 walker_lock: /tmp/hyperproxmoxwalker.lock
+
+; Set an unique ID (change comment part)
+uid = False
 
 [logger]
 ; logs level    1: "INFO",  2: "WARNING", 3: "ERROR", 4: "CRITICAL",  5: "DEBUG"

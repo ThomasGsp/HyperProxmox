@@ -37,7 +37,9 @@ if __name__ == "__main__":
                    "logs_dir": localconf['logger']['logs_dir'], "bulk_write": localconf['logger']['bulk_write'],
                    "bulk_size": localconf['logger']['bulk_size']},
 
-        "analyst": {"walker": localconf['walker']['walker'], "walker_lock": localconf['walker']['walker_lock']},
+        "analyst": {"walker": localconf['walker']['walker'], "walker_lock": localconf['walker']['walker_lock'],
+                    "walker_uid": localconf['walker']['uid']
+                    },
 
         "mongodb": {"ip": localconf['databases']['mongodb_ip'], 'port': localconf['databases']['mongodb_port']},
 

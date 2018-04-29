@@ -4,7 +4,7 @@ Langage: Python
 Minimum version require: 3.4
 
 Module function:
-The goal of this module is to analyse the differents clusters and node
+The goal of this module is to analyse clusters and nodes
 to allocate news instances.
 """
 
@@ -55,6 +55,10 @@ class Analyse:
         self.mongo.db = self.mongo.client.db
 
         self.clusters_conf = self.mongo.get_clusters_conf()["value"]
+
+
+    def threadcrawl(self):
+        return
 
     def run(self, instancetype="all"):
         """ Active logger"""
@@ -180,33 +184,34 @@ class Analyse:
                             instance["macaddr"] = maclist
 
                             """ Following instance ID """
-                            getidfromdesc = re.search("id=\"([A-Z\.\d\_]+)\"", currentdesc)
-                            # Set unique id if not found
-                            if getidfromdesc is None:
-                                # ajouter un test de duplicateid
-                                """ General description """
-                                randtext = ''.join(random.choice('AZERTYUIOPQSDFGHJKLMWXCVBN') for i in range(8))
-                                uniqid = "-- Please, do not change or delete this ID -- \n" \
-                                         "id=\"{0}_{1}\"\n------------------\n{2}".format(insert_time, randtext,
-                                                                  currentdesc)
-                                instance["description"] = uniqid
+                            if self.generalconf["analyst"]["walker_uid"]:
+                                getidfromdesc = re.search("id=\"([A-Z\.\d\_]+)\"", currentdesc)
+                                # Set unique id if not found
+                                if getidfromdesc is None:
+                                    # ajouter un test de duplicateid
+                                    """ General description """
+                                    randtext = ''.join(random.choice('AZERTYUIOPQSDFGHJKLMWXCVBN') for i in range(8))
+                                    uniqid = "-- Please, do not change or delete this ID -- \n" \
+                                             "id=\"{0}_{1}\"\n------------------\n{2}".format(insert_time, randtext,
+                                                                      currentdesc)
+                                    instance["description"] = uniqid
 
-                                idlist.append(uniqid)
-                                """ INSTANCE DEFINITION """
-                                datadesc = {'description': uniqid}
-                                resultsetdesc = proxmox.change_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                         value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)
-                                instance["uniqid"] = "{0}_{1}".format(insert_time, randtext)
+                                    idlist.append(uniqid)
+                                    """ INSTANCE DEFINITION """
+                                    datadesc = {'description': uniqid}
+                                    resultsetdesc = proxmox.change_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                             value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)
+                                    instance["uniqid"] = "{0}_{1}".format(insert_time, randtext)
 
-                            else:
-                                instance["uniqid"] = getidfromdesc.group(1)
-                                if getidfromdesc.group(1) in idlist:
-                                    self.logger.write(
-                                        {"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
-                                    self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": json.dumps(instance)})
-                                    self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "-------------------"})
                                 else:
-                                    idlist.append(getidfromdesc.group(1))
+                                    instance["uniqid"] = getidfromdesc.group(1)
+                                    if getidfromdesc.group(1) in idlist:
+                                        self.logger.write(
+                                            {"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
+                                        self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": json.dumps(instance)})
+                                        self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "-------------------"})
+                                    else:
+                                        idlist.append(getidfromdesc.group(1))
 
                             self.mongo.insert_instances(instance)
 
