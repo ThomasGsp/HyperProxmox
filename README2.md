@@ -16,7 +16,7 @@ Assign users to custom roles, search in inventory or provision new virtual machi
 This project is currently in active development. 
 You shouldn't use in production mode or... use at your risks !
 
-### This version provide:
+### This version provide:
 - Web interface to list instances, nodes and clusters
 - Current usage (cpu / ram / disks...) for your nodes, instances...
 - Quick usage visualisation by color (Green for low, yellow, red)
@@ -30,12 +30,12 @@ You shouldn't use in production mode or... use at your risks !
 - Group & cluster viewing in web interface
 - Api
 
-### Weak on this version (in progress):
+### Weak on this version (in progress):
 - Logs system 
 - Purge system 
 - Crawler work without parallel tasks (can be a bit slow on large infrastructure) 
 
-### This version don't provide (next features):
+### This version don't provide (next features):
 - Advanced management
 - Provision new virtual machines
 - ...
