@@ -11,7 +11,7 @@ Assign users to custom roles, search in inventory or provision new virtual machi
 * Version : Alpha 1.0
 * Status: Dev
 * Object :   Massive LXC CT / KVM deployment, management and viewer system for Proxmox clusters.
-* Proxmox version supported: 3.x/4.x/5/x
+* Proxmox version supported: 3.x/4.x/5.x
 * Information : 
 This project is currently in active development. 
 You shouldn't use in production mode or... use at your risks !
@@ -24,7 +24,7 @@ You shouldn't use in production mode or... use at your risks !
 - Infrastructure historic
 - Instance management (stop/start/restart...)
 - Search system by VM-name, mac address ...
-- Proxmox crawler (Get and store information)
+- Proxmox crawler (Getting cluster information)
 - Security : Encipher the critical data (cluster access)
 - LDAP authentication for web interface
 - Group & cluster viewing in web interface
