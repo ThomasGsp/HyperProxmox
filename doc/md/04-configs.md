@@ -1,4 +1,4 @@
-# Configs
+# Configs
 
 Configurations are managed by single point:
 
