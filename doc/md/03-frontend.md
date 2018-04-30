@@ -1,6 +1,6 @@
 # Frontend
 
-### Web server
+###  Web server
 The frontend is writing in php/html/css/js.  
 You can use every web servers that support theses technologies.  
 For this installation, we'll setting up nginx with php-fpm.
@@ -67,7 +67,7 @@ catch_workers_output = yes
 
 ```
 
-#### Web application
+####  Web application
 ``` bash
 # set www dir
 mkdir /var/www/hyperproxmox
