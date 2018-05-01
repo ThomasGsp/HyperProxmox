@@ -124,10 +124,10 @@ DATETIMESTAMP=$(($(date +%s)-$((86400*$RET))))
 * type: purge type (strict = all data before this date)
 * date: delete data before this date - in seconds(timestamp)
 
-Currently, just one mod is available: stric.  
+Currently, just one mod is available: strict.  
 It's mean that ALL data will be delete before the date. 
 Some others possibility should be available in the future, like keep one day per week.
 
 
 
-[Frontend](03-frontend.md) <-- Previous | Next --> [Usage - First start](05-first_start.md)
+[Setup - Frontend](03-frontend.md) <-- Previous | Next --> [Usage - First start](05-first_start.md)

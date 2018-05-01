@@ -30,6 +30,4 @@ If you loose it, you must delete the keys and delete the different entries in th
 Currently there are not system to provide a full reset function. Use MongoDB shell to do it.
 
 
-
-
-[Config](04-configs.md) <-- Previous | Next --> [Usage - Logs](05-first_start.md)
+[Setup - Config](04-configs.md) <-- Previous | Next --> [Usage - Logs](05-first_start.md)
