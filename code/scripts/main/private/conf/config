@@ -8,11 +8,6 @@ key_pub: private/keys/Ragnarok.pub.key
 
 admin_mail: tlams@localhost
 
-[web]
-user: www-data
-
-[api]:
-user: hyperproxmox
 
 [databases]
 ; Databases configurations
