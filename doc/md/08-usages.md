@@ -1,8 +1,6 @@
 # Usages
 
-## API
-
-Insert your first cluster (from host)
+##  New cluster
 ``` bash
 # Minimum:
 curl -H -XPOST -d '{
@@ -44,11 +42,5 @@ curl -H -XPOST -d '{
 * "exclude_nodes": Do not use this nodes - Not visible (list) 
 * "groups" : Symbolics groups for this node (list)
 * "weight": Weight for the cluster auto-selection (int) [VALUE NOT EMPTY REQUIRED]
-
-
-![alt text](https://github.com/ThomasGsp/HyperProxmox/blob/master/doc/screenshots/h-nodes.jpg)
-![alt text](https://github.com/ThomasGsp/HyperProxmox/blob/master/doc/screenshots/h-vms.jpg)
-![alt text](https://github.com/ThomasGsp/HyperProxmox/blob/master/doc/screenshots/h-sto.jpg)
-
 
 [Usage - api](07-api.md) <-- Previous
