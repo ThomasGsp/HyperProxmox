@@ -1,6 +1,8 @@
 # Usages
 
-##  New cluster
+## API
+
+###  New cluster
 ``` bash
 # Minimum:
 curl -H -XPOST -d '{
@@ -42,5 +44,58 @@ curl -H -XPOST -d '{
 * "exclude_nodes": Do not use this nodes - Not visible (list) 
 * "groups" : Symbolics groups for this node (list)
 * "weight": Weight for the cluster auto-selection (int) [VALUE NOT EMPTY REQUIRED]
+
+
+### Manage virtual machine (status)
+To manage an virtual machine, there are two way: use MongoID or the long path.  
+The first way is probably more efficient in a scripting/program system and the second way for human.
+Indeed, it's just a wrapper.
+
+First way:
+```bash
+# 1 - Get the last date
+curl '/api/v1/static/dates/last' 
+{"value": 1525013945}
+
+# 2 - Get VM-ID
+curl  'http://127.0.0.1:8080/api/v1/static/instances/1525188197/Cluster_1/my_node/105'  
+{"result": "OK", "value": [
+ {"netin": 0,
+  "name": "templatevm", 
+  "type": "qemu", 
+  "macaddr": ["BA:B6:C5:8C:F3:55"],
+  "cluster": "Cluster_1", 
+  "diskread": 0,
+  "mem": 0, 
+  "maxmem": 1073741824, 
+  "_id": {"$oid": "5ae886660e8d893fd32734e8"}, 
+  "disk": 0, 
+  "node": "my_node",
+  "netout": 0,
+  "vmid": 105,
+  "uptime": 0, 
+  "uniqid": "1524672808.5396078_ULBPKPXZ",
+  "template": "", 
+  "diskwrite": 0, 
+  "status": "stopped", 
+  "cpu": 0, 
+  "maxdisk": 53687091200,
+  "date": 1525188197, 
+  "cpus": 1, 
+  "pid": null
+ }
+]}
+
+# 3 - Action on VM
+curl /api/v1/instance/id/5ae886660e8d893fd32734e8/status/start
+{"result": "OK", "value": {"data": "UPID:sd-81592:00006C57:371A9F0B:5AE8884D:qmstart:105:api@pve:"}}%  
+```
+
+Second:
+```bash
+curl  'http://127.0.0.1:8080/api/v1/static/instances/last/Cluster_1/my_node/510/stop' 
+{'data': 'UPID:sd-81592:00003E35:379BC306:5AE9D2E7:qmstop:510:api@pve:'}%
+``̀
+
 
 [Usage - api](07-api.md) <-- Previous
