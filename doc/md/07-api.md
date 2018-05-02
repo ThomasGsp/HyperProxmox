@@ -67,7 +67,7 @@ This data are manage by the crawler, you can't insert or change data yourself
 
 ```
 
-<something> = Change this value
+<something> = Change this value  
 <date>|last = Two way - Use specific timestamp or select automaticaly the last date
 
 
