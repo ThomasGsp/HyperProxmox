@@ -95,7 +95,7 @@ Second:
 ```bash
 curl  'http://127.0.0.1:8080/api/v1/static/instances/last/Cluster_1/my_node/510/stop' 
 {'data': 'UPID:sd-81592:00003E35:379BC306:5AE9D2E7:qmstop:510:api@pve:'}%
-``̀
+```
 
 
 [Usage - api](07-api.md) <-- Previous
