@@ -48,7 +48,7 @@ You shouldn't use in production mode or... use at your risks !
 * [Setup - Configs](doc/md/04-configs.md)
 * [Usage - First start](doc/md/05-first_start.md)
 * [Usage - Logs system](doc/md/06-logs.md)
-* [Usage - API](doc/md/06-api.md)
+* [Usage - API](doc/md/07-api.md)
 * [Usage - Web interface](doc/md/08-usages.md)
 
 
