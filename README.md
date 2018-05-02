@@ -2,7 +2,7 @@
 
 HyperProxmox provides a centralized platform for managing your Proxmox environments.  
 The web based client lets you manage the essential functions of your Proxmox infrastructure from any browser, 
-offering more responsiveness and usability than ever before.  
+offering responsiveness and usability.  
 Gain the visibility and control needed for your virtual machines, hosts and datastore.  
 Assign users to custom roles, search in inventory or provision new virtual machines at the click of a button.
 
@@ -30,7 +30,7 @@ You shouldn't use in production mode or... use at your risks !
 - Group & cluster viewing in web interface
 - Api
 
-### Weak on this version (in progress):
+### Weakness on this version (in progress):
 - Logs system 
 - Purge system 
 - Auto-generation MongoDB indexes (performance)
