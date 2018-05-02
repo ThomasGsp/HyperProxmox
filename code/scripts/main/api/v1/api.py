@@ -18,7 +18,7 @@ class Purge:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
         return json.dumps(result)
@@ -30,7 +30,7 @@ class General_Search:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
         return json.dumps(result)
@@ -38,11 +38,13 @@ class General_Search:
 class QueryCache_Infra:
     def GET(self, dest, date, cluster=None, node=None, vmid=None):
         try:
+            if date == "last":
+                date = core.getkey(date)["value"]
             result = core.generalquerycacheinfra(dest, date, cluster, node, vmid)
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
 
@@ -55,7 +57,7 @@ class QueryDates:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
         return json.dumps(result)
@@ -72,7 +74,7 @@ class Cluster:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
 
@@ -96,7 +98,7 @@ class Cluster:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid insert request: {0}".format(e)
             }
         return result
@@ -108,7 +110,7 @@ class Cluster:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid update request: {0}".format(e)
             }
         return result
@@ -119,11 +121,29 @@ class Cluster:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid delete request: {0}".format(e)
             }
         return result
 
+class InstanceBc:
+    """ Convert to Instance """
+    def GET(self, date, cluster, node, vmid, action):
+        try:
+            if date == "last":
+                date = core.getkey(date)["value"]
+            idmongo = core.generalquerycacheinfra("instances", date, cluster, node, vmid)["value"][0]["_id"]["$oid"]
+            I = Instance()
+            result = json.loads(I.GET(idmongo, action))["value"]
+
+        except BaseException as e:
+            result = {
+                "result": "ERROR",
+                "type": "API",
+                "value": "(bc) Invalid request: {0}".format(e)
+            }
+
+        return result
 
 class Instance:
     def GET(self, id, action=None):
@@ -137,7 +157,7 @@ class Instance:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
         return json.dumps(result)
@@ -187,7 +207,7 @@ class Instance:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
         return result
@@ -199,7 +219,7 @@ class Instance:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
         return result
@@ -210,7 +230,7 @@ class Instance:
         except BaseException as e:
             result = {
                 "result": "ERROR",
-                "type": "PYTHON - API",
+                "type": "API",
                 "value": "Invalid request: {0}".format(e)
             }
         return result

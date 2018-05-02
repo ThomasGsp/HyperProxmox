@@ -70,7 +70,7 @@ if __name__ == "__main__":
                   "\n - Private Key: {0} "
                   "\n - Public Key: {1}"
                   .format(localconf['system']['key_pvt'], localconf['system']['key_pub']))
-            print("Passphrase HASH: {0}".format(passhash))
+            # print("Passphrase HASH: {0}".format(passhash))
             print("You MUST save your passphrase in a security place !")
             key_pvt = CritConf.read_private_key(localconf['system']['key_pvt'], passhash)
         else:
@@ -111,6 +111,9 @@ if __name__ == "__main__":
             '/api/v1/instance/([0-9]+)', 'Instance',
             '/api/v1/instance/id/([a-z0-9]+)/status/(start|stop|current|reset|shutdown)', 'Instance',
 
+            # Instance by cache
+            '/api/v1/static/instances/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)/(start|stop|current|reset|shutdown)', 'InstanceBc',
+
             # AUTH
             # '/api/v1/login', 'Login'
 
@@ -125,30 +128,30 @@ if __name__ == "__main__":
             # CACHE DATA (MONGO)
             # date/cluster/node/vmid
             # Disks mapping
-            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)', 'QueryCache_Infra',
-            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(disks)/([0-9]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(disks)/([0-9]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(disks)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)', 'QueryCache_Infra',
+            '/api/v1/static/(disks)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(disks)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(disks)/([0-9]+|last)/', 'QueryCache_Infra',
 
             # Storages mapping
-            '/api/v1/static/(storages)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(storages)/([0-9]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(storages)/([0-9]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(storages)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(storages)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(storages)/([0-9]+|last)/', 'QueryCache_Infra',
 
             # Instances mapping
-            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)', 'QueryCache_Infra',
-            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(instances)/([0-9]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(instances)/([0-9]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/([0-9]+)', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(instances)/([0-9]+|last)/', 'QueryCache_Infra',
 
             # Nodes mapping
-            '/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)', 'QueryCache_Infra',
-            '/api/v1/static/(nodes)/([0-9]+)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
-            '/api/v1/static/(nodes)/([0-9]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(nodes)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/([0-9a-zA-Z\_\-]+)', 'QueryCache_Infra',
+            '/api/v1/static/(nodes)/([0-9]+|last)/([0-9a-zA-Z\_\-]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(nodes)/([0-9]+|last)/', 'QueryCache_Infra',
 
             # cluster mapping
-            '/api/v1/static/(clusters)/([0-9]+)/(?:[0-9a-zA-Z\_\-]+)',  'QueryCache_Infra',
-            '/api/v1/static/(clusters)/([0-9]+)/', 'QueryCache_Infra',
+            '/api/v1/static/(clusters)/([0-9]+|last)/(?:[0-9a-zA-Z\_\-]+)',  'QueryCache_Infra',
+            '/api/v1/static/(clusters)/([0-9]+|last)/', 'QueryCache_Infra',
 
             # date
             '/api/v1/static/dates/(all|last)', 'QueryDates',
