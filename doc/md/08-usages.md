@@ -1,8 +1,8 @@
 # Usages
 
-## API
+## API
 
-###  New cluster
+### New cluster
 ``` bash
 # Minimum:
 curl -H -XPOST -d '{
@@ -46,7 +46,7 @@ curl -H -XPOST -d '{
 * "weight": Weight for the cluster auto-selection (int) [VALUE NOT EMPTY REQUIRED]
 
 
-### Manage virtual machine (status)
+### Manage virtual machine (status)
 To manage an virtual machine, there are two way: use MongoID or the long path.  
 The first way is probably more efficient in a scripting/program system and the second way for human.
 Indeed, it's just a wrapper.
