@@ -67,8 +67,8 @@ This data are manage by the crawler, you can't insert or change data yourself
 
 ```
 
-<something> = Change this value  
-<date>|last = Two way - Use specific timestamp or select automaticaly the last date
+<\something\> = Change this value  
+<\date\>|last = Two way - Use specific timestamp or select automaticaly the last date
 
 
 [Usage - logs](06-logs.md) <-- Previous | Next --> [Usage - General](08-usages.md)
