@@ -183,6 +183,9 @@ class Analyse:
 
                             instance["macaddr"] = maclist
 
+                            """ Fix type for lxc output """
+                            instance["vmid"] = int(instance["vmid"])
+
                             """ Following instance ID """
                             if self.generalconf["analyst"]["walker_uid"]:
                                 getidfromdesc = re.search("id=\"([A-Z\.\d\_]+)\"", currentdesc)
