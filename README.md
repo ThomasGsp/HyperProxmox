@@ -8,7 +8,7 @@ Assign users to custom roles, search in inventory or provision new virtual machi
 
 * Author :  [ThomasGSP](https://www.thomasgsp.fr)
 * Date : 2017/2018
-* Version : Alpha 1.0
+* Version : V1.0-beta
 * Status: Dev
 * Object :   Massive LXC CT / KVM deployment, management and viewer system for Proxmox clusters.
 * Proxmox version supported: 3.x/4.x/5.x
