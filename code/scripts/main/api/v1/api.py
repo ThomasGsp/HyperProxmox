@@ -134,7 +134,7 @@ class InstanceBc:
                 date = core.getkey(date)["value"]
             idmongo = core.generalquerycacheinfra("instances", date, cluster, node, vmid)["value"][0]["_id"]["$oid"]
             I = Instance()
-            result = json.loads(I.GET(idmongo, action))["value"]
+            result = json.loads(I.GET(idmongo, action))
 
         except BaseException as e:
             result = {
