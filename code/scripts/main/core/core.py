@@ -17,6 +17,7 @@ import threading
 import time
 import base64
 import hashlib
+import pymongo
 
 def RunAnalyse(generalconf, logger):
     play = Analyse(generalconf, logger)
@@ -55,6 +56,9 @@ class Core:
 
         if self.mongo.client and self.redis_msg.connect() and self.redis_cache.connect():
             self.mongo.db = self.mongo.client.db
+
+            """ Create indexes"""
+            self.setupindexes()
 
             """ Others """
             # value
@@ -527,6 +531,30 @@ class Core:
             }
 
         return data
+
+
+    def setupindexes(self):
+        self.mongo.set_indexes("disks",
+                               [('date', pymongo.ASCENDING), ("cluster", pymongo.ASCENDING),
+                                ("node", pymongo.ASCENDING), ("vmid", pymongo.ASCENDING)])
+        self.mongo.set_indexes("storages",
+                               [('date', pymongo.ASCENDING), ("cluster", pymongo.ASCENDING), ("node", pymongo.ASCENDING)])
+        self.mongo.set_indexes("instances",
+                               [('date', pymongo.ASCENDING), ("cluster", pymongo.ASCENDING),
+                                ("node", pymongo.ASCENDING), ("vmid", pymongo.ASCENDING)])
+        self.mongo.set_indexes("nodes",
+                               [('date', pymongo.ASCENDING), ("cluster", pymongo.ASCENDING), ("node", pymongo.ASCENDING)])
+        self.mongo.set_indexes("clusters",
+                               [('date', pymongo.ASCENDING), ("cluster", pymongo.ASCENDING)])
+        self.mongo.set_indexes("cluster_conf", [('name', pymongo.ASCENDING)])
+
+        indexes_result = {
+            "value": "{0}".format("All indexes created"),
+            "result": "OK",
+            "type": "HYPERPROXMOX"
+        }
+
+        return indexes_result
 
     """ 
     #######################

@@ -75,6 +75,8 @@ class MongoDB:
             collection = self.collection_instances
         elif col == "nodes":
             collection = self.collection_nodes
+        elif col == "clusters_conf":
+            collection = self.collection_clusters_conf
         elif col == "disks":
             collection = self.collection_disks
         elif col == "storages":
@@ -145,14 +147,14 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(
-                        dumps(self.db[self.collection_clusters].find({'date': int(date)})))
+                        dumps(self.db[self.collection_clusters].find({'date': int(date)}).hint(self.collection_clusters)))
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(
                         dumps(self.db[self.collection_clusters].find(
-                            {'$and': [{'date': int(date), 'cluster': cluster}]})))
+                            {'$and': [{'date': int(date), 'cluster': cluster}]}).hint(self.collection_clusters)))
                 }
 
         except BaseException as serr:
@@ -299,7 +301,7 @@ class MongoDB:
                     "result": "OK",
                     "value": json.loads(
                         dumps(self.db[self.collection_nodes].find(
-                            {'date': int(date)})))
+                            {'date': int(date)}).hint(self.collection_nodes)))
                 }
 
             elif not node:
@@ -307,14 +309,16 @@ class MongoDB:
                     "result": "OK",
                     "value": json.loads(
                         dumps(self.db[self.collection_nodes].find(
-                        {'$and': [{'date': int(date), 'cluster': cluster}]})))
+                        {'$and': [{'date': int(date), 'cluster': cluster}]})
+                              .hint(self.collection_nodes)))
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(
                         dumps(self.db[self.collection_nodes].find(
-                            {'$and': [{'date': int(date), 'cluster': cluster, 'node': node}]})))
+                            {'$and': [{'date': int(date), 'cluster': cluster, 'node': node}]})
+                              .hint(self.collection_nodes)))
                 }
 
         except BaseException as serr:
@@ -346,28 +350,33 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_instances].find({"date": int(date)})))
+                        self.db[self.collection_instances].find({"date": int(date)})
+                            .hint(self.collection_instances)))
                 }
             elif not node:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_instances].find(
-                            {'$and': [{"date": int(date), "cluster": cluster}]})))
+                            {'$and': [{"date": int(date), "cluster": cluster}]})
+                            .hint(self.collection_instances)))
                 }
             elif not vmid:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_instances].find(
-                            {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})))
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})
+                            .hint(self.collection_instances)))
+
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_instances].find(
-                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})))
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": int(vmid)}]})
+                            .hint(self.collection_instances)))
                 }
 
         except BaseException as serr:
@@ -400,21 +409,24 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_storages].find({"date": int(date)})))
+                        self.db[self.collection_storages].find({"date": int(date)})
+                            .hint(self.collection_storages)))
                 }
             elif not node:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_storages].find(
-                            {'$and': [{"date": int(date), "cluster": cluster}]})))
+                            {'$and': [{"date": int(date), "cluster": cluster}]})
+                            .hint(self.collection_storages)))
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_storages].find(
-                            {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})))
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})
+                            .hint(self.collection_storages)))
                 }
         except BaseException as serr:
             result = {
@@ -447,34 +459,51 @@ class MongoDB:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
-                        self.db[self.collection_disks].find({"date": int(date)})))
+                        self.db[self.collection_disks].find({"date": int(date)})
+                            .hint(self.collection_disks)))
                 }
             elif not node:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_disks].find(
-                            {'$and': [{"date": int(date), "cluster": cluster}]})))
+                            {'$and': [{"date": int(date), "cluster": cluster}]})
+                            .hint(self.collection_disks)))
                 }
             elif not vmid:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_disks].find(
-                            {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})))
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node}]})
+                            .hint(self.collection_disks)))
                 }
             else:
                 result = {
                     "result": "OK",
                     "value": json.loads(dumps(
                         self.db[self.collection_disks].find(
-                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": str(vmid)}]})))
+                            {'$and': [{"date": int(date), "cluster": cluster, "node": node, "vmid": str(vmid)}]})
+                            .hint(self.collection_disks)))
                 }
 
         except BaseException as serr:
             result = {
                 "result": "ERROR",
                 "type": "MongoDB - Request on get_disks",
+                "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
+            }
+        return result
+
+
+    def set_indexes(self, col, list):
+        try:
+            # Add here a test if exist, pass
+            result = self.db[self.__mappingcol(col)].create_index(list, background=True, name=col)
+        except BaseException as serr:
+            result = {
+                "result": "ERROR",
+                "type": "MongoDB - Set Indexes",
                 "value": "MongoDB error on {0}:{1} ({2})".format(self.server, self.port, serr)
             }
         return result
