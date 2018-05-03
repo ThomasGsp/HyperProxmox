@@ -34,13 +34,13 @@ curl -H -XPOST -d '{
                     
 ```
 
-* "name": Symbolic cluster name. Should be uniq (string)  [VALUE NOT EMPTY REQUIRED]
+* "name": Symbolic cluster name. Should be unique (string)  [VALUE NOT EMPTY REQUIRED]
 * "url":  Proxmox - Web GUI URL access (string)           [VALUE NOT EMPTY REQUIRED] 
 * "port": Proxmox - Web PORT access (string)              [VALUE NOT EMPTY REQUIRED]
 * "user": Proxmox - Administrative PVE user (string)      [VALUE NOT EMPTY REQUIRED]
 * "password": Proxmox - PVE password (string)             [VALUE NOT EMPTY REQUIRED]
-* "template": Default template for LXC (string)
-* "storage_disk": Default shared disk for KVM/LXC (string)
+* "template": Default template for LXC (string)           [USELESS IN THIS VERSION]
+* "storage_disk": Default shared disk for KVM/LXC (string) [USELESS IN THIS VERSION]
 * "exclude_nodes": Do not use this nodes - Not visible (list) 
 * "groups" : Symbolics groups for this node (list)
 * "weight": Weight for the cluster auto-selection (int) [VALUE NOT EMPTY REQUIRED]
@@ -48,10 +48,10 @@ curl -H -XPOST -d '{
 
 ### Manage virtual machine (status)
 To manage an virtual machine, there are two way: use MongoID or the long path.  
-The first way is probably more efficient in a scripting/program system and the second way for human.
+The first possibility is probably more efficient in a scripting/program way and the second for human.
 Indeed, it's just a wrapper.
 
-First way:
+First possibility:
 ```bash
 # 1 - Get the last date
 curl '/api/v1/static/dates/last' 
@@ -94,7 +94,7 @@ curl /api/v1/instance/id/5ae886660e8d893fd32734e8/status/start
 Second:
 ```bash
 curl  'http://127.0.0.1:8080/api/v1/static/instances/last/Cluster_1/my_node/510/stop' 
-{'data': 'UPID:sd-81592:00003E35:379BC306:5AE9D2E7:qmstop:510:api@pve:'}%
+{"result": "OK", "value": {'data': 'UPID:sd-81592:00003E35:379BC306:5AE9D2E7:qmstop:510:api@pve:'}}%  
 ```
 
 

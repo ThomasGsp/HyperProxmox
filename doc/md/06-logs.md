@@ -3,7 +3,7 @@
 A log system is available, but not complete.
 
 Format:  [DATE] [THREAD_ID] [LEVEL] [TYPE] : JSON-DATA
-* DATE = When the log is generated. (If bulk system is activate, date is respected)
+* DATE = Date when the log is generated. (If bulk system is activate, date is respected)
 * THREAD_ID = Hyperproxmox work with different thread (Core, API, crawler, sub-crawler...). If you wan debug correctly, you can use 
 grep to follow your thread.
 * LEVEL = WARNING, INFO, DEBUG...

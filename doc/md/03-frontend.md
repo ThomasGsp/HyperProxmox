@@ -33,7 +33,7 @@ server {
 ```
 
 In this example, i used the pre-generates nginx key: "/etc/nginx/ssl/nginx.key"  
-You should change this part.  
+You should change this part and generate your keys.
 
 #### Php-fpm
 vi /etc/php/7.0/fpm/pool.d/www.conf

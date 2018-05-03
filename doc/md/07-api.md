@@ -29,7 +29,7 @@ Examples are available in the next page.
 ```
 
 ### Cache Data - MongoDB
-This data are manage by the crawler, you can't insert or change data yourself
+This data are manage by the crawler, you can't insert or change something yourself
 ``` bash
 # date/cluster/node/vmid
 # Disks mapping
@@ -68,7 +68,7 @@ This data are manage by the crawler, you can't insert or change data yourself
 ```
 
 <\something\> = Change this value  
-<\date\>|last = Two way - Use specific timestamp or select automaticaly the last date
+<\date\>|last = Two way - Use specific timestamp or auto-select the last date
 
 
 [Usage - logs](06-logs.md) <-- Previous | Next --> [Usage - General](08-usages.md)

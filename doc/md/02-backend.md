@@ -13,7 +13,7 @@ apt-get install mongodb nginx redis-server
 
 #### Setup Redis
 
-Redis-server can work with a small memory-cache dedicated.
+HyperProxmox doesn't use much memory on your Redis.
 
 vi /etc/redis/redis.conf
 ```bash

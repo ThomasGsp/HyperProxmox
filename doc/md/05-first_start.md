@@ -27,7 +27,6 @@ http://127.0.0.1:8080/
 Passphrase will be ask at each start.
 Without it, the privite key can be read and the access cannot be load in the memory.
 If you loose it, you must delete the keys and delete the different entries in the collection "clusters_conf" in mongoDB database.
-Currently there are not system to provide a full reset function. Use MongoDB shell to do it.
 
 
 [Setup - Config](04-configs.md) <-- Previous | Next --> [Usage - Logs](06-logs.md)

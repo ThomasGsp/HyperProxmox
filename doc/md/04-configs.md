@@ -1,6 +1,6 @@
 # Configs
 
-Configurations are managed by single point:
+Configurations are managed in a single point:
 
 vi /opt/HyperProxmox/code/scripts/main/private/conf/config
 ``` bash
@@ -9,7 +9,7 @@ vi /opt/HyperProxmox/code/scripts/main/private/conf/config
 user: hyperproxmox
 ```
 User created in the "Backend" page.   
-This user will run Hyperproxmox.
+This user will run HyperProxmox.
 
 ``` bash
 ; If not exist at startup, the key will be auto-generate.
@@ -17,7 +17,8 @@ key_pvt: private/keys/Ragnarok.pvt.key
 key_pub: private/keys/Ragnarok.pub.key
 ```
 Directory and private/public key generated to protect the critical data in MongoDB.  
-Private key is setup with an passphrase.
+Private key is set up with an Passphrase. You should save this keys in an other security place.  
+Indeed, you can backup your MongoDB server, but without this key, the data will be not readable.
 
 ``` bash
 admin_mail: tlams@localhost
@@ -38,7 +39,7 @@ redis_password:
 redis_ip: 127.0.0.1
 redis_port: 6379
 ```
-Databases setting for backed.  
+Databases settings for backend.  
 User / Password are not currently supported.  
 Don't expose your database on 0.0.0.0 or without firewall.
 
@@ -63,7 +64,7 @@ Currently not implemented (machine provision)
 walker: 300
 ```
 Delay minimum between to crawling on your Proxmox infrastructure.  
-A lock block a new crawl if the precedent is not terminated. If this situation append, the next crawl is
+A lock will block a new crawl if the precedent is not terminated. If this situation append, the next crawl is
 canceled and reported to the next windows.
 A delay too short can generate massive(and useless) data if your infrastructure is large ! 
 ```
@@ -80,7 +81,7 @@ uid = False
 ```
 Work but useless in this version.  
 HyperProxmox will set an unique ID in the comment area (machine configuration),
-with in the future the goal to have the possibility to follow an virtual machine in the infrastructure.
+with in the future the goal to have the possibility to follow an virtual machine everywhere in the infrastructure.
 The currents comments are not deleted, just reported after this ID.
   
 ``` bash
