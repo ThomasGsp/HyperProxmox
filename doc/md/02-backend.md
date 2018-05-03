@@ -65,4 +65,4 @@ chown hyperproxmox: /var/log/hyperproxmox/
 rm /opt/HyperProxmox/code/scripts/main/private/keys/Ragnarok.p*
 ```
 
-[Prerequisites](01-prerequisites.md) <-- Previous | Next --> [Setup - Backend](03-frontend.md)
+[Prerequisites](01-prerequisites.md) <-- Previous | Next --> [Setup - Frontend](03-frontend.md)
