@@ -14,7 +14,7 @@ vi /etc/nginx/sites-available/hyperproxmox.conf
 ``` bash
 server {
    listen *:443 ssl;
-   server_name youdomain.name;
+   server_name yourdomain.name;
    root /var/www/hyperproxmox;
    
    ssl on;
