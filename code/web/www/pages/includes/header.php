@@ -116,7 +116,7 @@ $html_groups = $html->List_Groups($lastdate);
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.php">Hyperproxmox - 1.0-Beta </a>
+            <a class="navbar-brand" href="index.php">HyperProxmox - 1.0-Beta </a>
 
             <form method="POST" class="navbar-brand" action="" style="margin-top: -7px">
                     <?php echo $html_dates; ?> &nbsp;&nbsp; <INPUT type="submit" class="btn btn-default pull-right" value="OK">
