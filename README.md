@@ -33,7 +33,6 @@ You shouldn't use in production mode or... use at your risks !
 ### Weakness on this version (in progress):
 - Logs system 
 - Purge system 
-- Crawler work without parallel tasks (can be a bit slow on large infrastructure) 
 
 ### This version don't provide (next features):
 - Advanced management
