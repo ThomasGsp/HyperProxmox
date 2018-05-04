@@ -48,6 +48,7 @@ class Analyse:
         """
         self.generalconf = generalconf
         self.logger = logger
+        self.idlist = []
 
         """ LOAD MONGODB """
         self.mongo = MongoDB(generalconf["mongodb"]["ip"])
@@ -57,10 +58,8 @@ class Analyse:
         self.clusters_conf = self.mongo.get_clusters_conf()["value"]
 
 
-    def threadcrawl(self):
-        return
 
-    def run(self, instancetype="all"):
+    def run(self,  instancetype="all"):
         """ Active logger"""
         self.logger.write({"thread":threading.get_ident(), "result": "INFO", "type": "HYPERPROXMOX", "value": "Start logger - Analyst Module"})
 
@@ -74,26 +73,49 @@ class Analyse:
         self.mongo.insert_datekey(insert_time, 'running')
 
         """ Init the ID list to detect the duplicates """
-        idlist = []
+        list_threads = []
         for cluster in self.clusters_conf:
-            self.logger.write({"thread":threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": "Start crawl on:"})
-            self.logger.write({"thread":threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": cluster})
+            thc = threading.Thread(name=cluster["name"], target=self.threadcrawl, args=(cluster, insert_time, instancetype))
+            list_threads.append(thc)
+            thc.start()
 
-            """ Decode data """
-            proxmox_clusters_user = pdecrypt(base64.b64decode(cluster["user"]),
-                            self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
+            # Waiting all threads
+        for thc in list_threads:
+            thc.join()
 
-            proxmox_clusters_pwd = pdecrypt(base64.b64decode(cluster["password"]),
-                                self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
+        self.mongo.update_datekey(int(insert_time), "OK")
 
-            """ AUTH """
-            proxmox = Proxmox("Analyse")
-            connection = proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), proxmox_clusters_user, proxmox_clusters_pwd)
+        """ Unlock file """
+        locker.unlock(self.generalconf["analyst"]["walker_lock"], "analyst")
 
-            """ ByPass and log if connection has failed """
-            if connection["result"] != "OK":
-                self.logger.write({"thread": threading.get_ident(), "result": "ERROR", "type": "HYPERPROXMOX", "value": connection})
-                continue
+        return
+
+
+
+    def threadcrawl(self, cluster, insert_time, instancetype="all"):
+        self.logger.write(
+            {"thread": threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": "Start crawl on:"})
+        self.logger.write(
+            {"thread": threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": cluster})
+
+        """ Decode data """
+        proxmox_clusters_user = pdecrypt(base64.b64decode(cluster["user"]),
+                                         self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
+
+        proxmox_clusters_pwd = pdecrypt(base64.b64decode(cluster["password"]),
+                                        self.generalconf["keys"]["key_pvt"])["value"].decode('utf-8')
+
+        """ AUTH """
+        proxmox = Proxmox("Analyse")
+        connection = proxmox.get_ticket("{0}:{1}".format(cluster["url"], int(cluster["port"])), proxmox_clusters_user,
+                                        proxmox_clusters_pwd)
+
+        """ ByPass and log if connection has failed """
+        if connection["result"] != "OK":
+            self.logger.write(
+                {"thread": threading.get_ident(), "result": "ERROR", "type": "HYPERPROXMOX", "value": connection})
+
+        else:
 
             """ 
             ##############
@@ -103,8 +125,10 @@ class Analyse:
 
             """ Get excluded nodes """
             exclude_nodes = cluster["exclude_nodes"]
-            self.logger.write({"thread":threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": "List nodes excludes:"})
-            self.logger.write({"thread":threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": exclude_nodes})
+            self.logger.write({"thread": threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX",
+                               "value": "List nodes excludes:"})
+            self.logger.write(
+                {"thread": threading.get_ident(), "result": "DEBUG", "type": "HYPERPROXMOX", "value": exclude_nodes})
 
             """ UPDATE CLUSTER STATUS """
             clusters_status = proxmox.get_clusters("{0}:{1}".format(cluster["url"], int(cluster["port"])))
@@ -136,15 +160,15 @@ class Analyse:
 
                         for type in types:
                             list_instances["data"] = list_instances["data"] + \
-                                                         proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                     proxmox.get_instances(
+                                                         "{0}:{1}".format(cluster["url"], int(cluster["port"])),
                                                          value_nodes_list["node"], type)["value"]["data"]
 
 
                     else:
                         list_instances = \
-                        proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                             value_nodes_list["node"], instancetype)["value"]
-
+                            proxmox.get_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                                  value_nodes_list["node"], instancetype)["value"]
 
                     totalcpu = 0
                     totalram = 0
@@ -168,8 +192,8 @@ class Analyse:
                                 instance["type"] = "qemu"
 
                             config_av = proxmox.get_configs("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                         value_nodes_list["node"], instance["type"], instance["vmid"])["value"]
-
+                                                            value_nodes_list["node"], instance["type"], instance["vmid"])[
+                                "value"]
 
                             maclist = []
                             currentdesc = ""
@@ -191,30 +215,35 @@ class Analyse:
                                 getidfromdesc = re.search("id=\"([A-Z\.\d\_]+)\"", currentdesc)
                                 # Set unique id if not found
                                 if getidfromdesc is None:
-                                    # ajouter un test de duplicateid
                                     """ General description """
                                     randtext = ''.join(random.choice('AZERTYUIOPQSDFGHJKLMWXCVBN') for i in range(8))
                                     uniqid = "-- Please, do not change or delete this ID -- \n" \
                                              "id=\"{0}_{1}\"\n------------------\n{2}".format(insert_time, randtext,
-                                                                      currentdesc)
+                                                                                              currentdesc)
                                     instance["description"] = uniqid
 
-                                    idlist.append(uniqid)
+                                    self.idlist.append(uniqid)
                                     """ INSTANCE DEFINITION """
                                     datadesc = {'description': uniqid}
-                                    resultsetdesc = proxmox.change_instances("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                             value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)
+                                    resultsetdesc = proxmox.change_instances(
+                                        "{0}:{1}".format(cluster["url"], int(cluster["port"])),
+                                        value_nodes_list["node"], instance["type"], instance["vmid"], datadesc)
                                     instance["uniqid"] = "{0}_{1}".format(insert_time, randtext)
 
                                 else:
                                     instance["uniqid"] = getidfromdesc.group(1)
-                                    if getidfromdesc.group(1) in idlist:
+                                    if getidfromdesc.group(1) in self.idlist:
                                         self.logger.write(
-                                            {"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
-                                        self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": json.dumps(instance)})
-                                        self.logger.write({"thread":threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX", "value": "-------------------"})
+                                            {"thread": threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX",
+                                             "value": "Double ID detected: {0}".format(getidfromdesc.group(1))})
+                                        self.logger.write(
+                                            {"thread": threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX",
+                                             "value": json.dumps(instance)})
+                                        self.logger.write(
+                                            {"thread": threading.get_ident(), "result": "WARNING", "type": "HYPERPROXMOX",
+                                             "value": "-------------------"})
                                     else:
-                                        idlist.append(getidfromdesc.group(1))
+                                        self.idlist.append(getidfromdesc.group(1))
 
                             self.mongo.insert_instances(instance)
 
@@ -269,9 +298,8 @@ class Analyse:
                         storage["date"] = int(insert_time)
                         storage["cluster"] = cluster["name"]
 
-
                         disks_list = proxmox.get_disks("{0}:{1}".format(cluster["url"], int(cluster["port"])),
-                                                         value_nodes_list["node"], storage["storage"])
+                                                       value_nodes_list["node"], storage["storage"])
 
                         totalsize = 0
                         for disk in disks_list["value"]["data"]:
@@ -288,12 +316,6 @@ class Analyse:
                         storage["totalallocdisk"] = totalsize
                         self.mongo.insert_storages(storage)
 
-        self.mongo.update_datekey(int(insert_time), "OK")
-
-        """ Unlock file """
-        locker.unlock(self.generalconf["analyst"]["walker_lock"], "alanyst")
-
-        return
 
     def set_attribution(self, count):
         """ RETURN cluster and node"""
