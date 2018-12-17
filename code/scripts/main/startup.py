@@ -29,8 +29,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     """ Read conf """
+    getpathscriptdir = os.path.dirname(sys.argv[0])
     localconf = configparser.ConfigParser()
-    localconf.read('private/conf/config')
+    localconf.read("{pathrun}/private/conf/config".format(pathrun=getpathscriptdir))
 
     generalconf = {
         "logger": {"logs_level": localconf['logger']['logs_level'],
@@ -74,7 +75,7 @@ if __name__ == "__main__":
             print("You MUST save your passphrase in a security place !")
             key_pvt = CritConf.read_private_key(localconf['system']['key_pvt'], passhash)
         else:
-            print(gen['Error'])
+            print(gen['value'])
             logger.write({"thread":threading.get_ident(), "result": "ERROR", "type": "HYPERPROXMOX", "value": "Your key is not create due to an error: {0}".format(gen['value'])})
             exit(1)
 
