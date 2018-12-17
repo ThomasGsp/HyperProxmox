@@ -31,7 +31,7 @@ if __name__ == "__main__":
     """ Read conf """
     getpathscriptdir = os.path.dirname(sys.argv[0])
     localconf = configparser.ConfigParser()
-    localconf.read("{pathrun}/private/conf/config".format(pathrun=getpathscriptdir))
+    localconf.read("private/conf/config")
 
     generalconf = {
         "logger": {"logs_level": localconf['logger']['logs_level'],
@@ -72,7 +72,7 @@ if __name__ == "__main__":
                   "\n - Public Key: {1}"
                   .format(localconf['system']['key_pvt'], localconf['system']['key_pub']))
             # print("Passphrase HASH: {0}".format(passhash))
-            print("You MUST save your passphrase in a security place !")
+            print("You MUST save your passphrase in a secure place !")
             key_pvt = CritConf.read_private_key(localconf['system']['key_pvt'], passhash)
         else:
             print(gen['value'])
