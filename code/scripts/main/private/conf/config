@@ -3,8 +3,8 @@
 user: hyperproxmox
 
 ; If not exist at startup, the key will be auto-generate.
-key_pvt: private/keys/Ragnarok.pvt.key
-key_pub: private/keys/Ragnarok.pub.key
+key_pvt:  /opt/HyperProxmox/code/scripts/main/private/keys/Ragnarok.pvt.key
+key_pub:  /opt/HyperProxmox/code/scripts/main/private/keys/Ragnarok.pub.key
 
 admin_mail: tlams@localhost
 
