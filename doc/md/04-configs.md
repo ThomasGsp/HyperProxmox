@@ -1,6 +1,6 @@
 # Configs
 
-Configurations are managed in a single point:
+Configurations are managed by a single point:
 
 vi /opt/HyperProxmox/code/scripts/main/private/conf/config
 ``` bash
@@ -39,7 +39,7 @@ redis_password:
 redis_ip: 127.0.0.1
 redis_port: 6379
 ```
-Databases settings for backend.  
+Databases settings (backend).  
 User / Password are not currently supported.  
 Don't expose your database on 0.0.0.0 or without firewall.
 
