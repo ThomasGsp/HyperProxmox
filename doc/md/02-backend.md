@@ -2,9 +2,9 @@
 
 
 ### Databases
-The backend need two database servers: MongoDB and Redis.  
+Backend need two database servers: MongoDB and Redis.  
 MongoDB is the main data storage and redis is used like a cache system.  
-HyperProxmox can run with default configuration, but you should setup redis to work in full memory, and the same
+HyperProxmox can run with defaults configuration, but you should setup redis to work in full memory as well
 for the MongoDB indexes.
  
 ``` bash
