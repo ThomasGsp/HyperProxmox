@@ -1,9 +1,9 @@
 # Frontend
 
 ###  Web server
-The frontend is writing in php/html/css/js.  
-You can use every web servers that support theses technologies.  
-For this installation, we'll setting up nginx with php-fpm.
+The frontend is in php/html/css/js.  
+You can use any web servers supporting theses technologies.  
+For this installation, we will setting up nginx with php-fpm.
 
 ``` bash
 apt-get install nginx php-fpm php-curl php-json
@@ -32,7 +32,7 @@ server {
 
 ```
 
-In this example, i used the pre-generates nginx key: "/etc/nginx/ssl/nginx.key"  
+In this example, I used the pre-generates nginx key: "/etc/nginx/ssl/nginx.key"  
 You should change this part and generate your keys.
 
 #### Php-fpm
